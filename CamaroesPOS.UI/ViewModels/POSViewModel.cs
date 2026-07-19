@@ -10,8 +10,8 @@ namespace CamaroesPOS.UI.ViewModels
         public ObservableCollection<Product> Products { get; set; }
         public ObservableCollection<CartItem> Cart { get; set; }
 
-        private decimal _totalAmount;
-        public decimal TotalAmount
+        private double _totalAmount;
+        public double TotalAmount
         {
             get => _totalAmount;
             set
@@ -32,9 +32,9 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void LoadDummyData()
         {
-            Products.Add(new Product { pcode = "P001", pdesc = "Laptop Gamer", price = 1500.00m });
-            Products.Add(new Product { pcode = "P002", pdesc = "Souris Sans Fil", price = 25.50m });
-            Products.Add(new Product { pcode = "P003", pdesc = "Clavier Mécanique", price = 75.00m });
+            Products.Add(new Product { ProductCode = "P001", Description = "Laptop Gamer", Price = 1500.00 });
+            Products.Add(new Product { ProductCode = "P002", Description = "Souris Sans Fil", Price = 25.50 });
+            Products.Add(new Product { ProductCode = "P003", Description = "Clavier Mécanique", Price = 75.00 });
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

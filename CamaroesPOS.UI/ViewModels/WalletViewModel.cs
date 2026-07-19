@@ -17,8 +17,8 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void LoadDummyData()
         {
-            Wallets.Add(new CustomerWallet { ClientName = "Jean Dupont", PhoneNumber = "0601020304", Balance = 150.00m, WalletHash = "HASH123" });
-            Wallets.Add(new CustomerWallet { ClientName = "Marie Curie", PhoneNumber = "0611223344", Balance = 50.00m, WalletHash = "HASH456" });
+            Wallets.Add(new CustomerWallet { Phone = "0601020304", Balance = 150.00 });
+            Wallets.Add(new CustomerWallet { Phone = "0611223344", Balance = 50.00 });
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

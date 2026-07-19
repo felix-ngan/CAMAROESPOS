@@ -24,8 +24,7 @@
         <materialDesign:Card Grid.Row="1" Padding="15" UniformCornerRadius="10">
             <DataGrid ItemsSource="{Binding Wallets}" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F5F5F5">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Nom du Client" Binding="{Binding ClientName}" Width="*" />
-                    <DataGridTextColumn Header="Téléphone" Binding="{Binding PhoneNumber}" Width="200" />
+                    <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="*" />
                     <DataGridTextColumn Header="Solde" Binding="{Binding Balance, StringFormat={}{0:C}}" Width="150" />
                     
                     <DataGridTemplateColumn Header="Recharger" Width="100">

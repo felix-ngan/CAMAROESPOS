@@ -24,10 +24,10 @@
         <materialDesign:Card Grid.Row="1" Padding="15" UniformCornerRadius="10">
             <DataGrid ItemsSource="{Binding InventoryList}" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F5F5F5">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Code Produit" Binding="{Binding pcode}" Width="150" />
-                    <DataGridTextColumn Header="Description" Binding="{Binding pdesc}" Width="*" />
-                    <DataGridTextColumn Header="Prix" Binding="{Binding price, StringFormat={}{0:C}}" Width="150" />
-                    <DataGridTextColumn Header="Quantité en Stock" Binding="{Binding qty}" Width="150" />
+                    <DataGridTextColumn Header="Code Produit" Binding="{Binding ProductCode}" Width="150" />
+                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
+                    <DataGridTextColumn Header="Prix" Binding="{Binding Price, StringFormat={}{0:C}}" Width="150" />
+                    <DataGridTextColumn Header="Quantité en Stock" Binding="{Binding Qty}" Width="150" />
                     
                     <DataGridTemplateColumn Header="Actions" Width="100">
                         <DataGridTemplateColumn.CellTemplate>

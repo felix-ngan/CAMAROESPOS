@@ -17,9 +17,9 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void LoadDummyData()
         {
-            InventoryList.Add(new Product { pcode = "P001", pdesc = "Laptop Gamer", price = 1500.00m, qty = 10 });
-            InventoryList.Add(new Product { pcode = "P002", pdesc = "Souris Sans Fil", price = 25.50m, qty = 45 });
-            InventoryList.Add(new Product { pcode = "P003", pdesc = "Clavier Mécanique", price = 75.00m, qty = 5 }); // Faible stock
+            InventoryList.Add(new Product { ProductCode = "P001", Description = "Laptop Gamer", Price = 1500.00, Qty = 10 });
+            InventoryList.Add(new Product { ProductCode = "P002", Description = "Souris Sans Fil", Price = 25.50, Qty = 45 });
+            InventoryList.Add(new Product { ProductCode = "P003", Description = "Clavier Mécanique", Price = 75.00, Qty = 5 }); // Faible stock
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
