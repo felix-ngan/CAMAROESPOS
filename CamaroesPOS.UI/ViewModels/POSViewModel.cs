@@ -82,10 +82,47 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void Checkout(object obj)
         {
-            // Logique d'encaissement et de sauvegarde en BDD (Phase 7)
+            if (Cart.Count == 0) return;
+
+            string transNo = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+            using (var context = new CamaroesPOS.Data.PosDbContext())
+            {
+                foreach (var item in Cart)
+                {
+                    // Enregistrer la vente dans la table SoldItems
+                    var soldItem = new SoldItem
+                    {
+                        TransNo = transNo,
+                        ProductCode = item.ProductCode,
+                        Description = item.ProductDescription,
+                        Price = item.Price,
+                        Qty = item.Qty,
+                        Total = item.Total,
+                        SoldDate = DateTime.Now,
+                        Cashier = "Admin"
+                    };
+                    context.SoldItems.Add(soldItem);
+
+                    // Déduire la quantité du stock
+                    var product = context.Products.FirstOrDefault(p => p.ProductCode == item.ProductCode);
+                    if (product != null)
+                    {
+                        product.Qty -= item.Qty;
+                        if (product.Qty < 0) product.Qty = 0; // Sécurité
+                    }
+                }
+
+                context.SaveChanges(); // Tout sauvegarder en une seule transaction
+            }
+
             Cart.Clear();
             UpdateTotalAmount();
-            // Optionnel : Afficher un message de succès
+            
+            // Rafraîchir la liste locale pour avoir les stocks à jour
+            LoadDataFromDatabase();
+
+            System.Windows.MessageBox.Show($"Encaissement réussi !\nN° Transaction : {transNo}", "Caisse", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
         }
 
         private void LoadDataFromDatabase()
