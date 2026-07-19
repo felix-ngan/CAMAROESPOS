@@ -9,6 +9,7 @@ namespace CamaroesPOS.UI
         private POSView _posView;
         private InventoryView _inventoryView;
         private WalletView _walletView;
+        private DashboardView _dashboardView;
 
         public MainWindow()
         {
@@ -16,6 +17,7 @@ namespace CamaroesPOS.UI
             _posView = new POSView();
             _inventoryView = new InventoryView();
             _walletView = new WalletView();
+            _dashboardView = new DashboardView();
 
             ShowDashboard();
         }
@@ -47,16 +49,12 @@ namespace CamaroesPOS.UI
         {
             TxtHeader.Text = "Tableau de Bord";
             
-            var dashboardPlaceholder = new TextBlock
+            if (_dashboardView.DataContext is CamaroesPOS.UI.ViewModels.DashboardViewModel vm)
             {
-                Text = "Résumé des ventes du jour à venir ici...",
-                FontSize = 20,
-                Foreground = System.Windows.Media.Brushes.Gray,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+                vm.LoadStats(); // Force la mise à jour à chaque affichage
+            }
             
-            MainContentControl.Content = dashboardPlaceholder;
+            MainContentControl.Content = _dashboardView;
         }
     }
 }
