@@ -14,5 +14,5 @@ Transformer l'ancienne application Windows Forms "CAMAROES POS" en une applicati
 - [x] **Phase 2** : Migration du modèle de données (Entités) et configuration de SQLite.
 - [x] **Phase 3** : Création de l'interface principale (Dashboard) avec Material Design.
 - [x] **Phase 4** : Refonte de la Caisse (Point of Sale) et logique du Panier.
-- [ ] **Phase 5** : Refonte de la gestion des stocks et du Portefeuille Client (Customer Wallet).
+- [x] **Phase 5** : Refonte de la gestion des stocks et du Portefeuille Client (Customer Wallet).
 - [ ] **Phase 6** : Mise en place du nouveau système de synchronisation et finitions.

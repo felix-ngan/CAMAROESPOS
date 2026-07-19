@@ -1,0 +1,42 @@
+<UserControl x:Class="CamaroesPOS.UI.Views.WalletView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:CamaroesPOS.UI.ViewModels"
+             Background="{DynamicResource MaterialDesignPaper}">
+    <UserControl.DataContext>
+        <viewmodels:WalletViewModel />
+    </UserControl.DataContext>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
+            <materialDesign:PackIcon Kind="Wallet" Width="30" Height="30" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+            <TextBlock Text="Portefeuilles Clients" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" />
+            
+            <Button Content="CRÉER UN PORTEFEUILLE" Margin="30,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" />
+        </StackPanel>
+
+        <materialDesign:Card Grid.Row="1" Padding="15" UniformCornerRadius="10">
+            <DataGrid ItemsSource="{Binding Wallets}" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F5F5F5">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Nom du Client" Binding="{Binding ClientName}" Width="*" />
+                    <DataGridTextColumn Header="Téléphone" Binding="{Binding PhoneNumber}" Width="200" />
+                    <DataGridTextColumn Header="Solde" Binding="{Binding Balance, StringFormat={}{0:C}}" Width="150" />
+                    
+                    <DataGridTemplateColumn Header="Recharger" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource MaterialDesignOutlinedButton}" Content="+ Créditer" Height="30" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </materialDesign:Card>
+    </Grid>
+</UserControl>
