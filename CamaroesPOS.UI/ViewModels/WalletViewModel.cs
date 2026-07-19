@@ -12,13 +12,20 @@ namespace CamaroesPOS.UI.ViewModels
         public WalletViewModel()
         {
             Wallets = new ObservableCollection<CustomerWallet>();
-            LoadDummyData();
+            LoadDataFromDatabase();
         }
 
-        private void LoadDummyData()
+        private void LoadDataFromDatabase()
         {
-            Wallets.Add(new CustomerWallet { Phone = "0601020304", Balance = 150.00 });
-            Wallets.Add(new CustomerWallet { Phone = "0611223344", Balance = 50.00 });
+            using (var context = new CamaroesPOS.Data.PosDbContext())
+            {
+                var wallets = context.CustomerWallets.ToList();
+                Wallets.Clear();
+                foreach (var w in wallets)
+                {
+                    Wallets.Add(w);
+                }
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

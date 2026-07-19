@@ -12,14 +12,20 @@ namespace CamaroesPOS.UI.ViewModels
         public InventoryViewModel()
         {
             InventoryList = new ObservableCollection<Product>();
-            LoadDummyData();
+            LoadDataFromDatabase();
         }
 
-        private void LoadDummyData()
+        private void LoadDataFromDatabase()
         {
-            InventoryList.Add(new Product { ProductCode = "P001", Description = "Laptop Gamer", Price = 1500.00, Qty = 10 });
-            InventoryList.Add(new Product { ProductCode = "P002", Description = "Souris Sans Fil", Price = 25.50, Qty = 45 });
-            InventoryList.Add(new Product { ProductCode = "P003", Description = "Clavier Mécanique", Price = 75.00, Qty = 5 }); // Faible stock
+            using (var context = new CamaroesPOS.Data.PosDbContext())
+            {
+                var products = context.Products.ToList();
+                InventoryList.Clear();
+                foreach (var p in products)
+                {
+                    InventoryList.Add(p);
+                }
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

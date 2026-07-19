@@ -39,8 +39,9 @@ namespace CamaroesPOS.Data
         {
             base.OnModelCreating(modelBuilder);
             
-            // Configuration de Fluent API si nécessaire
-            // Par exemple, définir des clés primaires spécifiques si elles ne respectent pas la convention Id
+            // Configuration de Fluent API pour les entités sans "Id" par défaut
+            modelBuilder.Entity<Product>().HasKey(p => p.ProductCode);
+            modelBuilder.Entity<CustomerWallet>().HasKey(w => w.Phone);
         }
     }
 }

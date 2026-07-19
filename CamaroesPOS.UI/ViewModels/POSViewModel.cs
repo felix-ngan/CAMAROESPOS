@@ -35,7 +35,7 @@ namespace CamaroesPOS.UI.ViewModels
             AddToCartCommand = new RelayCommand<Product>(AddToCart);
             CheckoutCommand = new RelayCommand<object>(Checkout, CanCheckout);
 
-            LoadDummyData();
+            LoadDataFromDatabase();
         }
 
         private void AddToCart(Product product)
@@ -88,13 +88,17 @@ namespace CamaroesPOS.UI.ViewModels
             // Optionnel : Afficher un message de succès
         }
 
-        private void LoadDummyData()
+        private void LoadDataFromDatabase()
         {
-            Products.Add(new Product { ProductCode = "P001", Description = "Laptop Gamer", Price = 1500000 });
-            Products.Add(new Product { ProductCode = "P002", Description = "Souris Sans Fil", Price = 15000 });
-            Products.Add(new Product { ProductCode = "P003", Description = "Clavier Mécanique", Price = 45000 });
-            Products.Add(new Product { ProductCode = "P004", Description = "Écran 27 pouces", Price = 120000 });
-            Products.Add(new Product { ProductCode = "P005", Description = "Casque Audio", Price = 35000 });
+            using (var context = new CamaroesPOS.Data.PosDbContext())
+            {
+                var products = context.Products.ToList();
+                Products.Clear();
+                foreach (var p in products)
+                {
+                    Products.Add(p);
+                }
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
