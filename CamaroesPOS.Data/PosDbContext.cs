@@ -42,6 +42,11 @@ namespace CamaroesPOS.Data
             // Configuration de Fluent API pour les entités sans "Id" par défaut
             modelBuilder.Entity<Product>().HasKey(p => p.ProductCode);
             modelBuilder.Entity<CustomerWallet>().HasKey(w => w.Phone);
+            modelBuilder.Entity<User>().HasKey(u => u.Username);
+            
+            // Entités sans clé primaire
+            modelBuilder.Entity<Store>().HasNoKey();
+            modelBuilder.Entity<StoreRevenue>().HasNoKey();
         }
     }
 }
