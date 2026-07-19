@@ -1,12 +1,82 @@
-﻿<Window x:Class="CamaroesPOS.UI.MainWindow"
+<Window x:Class="CamaroesPOS.UI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CamaroesPOS.UI"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Title="CAMAROES POS Moderne" Height="700" Width="1200" WindowStartupLocation="CenterScreen">
+    
+    <materialDesign:DialogHost Identifier="RootDialog" DialogTheme="Inherit">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-    </Grid>
+            <!-- Sidebar -->
+            <Border Grid.Column="0" Background="{DynamicResource PrimaryHueDarkBrush}" CornerRadius="0,20,20,0">
+                <StackPanel Margin="0,30,0,0">
+                    <TextBlock Text="CAMAROES" Foreground="White" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                    <TextBlock Text="Point of Sale" Foreground="White" Opacity="0.7" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,40"/>
+
+                    <Button Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ViewDashboard" Width="24" Height="24" VerticalAlignment="Center"/>
+                            <TextBlock Text="Tableau de bord" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Cart" Width="24" Height="24" VerticalAlignment="Center"/>
+                            <TextBlock Text="Caisse (POS)" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="PackageVariant" Width="24" Height="24" VerticalAlignment="Center"/>
+                            <TextBlock Text="Gestion des Stocks" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Wallet" Width="24" Height="24" VerticalAlignment="Center"/>
+                            <TextBlock Text="Portefeuilles Clients" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- Main Content Area -->
+            <Border Grid.Column="1" Background="{DynamicResource MaterialDesignPaper}" CornerRadius="20" Margin="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Text="Bienvenue sur CAMAROES POS" FontSize="28" FontWeight="Light" Margin="20" />
+                    
+                    <materialDesign:Card Grid.Row="1" Margin="20" Padding="30" UniformCornerRadius="15">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <materialDesign:PackIcon Kind="RocketLaunch" Width="100" Height="100" Foreground="{DynamicResource PrimaryHueMidBrush}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Votre nouvelle application est prête !" FontSize="20" FontWeight="Bold" Margin="0,20,0,10" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Sélectionnez une option dans le menu de gauche pour commencer." Foreground="Gray" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </materialDesign:Card>
+                </Grid>
+            </Border>
+        </Grid>
+    </materialDesign:DialogHost>
 </Window>
