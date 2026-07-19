@@ -26,7 +26,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Code Produit" Binding="{Binding ProductCode}" Width="150" />
                     <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
-                    <DataGridTextColumn Header="Prix" Binding="{Binding Price, StringFormat={}{0:C}}" Width="150" />
+                    <DataGridTextColumn Header="Prix" Binding="{Binding Price, StringFormat={}{0:N0} FCFA}" Width="150" />
                     <DataGridTextColumn Header="Quantité en Stock" Binding="{Binding Qty}" Width="150" />
                     
                     <DataGridTemplateColumn Header="Actions" Width="100">

@@ -25,7 +25,7 @@
             <DataGrid ItemsSource="{Binding Wallets}" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F5F5F5">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="*" />
-                    <DataGridTextColumn Header="Solde" Binding="{Binding Balance, StringFormat={}{0:C}}" Width="150" />
+                    <DataGridTextColumn Header="Solde" Binding="{Binding Balance, StringFormat={}{0:N0} FCFA}" Width="150" />
                     
                     <DataGridTemplateColumn Header="Recharger" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
