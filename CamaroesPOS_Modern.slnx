@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="CamaroesPOS.Data/CamaroesPOS.Data.csproj" />
+  <Project Path="CamaroesPOS.Domain/CamaroesPOS.Domain.csproj" />
+  <Project Path="CamaroesPOS.UI/CamaroesPOS.UI.csproj" />
+</Solution>
