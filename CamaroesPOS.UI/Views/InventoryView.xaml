@@ -59,26 +59,28 @@
 
             <!-- Right Edit Panel -->
             <materialDesign:Card Grid.Column="1" Padding="20" UniformCornerRadius="10" Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}" Background="{DynamicResource MaterialDesignPaper}">
-                <StackPanel>
-                    <TextBlock Text="Fiche Produit" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueMidBrush}" />
-                    
-                    <TextBox materialDesign:HintAssist.Hint="Code Produit" Text="{Binding SelectedProduct.ProductCode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                    <TextBox materialDesign:HintAssist.Hint="Description" Text="{Binding SelectedProduct.Description}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                    <TextBox materialDesign:HintAssist.Hint="Prix (FCFA)" Text="{Binding SelectedProduct.Price}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                    <TextBox materialDesign:HintAssist.Hint="Quantité" Text="{Binding SelectedProduct.Qty}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                    <TextBox materialDesign:HintAssist.Hint="Code Barre" Text="{Binding SelectedProduct.Barcode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                    <TextBox materialDesign:HintAssist.Hint="Marque" Text="{Binding SelectedProduct.BrandName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                    <TextBox materialDesign:HintAssist.Hint="Catégorie" Text="{Binding SelectedProduct.CategoryName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" />
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Fiche Produit" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                        
+                        <TextBox materialDesign:HintAssist.Hint="Code Produit" Text="{Binding SelectedProduct.ProductCode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="Description" Text="{Binding SelectedProduct.Description}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="Prix (FCFA)" Text="{Binding SelectedProduct.Price}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="Quantité" Text="{Binding SelectedProduct.Qty}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="Code Barre" Text="{Binding SelectedProduct.Barcode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="Marque" Text="{Binding SelectedProduct.BrandName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="Catégorie" Text="{Binding SelectedProduct.CategoryName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" />
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
-                        <Button Grid.Column="1" Content="ENREGISTRER" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" />
-                    </Grid>
-                </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
+                            <Button Grid.Column="1" Content="ENREGISTRER" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" />
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
             </materialDesign:Card>
         </Grid>
     </Grid>

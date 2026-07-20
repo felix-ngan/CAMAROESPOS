@@ -49,22 +49,24 @@
 
             <!-- Right Panel: Form -->
             <materialDesign:Card Grid.Column="1" Padding="20" UniformCornerRadius="10" Visibility="{Binding IsRecharging, Converter={StaticResource BoolToVis}}" Background="{DynamicResource MaterialDesignPaper}">
-                <StackPanel>
-                    <TextBlock Text="Opération Portefeuille" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueMidBrush}" />
-                    
-                    <TextBox materialDesign:HintAssist.Hint="Numéro de Téléphone" Text="{Binding SelectedWallet.Phone}" IsEnabled="{Binding IsNewWallet}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
-                    
-                    <TextBox materialDesign:HintAssist.Hint="Montant (FCFA)" Text="{Binding RechargeAmount}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Opération Portefeuille" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                        
+                        <TextBox materialDesign:HintAssist.Hint="Numéro de Téléphone" Text="{Binding SelectedWallet.Phone}" IsEnabled="{Binding IsNewWallet}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
+                        
+                        <TextBox materialDesign:HintAssist.Hint="Montant (FCFA)" Text="{Binding RechargeAmount}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
-                        <Button Grid.Column="1" Content="VALIDER" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
-                    </Grid>
-                </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
+                            <Button Grid.Column="1" Content="VALIDER" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
             </materialDesign:Card>
         </Grid>
     </Grid>

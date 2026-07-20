@@ -29,20 +29,25 @@
                 <ListBox Grid.Row="1" ItemsSource="{Binding Products}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="Transparent" BorderThickness="0">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <materialDesign:Card Margin="5" Padding="10" Width="180">
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Description}" FontWeight="Bold" FontSize="16" TextWrapping="Wrap" />
-                                    <TextBlock Text="{Binding Price, StringFormat={}{0:N0} FCFA}" Foreground="#43A047" Margin="0,5,0,0" FontWeight="Bold" />
-                                    <Button Content="Ajouter" Margin="0,10,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" 
+                            <materialDesign:Card Margin="2,5" Padding="10" HorizontalAlignment="Stretch">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding Description}" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Price, StringFormat={}{0:N0} FCFA}" Foreground="#43A047" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,15,0" />
+                                    <Button Grid.Column="2" Content="+" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Width="30" Height="30"
                                             Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                             CommandParameter="{Binding}" />
-                                </StackPanel>
+                                </Grid>
                             </materialDesign:Card>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel />
+                            <StackPanel Orientation="Vertical" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                 </ListBox>
