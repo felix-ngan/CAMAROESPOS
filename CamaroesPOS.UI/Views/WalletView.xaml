@@ -7,6 +7,9 @@
     <UserControl.DataContext>
         <viewmodels:WalletViewModel />
     </UserControl.DataContext>
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -18,24 +21,51 @@
             <materialDesign:PackIcon Kind="Wallet" Width="30" Height="30" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
             <TextBlock Text="Portefeuilles Clients" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" />
             
-            <Button Content="CRÉER UN PORTEFEUILLE" Margin="30,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" />
+            <Button Content="CRÉER UN PORTEFEUILLE" Command="{Binding CreateWalletCommand}" Margin="30,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" />
         </StackPanel>
 
-        <materialDesign:Card Grid.Row="1" Padding="15" UniformCornerRadius="10">
-            <DataGrid ItemsSource="{Binding Wallets}" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F5F5F5">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="*" />
-                    <DataGridTextColumn Header="Solde" Binding="{Binding Balance, StringFormat={}{0:N0} FCFA}" Width="150" />
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="350" />
+            </Grid.ColumnDefinitions>
+
+            <materialDesign:Card Grid.Column="0" Padding="15" UniformCornerRadius="10" Margin="0,0,20,0">
+                <DataGrid ItemsSource="{Binding Wallets}" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F5F5F5" Background="Transparent" BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="*" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Solde Actuel" Binding="{Binding Balance, StringFormat={}{0:N0} FCFA}" Width="150" IsReadOnly="True" />
+                        
+                        <DataGridTemplateColumn Header="Recharger" Width="100">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding DataContext.RechargeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Content="+ Créditer" Height="30" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </materialDesign:Card>
+
+            <!-- Right Panel: Form -->
+            <materialDesign:Card Grid.Column="1" Padding="20" UniformCornerRadius="10" Visibility="{Binding IsRecharging, Converter={StaticResource BoolToVis}}" Background="{DynamicResource MaterialDesignPaper}">
+                <StackPanel>
+                    <TextBlock Text="Opération Portefeuille" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueMidBrush}" />
                     
-                    <DataGridTemplateColumn Header="Recharger" Width="100">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Style="{StaticResource MaterialDesignOutlinedButton}" Content="+ Créditer" Height="30" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </materialDesign:Card>
+                    <TextBox materialDesign:HintAssist.Hint="Numéro de Téléphone" Text="{Binding SelectedWallet.Phone}" IsEnabled="{Binding IsNewWallet}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
+                    
+                    <TextBox materialDesign:HintAssist.Hint="Montant (FCFA)" Text="{Binding RechargeAmount}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
+                        <Button Grid.Column="1" Content="VALIDER" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
+                    </Grid>
+                </StackPanel>
+            </materialDesign:Card>
+        </Grid>
     </Grid>
 </UserControl>

@@ -7,6 +7,9 @@
     <UserControl.DataContext>
         <viewmodels:POSViewModel />
     </UserControl.DataContext>
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
     
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
@@ -15,7 +18,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Catalogue Produits -->
-        <Border Grid.Column="0" Margin="0,0,10,0" CornerRadius="10" Background="White" Padding="15">
+        <Border Grid.Column="0" Margin="0,0,10,0" CornerRadius="10" Background="{DynamicResource MaterialDesignPaper}" Padding="15">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -23,13 +26,13 @@
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Text="Catalogue Produits" FontSize="20" FontWeight="Bold" Margin="0,0,0,15" />
                 
-                <ListBox Grid.Row="1" ItemsSource="{Binding Products}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox Grid.Row="1" ItemsSource="{Binding Products}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="Transparent" BorderThickness="0">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <materialDesign:Card Margin="5" Padding="10" Width="180">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Description}" FontWeight="Bold" FontSize="16" TextWrapping="Wrap" />
-                                    <TextBlock Text="{Binding Price, StringFormat={}{0:N0} FCFA}" Foreground="Green" Margin="0,5,0,0" />
+                                    <TextBlock Text="{Binding Price, StringFormat={}{0:N0} FCFA}" Foreground="#43A047" Margin="0,5,0,0" FontWeight="Bold" />
                                     <Button Content="Ajouter" Margin="0,10,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" 
                                             Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                             CommandParameter="{Binding}" />
@@ -57,17 +60,30 @@
                 
                 <TextBlock Grid.Row="0" Text="Panier Actuel" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,0,0,15" />
                 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding Cart}" AutoGenerateColumns="False" Background="White" Opacity="0.9" CanUserAddRows="False">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Cart}" AutoGenerateColumns="False" Background="White" Opacity="0.9" CanUserAddRows="False" Margin="0,0,0,15">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Article" Binding="{Binding ProductDescription}" Width="*" />
-                        <DataGridTextColumn Header="Qté" Binding="{Binding Qty}" />
-                        <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N0} FCFA}" />
+                        <DataGridTextColumn Header="Article" Binding="{Binding ProductDescription}" Width="*" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Qté" Binding="{Binding Qty}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N0} FCFA}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
                 
-                <StackPanel Grid.Row="2" Margin="0,15,0,0">
+                <StackPanel Grid.Row="2">
+                    <TextBlock Text="Mode de paiement :" Foreground="White" FontSize="14" Margin="0,0,0,5"/>
+                    <ComboBox SelectedIndex="{Binding PaymentMethodIndex}" Background="White" Foreground="Black" Margin="0,0,0,10" Padding="5">
+                        <ComboBoxItem Content="Espèces" />
+                        <ComboBoxItem Content="Portefeuille (Wallet)" />
+                    </ComboBox>
+
+                    <!-- Visible only if PaymentMethodIndex == 1 (Wallet) -->
+                    <TextBox materialDesign:HintAssist.Hint="Téléphone Client" 
+                             Text="{Binding CustomerPhone}" Background="White" Foreground="Black" 
+                             Visibility="{Binding IsWalletPayment, Converter={StaticResource BoolToVis}}" 
+                             Margin="0,0,0,15" Padding="5" />
+
                     <TextBlock Text="Total à Payer :" Foreground="White" FontSize="16" />
                     <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} FCFA}" Foreground="White" FontSize="28" FontWeight="Bold" HorizontalAlignment="Right" />
+                    
                     <Button Content="ENCAISSER" Margin="0,15,0,0" Height="50" FontSize="18" Style="{StaticResource MaterialDesignRaisedDarkButton}"
                             Command="{Binding CheckoutCommand}" />
                 </StackPanel>
