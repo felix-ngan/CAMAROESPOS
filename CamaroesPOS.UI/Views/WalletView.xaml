@@ -31,7 +31,7 @@
             </Grid.ColumnDefinitions>
 
             <materialDesign:Card Grid.Column="0" Padding="15" UniformCornerRadius="10" Margin="0,0,20,0">
-                <DataGrid ItemsSource="{Binding Wallets}" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F5F5F5" Background="Transparent" BorderThickness="0">
+                <DataGrid ItemsSource="{Binding Wallets}" AutoGenerateColumns="False" CanUserAddRows="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="*" IsReadOnly="True" />
                         <DataGridTextColumn Header="Solde Actuel" Binding="{Binding Balance, StringFormat={}{0:N0} FCFA}" Width="150" IsReadOnly="True" />

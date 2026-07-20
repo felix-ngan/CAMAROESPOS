@@ -65,7 +65,7 @@
                 
                 <TextBlock Grid.Row="0" Text="Panier Actuel" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,0,0,15" />
                 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding Cart}" AutoGenerateColumns="False" Background="White" Opacity="0.9" CanUserAddRows="False" Margin="0,0,0,15">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Cart}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,15">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Article" Binding="{Binding ProductDescription}" Width="*" IsReadOnly="True" />
                         <DataGridTextColumn Header="Qté" Binding="{Binding Qty}" IsReadOnly="True" />
@@ -75,14 +75,14 @@
                 
                 <StackPanel Grid.Row="2">
                     <TextBlock Text="Mode de paiement :" Foreground="White" FontSize="14" Margin="0,0,0,5"/>
-                    <ComboBox SelectedIndex="{Binding PaymentMethodIndex}" Background="White" Foreground="Black" Margin="0,0,0,10" Padding="5">
+                    <ComboBox SelectedIndex="{Binding PaymentMethodIndex}" Margin="0,0,0,10" Padding="5">
                         <ComboBoxItem Content="Espèces" />
                         <ComboBoxItem Content="Portefeuille (Wallet)" />
                     </ComboBox>
 
                     <!-- Visible only if PaymentMethodIndex == 1 (Wallet) -->
                     <TextBox materialDesign:HintAssist.Hint="Téléphone Client" 
-                             Text="{Binding CustomerPhone}" Background="White" Foreground="Black" 
+                             Text="{Binding CustomerPhone}" 
                              Visibility="{Binding IsWalletPayment, Converter={StaticResource BoolToVis}}" 
                              Margin="0,0,0,15" Padding="5" />
 

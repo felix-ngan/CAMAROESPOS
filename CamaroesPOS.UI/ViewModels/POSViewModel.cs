@@ -73,7 +73,8 @@ namespace CamaroesPOS.UI.ViewModels
                 existingItem.Total = existingItem.Qty * existingItem.Price;
                 
                 int index = Cart.IndexOf(existingItem);
-                Cart[index] = existingItem;
+                Cart.RemoveAt(index);
+                Cart.Insert(index, existingItem);
             }
             else
             {
