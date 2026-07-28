@@ -25,6 +25,8 @@ namespace CamaroesPOS.UI.ViewModels
         public ICommand QuickCashCommand { get; }
         public ICommand ClearCartCommand { get; }
         public ICommand RemoveFromCartCommand { get; }
+        public ICommand OpenCatalogCommand { get; }
+        public ICommand CloseCatalogCommand { get; }
 
         private double _totalAmount;
         public double TotalAmount
@@ -64,7 +66,36 @@ namespace CamaroesPOS.UI.ViewModels
         public bool IsCheckoutDialogOpen
         {
             get => _isCheckoutDialogOpen;
-            set { _isCheckoutDialogOpen = value; OnPropertyChanged(); }
+            set 
+            { 
+                _isCheckoutDialogOpen = value; 
+                OnPropertyChanged(); 
+                UpdateAnyDialogOpen();
+            }
+        }
+
+        private bool _isCatalogDialogOpen;
+        public bool IsCatalogDialogOpen
+        {
+            get => _isCatalogDialogOpen;
+            set
+            {
+                _isCatalogDialogOpen = value;
+                OnPropertyChanged();
+                UpdateAnyDialogOpen();
+            }
+        }
+
+        private bool _isAnyDialogOpen;
+        public bool IsAnyDialogOpen
+        {
+            get => _isAnyDialogOpen;
+            set { _isAnyDialogOpen = value; OnPropertyChanged(); }
+        }
+
+        private void UpdateAnyDialogOpen()
+        {
+            IsAnyDialogOpen = IsCheckoutDialogOpen || IsCatalogDialogOpen;
         }
 
         private string _receivedAmountString = "";
@@ -109,6 +140,8 @@ namespace CamaroesPOS.UI.ViewModels
             QuickCashCommand = new RelayCommand<string>(QuickCash);
             ClearCartCommand = new RelayCommand<object>(ClearCart, CanClearCart);
             RemoveFromCartCommand = new RelayCommand<CartItem>(RemoveFromCart);
+            OpenCatalogCommand = new RelayCommand<object>(o => IsCatalogDialogOpen = true);
+            CloseCatalogCommand = new RelayCommand<object>(o => IsCatalogDialogOpen = false);
 
             LoadDataFromDatabase();
         }
