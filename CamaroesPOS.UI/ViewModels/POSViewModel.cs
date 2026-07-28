@@ -17,6 +17,10 @@ namespace CamaroesPOS.UI.ViewModels
 
         public ICommand AddToCartCommand { get; }
         public ICommand CheckoutCommand { get; }
+        public ICommand NumpadCommand { get; }
+        public ICommand ClearNumpadCommand { get; }
+        public ICommand CancelCheckoutCommand { get; }
+        public ICommand ConfirmCashPaymentCommand { get; }
 
         private double _totalAmount;
         public double TotalAmount
@@ -51,6 +55,40 @@ namespace CamaroesPOS.UI.ViewModels
             set { _customerPhone = value; OnPropertyChanged(); }
         }
 
+        // Tactile Calculator variables
+        private bool _isCheckoutDialogOpen;
+        public bool IsCheckoutDialogOpen
+        {
+            get => _isCheckoutDialogOpen;
+            set { _isCheckoutDialogOpen = value; OnPropertyChanged(); }
+        }
+
+        private string _receivedAmountString = "";
+        public string ReceivedAmountString
+        {
+            get => _receivedAmountString;
+            set 
+            { 
+                _receivedAmountString = value; 
+                OnPropertyChanged(); 
+                UpdateChangeAmount();
+            }
+        }
+
+        private double _receivedAmount;
+        public double ReceivedAmount
+        {
+            get => _receivedAmount;
+            set { _receivedAmount = value; OnPropertyChanged(); }
+        }
+
+        private double _changeAmount;
+        public double ChangeAmount
+        {
+            get => _changeAmount;
+            set { _changeAmount = value; OnPropertyChanged(); }
+        }
+
         public POSViewModel()
         {
             Products = new ObservableCollection<Product>();
@@ -58,6 +96,11 @@ namespace CamaroesPOS.UI.ViewModels
             
             AddToCartCommand = new RelayCommand<Product>(AddToCart);
             CheckoutCommand = new RelayCommand<object>(Checkout, CanCheckout);
+
+            NumpadCommand = new RelayCommand<string>(NumpadPress);
+            ClearNumpadCommand = new RelayCommand<object>(ClearNumpad);
+            CancelCheckoutCommand = new RelayCommand<object>(CancelCheckout);
+            ConfirmCashPaymentCommand = new RelayCommand<object>(ConfirmCashPayment, CanConfirmCashPayment);
 
             LoadDataFromDatabase();
         }
@@ -96,6 +139,7 @@ namespace CamaroesPOS.UI.ViewModels
         private void UpdateTotalAmount()
         {
             TotalAmount = Cart.Sum(c => c.Total);
+            UpdateChangeAmount(); // To update the popup if it's open (though you can't add to cart while it's open)
         }
 
         private bool CanCheckout(object obj)
@@ -107,10 +151,9 @@ namespace CamaroesPOS.UI.ViewModels
         {
             if (Cart.Count == 0) return;
 
-            using (var context = new PosDbContext())
+            if (IsWalletPayment)
             {
-                // Vérification du portefeuille si c'est le mode de paiement
-                if (IsWalletPayment)
+                using (var context = new PosDbContext())
                 {
                     if (string.IsNullOrWhiteSpace(CustomerPhone))
                     {
@@ -131,10 +174,8 @@ namespace CamaroesPOS.UI.ViewModels
                         return;
                     }
 
-                    // Déduire le solde
                     wallet.Balance -= TotalAmount;
                     
-                    // Ajouter la transaction Wallet
                     context.WalletTransactions.Add(new WalletTransaction
                     {
                         Phone = wallet.Phone,
@@ -143,8 +184,29 @@ namespace CamaroesPOS.UI.ViewModels
                         Amount = TotalAmount,
                         CreatedAt = DateTime.Now
                     });
+                    context.SaveChanges();
                 }
 
+                SaveTransaction("Portefeuille");
+                MessageBox.Show("Encaissement réussi par Portefeuille !", "Caisse", MessageBoxButton.OK, MessageBoxImage.Information);
+                
+                Cart.Clear();
+                UpdateTotalAmount();
+                CustomerPhone = string.Empty;
+                LoadDataFromDatabase();
+            }
+            else
+            {
+                // Cash Payment: Open Numpad Popup
+                ReceivedAmountString = "";
+                IsCheckoutDialogOpen = true;
+            }
+        }
+
+        private void SaveTransaction(string paymentMode)
+        {
+            using (var context = new PosDbContext())
+            {
                 string transNo = DateTime.Now.ToString("yyyyMMddHHmmss");
 
                 foreach (var item in Cart)
@@ -171,15 +233,55 @@ namespace CamaroesPOS.UI.ViewModels
                 }
 
                 context.SaveChanges(); 
-                
-                string mode = IsWalletPayment ? "Portefeuille" : "Espèces";
-                MessageBox.Show($"Encaissement réussi par {mode} !\nN° Transaction : {transNo}", "Caisse", MessageBoxButton.OK, MessageBoxImage.Information);
             }
+        }
 
+        private void NumpadPress(string digit)
+        {
+            if (ReceivedAmountString == "0") ReceivedAmountString = digit;
+            else ReceivedAmountString += digit;
+        }
+
+        private void ClearNumpad(object obj)
+        {
+            ReceivedAmountString = "";
+        }
+
+        private void UpdateChangeAmount()
+        {
+            if (double.TryParse(ReceivedAmountString, out double parsed))
+            {
+                ReceivedAmount = parsed;
+                ChangeAmount = ReceivedAmount - TotalAmount;
+            }
+            else
+            {
+                ReceivedAmount = 0;
+                ChangeAmount = -TotalAmount;
+            }
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        private void CancelCheckout(object obj)
+        {
+            IsCheckoutDialogOpen = false;
+        }
+
+        private bool CanConfirmCashPayment(object obj)
+        {
+            return ReceivedAmount >= TotalAmount && TotalAmount > 0;
+        }
+
+        private void ConfirmCashPayment(object obj)
+        {
+            SaveTransaction("Espèces");
+            
+            MessageBox.Show($"Encaissement réussi !\nRendu Monnaie : {ChangeAmount:N0} FCFA", "Caisse", MessageBoxButton.OK, MessageBoxImage.Information);
+            
+            IsCheckoutDialogOpen = false;
             Cart.Clear();
             UpdateTotalAmount();
-            CustomerPhone = string.Empty;
-            
+            ReceivedAmountString = "";
             LoadDataFromDatabase();
         }
 

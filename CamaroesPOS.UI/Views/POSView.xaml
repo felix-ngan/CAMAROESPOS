@@ -11,88 +11,129 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
     
-    <Grid Margin="10">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" />
-            <ColumnDefinition Width="1*" />
-        </Grid.ColumnDefinitions>
-
-        <!-- Catalogue Produits -->
-        <Border Grid.Column="0" Margin="0,0,10,0" CornerRadius="10" Background="{DynamicResource MaterialDesignPaper}" Padding="15">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="Catalogue Produits" FontSize="20" FontWeight="Bold" Margin="0,0,0,15" />
+    <materialDesign:DialogHost IsOpen="{Binding IsCheckoutDialogOpen}" CloseOnClickAway="False">
+        <materialDesign:DialogHost.DialogContent>
+            <!-- CALCULATOR NUMPAD -->
+            <StackPanel Margin="20" Width="300">
+                <TextBlock Text="Rendu Monnaie" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                <TextBlock Text="{Binding TotalAmount, StringFormat=Total à payer: {0:N0} FCFA}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" />
                 
-                <ListBox Grid.Row="1" ItemsSource="{Binding Products}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="Transparent" BorderThickness="0">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <materialDesign:Card Margin="2,5" Padding="10" HorizontalAlignment="Stretch">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="100" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="{Binding Description}" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" TextWrapping="Wrap" />
-                                    <TextBlock Grid.Column="1" Text="{Binding Price, StringFormat={}{0:N0} FCFA}" Foreground="#43A047" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,15,0" />
-                                    <Button Grid.Column="2" Content="+" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Width="30" Height="30"
-                                            Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                            CommandParameter="{Binding}" />
-                                </Grid>
-                            </materialDesign:Card>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Vertical" />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                </ListBox>
-            </Grid>
-        </Border>
-
-        <!-- Panier (Cart) -->
-        <Border Grid.Column="1" CornerRadius="10" Background="{DynamicResource PrimaryHueLightBrush}" Padding="15">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+                <TextBox Text="{Binding ReceivedAmountString, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Montant reçu (Espèces)" FontSize="24" TextAlignment="Center" Margin="0,0,0,10" IsReadOnly="True" />
                 
-                <TextBlock Grid.Row="0" Text="Panier Actuel" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,0,0,15" />
+                <TextBlock Text="{Binding ChangeAmount, StringFormat=Rendu: {0:N0} FCFA}" FontSize="24" FontWeight="Bold" Foreground="#E53935" HorizontalAlignment="Center" Margin="0,0,0,20" />
                 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding Cart}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,15">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Article" Binding="{Binding ProductDescription}" Width="*" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Qté" Binding="{Binding Qty}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N0} FCFA}" IsReadOnly="True" />
-                    </DataGrid.Columns>
-                </DataGrid>
-                
-                <StackPanel Grid.Row="2">
-                    <TextBlock Text="Mode de paiement :" Foreground="White" FontSize="14" Margin="0,0,0,5"/>
-                    <ComboBox SelectedIndex="{Binding PaymentMethodIndex}" Margin="0,0,0,10" Padding="5">
-                        <ComboBoxItem Content="Espèces" />
-                        <ComboBoxItem Content="Portefeuille (Wallet)" />
-                    </ComboBox>
-
-                    <!-- Visible only if PaymentMethodIndex == 1 (Wallet) -->
-                    <TextBox materialDesign:HintAssist.Hint="Téléphone Client" 
-                             Text="{Binding CustomerPhone}" 
-                             Visibility="{Binding IsWalletPayment, Converter={StaticResource BoolToVis}}" 
-                             Margin="0,0,0,15" Padding="5" />
-
-                    <TextBlock Text="Total à Payer :" Foreground="White" FontSize="16" />
-                    <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} FCFA}" Foreground="White" FontSize="28" FontWeight="Bold" HorizontalAlignment="Right" />
+                <UniformGrid Columns="3" Rows="4" Margin="0,0,0,20">
+                    <Button Content="7" Command="{Binding NumpadCommand}" CommandParameter="7" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" />
+                    <Button Content="8" Command="{Binding NumpadCommand}" CommandParameter="8" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                    <Button Content="9" Command="{Binding NumpadCommand}" CommandParameter="9" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
                     
-                    <Button Content="ENCAISSER" Margin="0,15,0,0" Height="50" FontSize="18" Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                            Command="{Binding CheckoutCommand}" />
-                </StackPanel>
-            </Grid>
-        </Border>
-    </Grid>
+                    <Button Content="4" Command="{Binding NumpadCommand}" CommandParameter="4" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" />
+                    <Button Content="5" Command="{Binding NumpadCommand}" CommandParameter="5" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                    <Button Content="6" Command="{Binding NumpadCommand}" CommandParameter="6" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                    
+                    <Button Content="1" Command="{Binding NumpadCommand}" CommandParameter="1" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" />
+                    <Button Content="2" Command="{Binding NumpadCommand}" CommandParameter="2" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                    <Button Content="3" Command="{Binding NumpadCommand}" CommandParameter="3" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                    
+                    <Button Content="C" Command="{Binding ClearNumpadCommand}" Margin="5" FontSize="20" Foreground="Red" BorderBrush="Red" Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" />
+                    <Button Content="0" Command="{Binding NumpadCommand}" CommandParameter="0" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                    <Button Content="00" Command="{Binding NumpadCommand}" CommandParameter="00" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                </UniformGrid>
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCheckoutCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
+                    <Button Grid.Column="1" Content="ENCAISSER" Command="{Binding ConfirmCashPaymentCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
+                </Grid>
+            </StackPanel>
+        </materialDesign:DialogHost.DialogContent>
+
+        <Grid Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Catalogue Produits -->
+            <Border Grid.Column="0" Margin="0,0,10,0" CornerRadius="10" Background="{DynamicResource MaterialDesignPaper}" Padding="15">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Catalogue Produits" FontSize="20" FontWeight="Bold" Margin="0,0,0,15" />
+                    
+                    <ListBox Grid.Row="1" ItemsSource="{Binding Products}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="Transparent" BorderThickness="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <materialDesign:Card Margin="2,5" Padding="10" HorizontalAlignment="Stretch">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="100" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Description}" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Price, StringFormat={}{0:N0} FCFA}" Foreground="#43A047" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,15,0" />
+                                        <Button Grid.Column="2" Content="+" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Width="30" Height="30"
+                                                Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                CommandParameter="{Binding}" />
+                                    </Grid>
+                                </materialDesign:Card>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- Panier (Cart) -->
+            <Border Grid.Column="1" CornerRadius="10" Background="{DynamicResource PrimaryHueLightBrush}" Padding="15">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Text="Panier Actuel" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,0,0,15" />
+                    
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Cart}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,15">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Article" Binding="{Binding ProductDescription}" Width="*" IsReadOnly="True" />
+                            <DataGridTextColumn Header="Qté" Binding="{Binding Qty}" IsReadOnly="True" />
+                            <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N0} FCFA}" IsReadOnly="True" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    
+                    <StackPanel Grid.Row="2">
+                        <TextBlock Text="Mode de paiement :" Foreground="White" FontSize="14" Margin="0,0,0,5"/>
+                        <ComboBox SelectedIndex="{Binding PaymentMethodIndex}" Margin="0,0,0,10" Padding="5">
+                            <ComboBoxItem Content="Espèces" />
+                            <ComboBoxItem Content="Portefeuille (Wallet)" />
+                        </ComboBox>
+
+                        <!-- Visible only if PaymentMethodIndex == 1 (Wallet) -->
+                        <TextBox materialDesign:HintAssist.Hint="Téléphone Client" 
+                                 Text="{Binding CustomerPhone}" 
+                                 Visibility="{Binding IsWalletPayment, Converter={StaticResource BoolToVis}}" 
+                                 Margin="0,0,0,15" Padding="5" />
+
+                        <TextBlock Text="Total à Payer :" Foreground="White" FontSize="16" />
+                        <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} FCFA}" Foreground="White" FontSize="28" FontWeight="Bold" HorizontalAlignment="Right" />
+                        
+                        <Button Content="ENCAISSER" Margin="0,15,0,0" Height="50" FontSize="18" Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                                Command="{Binding CheckoutCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </materialDesign:DialogHost>
 </UserControl>
