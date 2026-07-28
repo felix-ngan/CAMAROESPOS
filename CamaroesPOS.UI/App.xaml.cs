@@ -33,6 +33,13 @@ namespace CamaroesPOS.UI
                     context.CustomerWallets.Add(new CustomerWallet { Phone = "0611223344", Balance = 50000 });
                     context.SaveChanges();
                 }
+
+                if (!context.Users.Any())
+                {
+                    context.Users.Add(new User { Username = "admin", Password = "123", Role = "Admin", Name = "Administrateur", IsActive = true });
+                    context.Users.Add(new User { Username = "caissier1", Password = "123", Role = "Cashier", Name = "Caissier 1", IsActive = true });
+                    context.SaveChanges();
+                }
             }
         }
     }

@@ -28,38 +28,49 @@
                     <TextBlock Text="CAMAROES" Foreground="White" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
                     <TextBlock Text="Point of Sale" Foreground="White" Opacity="0.7" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,40"/>
 
-                    <Button Click="BtnDashboard_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
+                    <Button x:Name="BtnDashboard" Click="BtnDashboard_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="ViewDashboard" Width="24" Height="24" VerticalAlignment="Center"/>
                             <TextBlock Text="Tableau de bord" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
                         </StackPanel>
                     </Button>
                     
-                    <Button Click="BtnPOS_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
+                    <Button x:Name="BtnPOS" Click="BtnPOS_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Cart" Width="24" Height="24" VerticalAlignment="Center"/>
                             <TextBlock Text="Caisse (POS)" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
                         </StackPanel>
                     </Button>
                     
-                    <Button Click="BtnInventory_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
+                    <Button x:Name="BtnInventory" Click="BtnInventory_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="PackageVariant" Width="24" Height="24" VerticalAlignment="Center"/>
                             <TextBlock Text="Gestion des Stocks" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
                         </StackPanel>
                     </Button>
 
-                    <Button Click="BtnWallet_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
+                    <Button x:Name="BtnWallet" Click="BtnWallet_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Wallet" Width="24" Height="24" VerticalAlignment="Center"/>
                             <TextBlock Text="Portefeuilles Clients" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
                         </StackPanel>
                     </Button>
 
-                    <Button Click="BtnReports_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
+                    <Button x:Name="BtnReports" Click="BtnReports_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="FileChart" Width="24" Height="24" VerticalAlignment="Center"/>
                             <TextBlock Text="Rapports &amp; Ventes" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Border Height="1" Background="White" Opacity="0.2" Margin="10,20" />
+                    
+                    <TextBlock x:Name="TxtUsername" Text="Connecté : ..." Foreground="White" Opacity="0.8" HorizontalAlignment="Center" Margin="0,0,0,10" />
+
+                    <Button Click="BtnLogout_Click" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" HorizontalAlignment="Stretch" Height="40" Margin="10,5">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Logout" Width="20" Height="20" VerticalAlignment="Center"/>
+                            <TextBlock Text="Déconnexion" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="14"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>

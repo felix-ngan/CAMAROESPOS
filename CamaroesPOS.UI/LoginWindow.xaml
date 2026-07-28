@@ -1,0 +1,36 @@
+<Window x:Class="CamaroesPOS.UI.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:viewmodels="clr-namespace:CamaroesPOS.UI.ViewModels"
+        Name="LoginWin"
+        Title="Connexion - Camaroes POS" Height="500" Width="400"
+        WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        FontFamily="{DynamicResource MaterialDesignFont}">
+    <Window.DataContext>
+        <viewmodels:LoginViewModel />
+    </Window.DataContext>
+    
+    <materialDesign:Card Margin="20" UniformCornerRadius="15" Background="{DynamicResource MaterialDesignPaper}">
+        <StackPanel Margin="30">
+            <materialDesign:PackIcon Kind="AccountCircleOutline" Width="100" Height="100" HorizontalAlignment="Center" Margin="0,20,0,10" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+            
+            <TextBlock Text="CONNEXION" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+            <TextBlock Text="Veuillez vous identifier pour continuer" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,40" Opacity="0.7" />
+
+            <TextBox materialDesign:HintAssist.Hint="Nom d'utilisateur" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,25" FontSize="16" />
+
+            <!-- PasswordBox is passed via ElementName to CommandParameter -->
+            <PasswordBox x:Name="TxtPassword" materialDesign:HintAssist.Hint="Mot de passe" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="0,0,0,40" FontSize="16" />
+
+            <Button Content="SE CONNECTER" Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=TxtPassword}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="0,0,0,15" Height="50" FontSize="16" />
+            
+            <Button Content="QUITTER" Command="{Binding CloseCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="Gray" BorderBrush="Gray" Height="50" FontSize="16" />
+        </StackPanel>
+    </materialDesign:Card>
+</Window>

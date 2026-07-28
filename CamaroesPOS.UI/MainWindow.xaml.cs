@@ -21,7 +21,30 @@ namespace CamaroesPOS.UI
             _dashboardView = new DashboardView();
             _reportsView = new ReportsView();
 
-            ShowDashboard();
+            if (Application.Current.Properties.Contains("CurrentUserName"))
+            {
+                TxtUsername.Text = $"Connecté : {Application.Current.Properties["CurrentUserName"]}";
+            }
+
+            if (Application.Current.Properties.Contains("CurrentUserRole"))
+            {
+                var role = Application.Current.Properties["CurrentUserRole"].ToString();
+                if (role == "Cashier")
+                {
+                    BtnDashboard.Visibility = System.Windows.Visibility.Collapsed;
+                    BtnReports.Visibility = System.Windows.Visibility.Collapsed;
+                    BtnInventory.Visibility = System.Windows.Visibility.Collapsed;
+                    BtnPOS_Click(null, null); // Start directly on POS
+                }
+                else
+                {
+                    ShowDashboard(); // Admins start on Dashboard
+                }
+            }
+            else
+            {
+                ShowDashboard();
+            }
         }
 
         private void BtnDashboard_Click(object sender, RoutedEventArgs e)
@@ -57,6 +80,17 @@ namespace CamaroesPOS.UI
             }
 
             MainContentControl.Content = _reportsView;
+        }
+
+        private void BtnLogout_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Properties.Remove("CurrentUser");
+            Application.Current.Properties.Remove("CurrentUserRole");
+            Application.Current.Properties.Remove("CurrentUserName");
+            
+            var loginWin = new LoginWindow();
+            loginWin.Show();
+            this.Close();
         }
 
         private void ShowDashboard()
