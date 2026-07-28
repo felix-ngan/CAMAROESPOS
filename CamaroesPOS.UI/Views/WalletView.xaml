@@ -61,7 +61,7 @@
                         
                         <TextBox materialDesign:HintAssist.Hint="Numéro de Téléphone" Text="{Binding SelectedWallet.Phone}" IsEnabled="{Binding IsNewWallet}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Montant (FCFA)" Text="{Binding RechargeAmount}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
+                        <TextBox materialDesign:HintAssist.Hint="Montant" Text="{Binding RechargeAmount}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
 
                         <Grid>
                             <Grid.ColumnDefinitions>

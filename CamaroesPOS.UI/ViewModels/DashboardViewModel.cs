@@ -110,8 +110,8 @@ namespace CamaroesPOS.UI.ViewModels
                 // Total produits
                 TotalProducts = context.Products.Count();
 
-                // Alertes stock (produits dont la quantité est <= seuil critique de 5)
-                LowStockItems = context.Products.Count(p => p.Qty <= 5);
+                // Alertes stock (produits dont la quantité est <= seuil critique défini (Reorder))
+                LowStockItems = context.Products.Count(p => p.Qty <= p.Reorder);
 
                 // Solde total des portefeuilles clients
                 TotalWalletsBalance = context.CustomerWallets.Sum(w => (double?)w.Balance) ?? 0;

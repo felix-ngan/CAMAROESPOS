@@ -63,7 +63,10 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void OpenAddForm(object obj)
         {
-            SelectedProduct = new Product();
+            SelectedProduct = new Product
+            {
+                Reorder = 5
+            };
             _isNewProduct = true;
             IsEditing = true;
         }
@@ -78,6 +81,7 @@ namespace CamaroesPOS.UI.ViewModels
                 Description = product.Description,
                 Price = product.Price,
                 Qty = product.Qty,
+                Reorder = product.Reorder,
                 Barcode = product.Barcode,
                 BrandName = product.BrandName,
                 CategoryName = product.CategoryName
@@ -133,6 +137,7 @@ namespace CamaroesPOS.UI.ViewModels
                         dbProduct.Description = SelectedProduct.Description;
                         dbProduct.Price = SelectedProduct.Price;
                         dbProduct.Qty = SelectedProduct.Qty;
+                        dbProduct.Reorder = SelectedProduct.Reorder;
                         dbProduct.Barcode = SelectedProduct.Barcode;
                         dbProduct.BrandName = SelectedProduct.BrandName;
                         dbProduct.CategoryName = SelectedProduct.CategoryName;

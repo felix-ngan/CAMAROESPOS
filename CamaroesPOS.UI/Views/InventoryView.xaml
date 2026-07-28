@@ -65,8 +65,9 @@
                         
                         <TextBox materialDesign:HintAssist.Hint="Code Produit" Text="{Binding SelectedProduct.ProductCode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
                         <TextBox materialDesign:HintAssist.Hint="Description" Text="{Binding SelectedProduct.Description}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                        <TextBox materialDesign:HintAssist.Hint="Prix (FCFA)" Text="{Binding SelectedProduct.Price}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="Prix" Text="{Binding SelectedProduct.Price}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
                         <TextBox materialDesign:HintAssist.Hint="Quantité" Text="{Binding SelectedProduct.Qty}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="Niveau d'Alerte Stock" Text="{Binding SelectedProduct.Reorder}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
                         <TextBox materialDesign:HintAssist.Hint="Code Barre" Text="{Binding SelectedProduct.Barcode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
                         <TextBox materialDesign:HintAssist.Hint="Marque" Text="{Binding SelectedProduct.BrandName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
                         <TextBox materialDesign:HintAssist.Hint="Catégorie" Text="{Binding SelectedProduct.CategoryName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" />

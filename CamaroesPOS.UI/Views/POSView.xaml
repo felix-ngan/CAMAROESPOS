@@ -26,7 +26,7 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBox Grid.Column="0" Text="{Binding ReceivedAmountString, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Montant donné (FCFA)" FontSize="32" FontWeight="Bold" TextAlignment="Right" Margin="0,0,10,0" />
+                        <TextBox Grid.Column="0" Text="{Binding ReceivedAmountString, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Montant donné" FontSize="32" FontWeight="Bold" TextAlignment="Right" Margin="0,0,10,0" />
                         <Button Grid.Column="1" Content="C" Command="{Binding ClearNumpadCommand}" FontSize="20" Foreground="Red" BorderBrush="Red" Style="{StaticResource MaterialDesignOutlinedButton}" Height="55" Width="55" />
                     </Grid>
 
@@ -151,7 +151,7 @@
 
                 <!-- SCAN CODE BARRE -->
                 <TextBox Grid.Column="1" Text="{Binding BarcodeSearch, UpdateSourceTrigger=PropertyChanged}" 
-                         materialDesign:HintAssist.Hint="Scanner ou saisir un code-barres... (puis Entrée)" 
+                         materialDesign:HintAssist.Hint="Scanner ou saisir un code-barres..." 
                          Style="{StaticResource MaterialDesignOutlinedTextBox}"
                          VerticalAlignment="Center" Margin="0,0,20,0" Height="45">
                     <TextBox.InputBindings>
