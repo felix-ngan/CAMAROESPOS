@@ -10,6 +10,7 @@ namespace CamaroesPOS.UI
         private InventoryView _inventoryView;
         private WalletView _walletView;
         private DashboardView _dashboardView;
+        private ReportsView _reportsView;
 
         public MainWindow()
         {
@@ -18,6 +19,7 @@ namespace CamaroesPOS.UI
             _inventoryView = new InventoryView();
             _walletView = new WalletView();
             _dashboardView = new DashboardView();
+            _reportsView = new ReportsView();
 
             ShowDashboard();
         }
@@ -43,6 +45,18 @@ namespace CamaroesPOS.UI
         {
             TxtHeader.Text = "Portefeuilles Clients";
             MainContentControl.Content = _walletView;
+        }
+
+        private void BtnReports_Click(object sender, RoutedEventArgs e)
+        {
+            TxtHeader.Text = "Rapports & Ventes";
+            
+            if (_reportsView.DataContext is CamaroesPOS.UI.ViewModels.ReportsViewModel vm)
+            {
+                vm.LoadTransactions(); // Recharger à l'ouverture
+            }
+
+            MainContentControl.Content = _reportsView;
         }
 
         private void ShowDashboard()

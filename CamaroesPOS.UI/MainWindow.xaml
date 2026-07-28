@@ -55,6 +55,13 @@
                             <TextBlock Text="Portefeuilles Clients" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
                         </StackPanel>
                     </Button>
+
+                    <Button Click="BtnReports_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="FileChart" Width="24" Height="24" VerticalAlignment="Center"/>
+                            <TextBlock Text="Rapports &amp; Ventes" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </Border>
 
