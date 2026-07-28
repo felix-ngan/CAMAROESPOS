@@ -21,6 +21,8 @@ namespace CamaroesPOS.UI.ViewModels
         public ICommand ClearNumpadCommand { get; }
         public ICommand CancelCheckoutCommand { get; }
         public ICommand ConfirmCashPaymentCommand { get; }
+        public ICommand ExactAmountCommand { get; }
+        public ICommand QuickCashCommand { get; }
 
         private double _totalAmount;
         public double TotalAmount
@@ -101,6 +103,8 @@ namespace CamaroesPOS.UI.ViewModels
             ClearNumpadCommand = new RelayCommand<object>(ClearNumpad);
             CancelCheckoutCommand = new RelayCommand<object>(CancelCheckout);
             ConfirmCashPaymentCommand = new RelayCommand<object>(ConfirmCashPayment, CanConfirmCashPayment);
+            ExactAmountCommand = new RelayCommand<object>(ExactAmount);
+            QuickCashCommand = new RelayCommand<string>(QuickCash);
 
             LoadDataFromDatabase();
         }
@@ -238,8 +242,20 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void NumpadPress(string digit)
         {
-            if (ReceivedAmountString == "0") ReceivedAmountString = digit;
-            else ReceivedAmountString += digit;
+            if (ReceivedAmountString == "0" || string.IsNullOrEmpty(ReceivedAmountString)) 
+                ReceivedAmountString = digit;
+            else 
+                ReceivedAmountString += digit;
+        }
+
+        private void ExactAmount(object obj)
+        {
+            ReceivedAmountString = TotalAmount.ToString();
+        }
+
+        private void QuickCash(string amount)
+        {
+            ReceivedAmountString = amount;
         }
 
         private void ClearNumpad(object obj)

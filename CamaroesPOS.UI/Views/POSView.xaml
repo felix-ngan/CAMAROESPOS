@@ -13,40 +13,60 @@
     
     <materialDesign:DialogHost IsOpen="{Binding IsCheckoutDialogOpen}" CloseOnClickAway="False">
         <materialDesign:DialogHost.DialogContent>
-            <!-- CALCULATOR NUMPAD -->
-            <StackPanel Margin="20" Width="300">
-                <TextBlock Text="Rendu Monnaie" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="{DynamicResource PrimaryHueMidBrush}" />
-                <TextBlock Text="{Binding TotalAmount, StringFormat=Total à payer: {0:N0} FCFA}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" />
+            <!-- CALCULATOR NUMPAD MODERNE -->
+            <StackPanel Margin="20" Width="400">
+                <TextBlock Text="Règlement Espèces" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                <TextBlock Text="{Binding TotalAmount, StringFormat=Total à payer: {0:N0} FCFA}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" />
                 
-                <TextBox Text="{Binding ReceivedAmountString, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Montant reçu (Espèces)" FontSize="24" TextAlignment="Center" Margin="0,0,0,10" IsReadOnly="True" />
+                <!-- Champ de Saisie Editable -->
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBox Grid.Column="0" Text="{Binding ReceivedAmountString, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Montant donné (FCFA)" FontSize="32" FontWeight="Bold" TextAlignment="Right" Margin="0,0,10,0" />
+                    
+                    <Button Grid.Column="1" Content="C" Command="{Binding ClearNumpadCommand}" FontSize="20" Foreground="Red" BorderBrush="Red" Style="{StaticResource MaterialDesignOutlinedButton}" Height="55" Width="55" />
+                </Grid>
                 
-                <TextBlock Text="{Binding ChangeAmount, StringFormat=Rendu: {0:N0} FCFA}" FontSize="24" FontWeight="Bold" Foreground="#E53935" HorizontalAlignment="Center" Margin="0,0,0,20" />
+                <TextBlock Text="{Binding ChangeAmount, StringFormat=Reste à rendre: {0:N0} FCFA}" FontSize="26" FontWeight="Bold" Foreground="#E53935" HorizontalAlignment="Center" Margin="0,0,0,20" />
                 
-                <UniformGrid Columns="3" Rows="4" Margin="0,0,0,20">
-                    <Button Content="7" Command="{Binding NumpadCommand}" CommandParameter="7" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" />
-                    <Button Content="8" Command="{Binding NumpadCommand}" CommandParameter="8" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
-                    <Button Content="9" Command="{Binding NumpadCommand}" CommandParameter="9" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
-                    
-                    <Button Content="4" Command="{Binding NumpadCommand}" CommandParameter="4" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" />
-                    <Button Content="5" Command="{Binding NumpadCommand}" CommandParameter="5" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
-                    <Button Content="6" Command="{Binding NumpadCommand}" CommandParameter="6" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
-                    
-                    <Button Content="1" Command="{Binding NumpadCommand}" CommandParameter="1" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" />
-                    <Button Content="2" Command="{Binding NumpadCommand}" CommandParameter="2" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
-                    <Button Content="3" Command="{Binding NumpadCommand}" CommandParameter="3" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
-                    
-                    <Button Content="C" Command="{Binding ClearNumpadCommand}" Margin="5" FontSize="20" Foreground="Red" BorderBrush="Red" Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" />
-                    <Button Content="0" Command="{Binding NumpadCommand}" CommandParameter="0" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
-                    <Button Content="00" Command="{Binding NumpadCommand}" CommandParameter="00" Margin="5" FontSize="20" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                <!-- Boutons Rapides (Billets / Compte Exact) -->
+                <UniformGrid Columns="4" Rows="1" Margin="0,0,0,20">
+                    <Button Content="Exact" Command="{Binding ExactAmountCommand}" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#1E88E5" BorderBrush="#1E88E5" />
+                    <Button Content="5 000" Command="{Binding QuickCashCommand}" CommandParameter="5000" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#43A047" BorderBrush="#43A047" />
+                    <Button Content="10 000" Command="{Binding QuickCashCommand}" CommandParameter="10000" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#43A047" BorderBrush="#43A047" />
+                    <Button Content="20 000" Command="{Binding QuickCashCommand}" CommandParameter="20000" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#43A047" BorderBrush="#43A047" />
                 </UniformGrid>
                 
+                <!-- Pavé Numérique Tactile -->
+                <UniformGrid Columns="3" Rows="4" Margin="0,0,0,25">
+                    <Button Content="7" Command="{Binding NumpadCommand}" CommandParameter="7" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" Height="65" />
+                    <Button Content="8" Command="{Binding NumpadCommand}" CommandParameter="8" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
+                    <Button Content="9" Command="{Binding NumpadCommand}" CommandParameter="9" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
+                    
+                    <Button Content="4" Command="{Binding NumpadCommand}" CommandParameter="4" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" Height="65" />
+                    <Button Content="5" Command="{Binding NumpadCommand}" CommandParameter="5" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
+                    <Button Content="6" Command="{Binding NumpadCommand}" CommandParameter="6" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
+                    
+                    <Button Content="1" Command="{Binding NumpadCommand}" CommandParameter="1" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" Height="65" />
+                    <Button Content="2" Command="{Binding NumpadCommand}" CommandParameter="2" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
+                    <Button Content="3" Command="{Binding NumpadCommand}" CommandParameter="3" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
+                    
+                    <Button Content="0" Command="{Binding NumpadCommand}" CommandParameter="0" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" Height="65" />
+                    <Button Content="00" Command="{Binding NumpadCommand}" CommandParameter="00" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
+                    <Button Content="000" Command="{Binding NumpadCommand}" CommandParameter="000" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
+                </UniformGrid>
+                
+                <!-- Actions Finales -->
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCheckoutCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
-                    <Button Grid.Column="1" Content="ENCAISSER" Command="{Binding ConfirmCashPaymentCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
+                    <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCheckoutCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" Height="50" FontSize="18" />
+                    <Button Grid.Column="1" Content="VALIDER L'ENCAISSEMENT" Command="{Binding ConfirmCashPaymentCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" Height="50" FontSize="18" />
                 </Grid>
             </StackPanel>
         </materialDesign:DialogHost.DialogContent>
