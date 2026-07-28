@@ -11,11 +11,10 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Filtres -->
+        <!-- Filtres Globaux -->
         <materialDesign:Card Grid.Row="0" Margin="0,0,0,20" Padding="20" UniformCornerRadius="10">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -29,49 +28,105 @@
                 <DatePicker Grid.Column="0" materialDesign:HintAssist.Hint="Date de début" SelectedDate="{Binding StartDate}" Margin="0,0,20,0" Width="150" FontSize="16" />
                 <DatePicker Grid.Column="1" materialDesign:HintAssist.Hint="Date de fin" SelectedDate="{Binding EndDate}" Margin="0,0,20,0" Width="150" FontSize="16" />
                 
-                <TextBox Grid.Column="2" materialDesign:HintAssist.Hint="Recherche (Produit, Transaction, Caissier...)" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,20,0" FontSize="16" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+                <TextBox Grid.Column="2" materialDesign:HintAssist.Hint="Recherche globale (Code, Nom, TransNo...)" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,20,0" FontSize="16" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
 
                 <Button Grid.Column="3" Content="FILTRER" Command="{Binding FilterCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#1E88E5" BorderBrush="#1E88E5" Margin="0,0,10,0" Height="40" />
                 <Button Grid.Column="4" Content="RÉINITIALISER" Command="{Binding ResetFilterCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" Height="40" />
             </Grid>
         </materialDesign:Card>
 
-        <!-- Summary Cards -->
-        <Grid Grid.Row="1" Margin="0,0,0,20">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <!-- TabControl for different reports -->
+        <TabControl Grid.Row="1" materialDesign:ColorZoneAssist.Mode="PrimaryMid" materialDesign:ColorZoneAssist.Background="Transparent">
+            <!-- TAB: VENTES -->
+            <TabItem Header="Rapport des Ventes">
+                <Grid Margin="0,15,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <materialDesign:Card Grid.Column="0" Margin="0,0,10,0" Padding="20" Background="#43A047" Foreground="White" UniformCornerRadius="10">
+                            <StackPanel>
+                                <TextBlock Text="Chiffre d'Affaires (Période)" FontSize="16" Opacity="0.9" />
+                                <TextBlock Text="{Binding TotalSalesAmount, StringFormat={}{0:N0} FCFA}" FontSize="32" FontWeight="Bold" Margin="0,10,0,0" />
+                            </StackPanel>
+                        </materialDesign:Card>
+                        <materialDesign:Card Grid.Column="1" Margin="10,0,0,0" Padding="20" Background="#F39C12" Foreground="White" UniformCornerRadius="10">
+                            <StackPanel>
+                                <TextBlock Text="Articles Vendus (Période)" FontSize="16" Opacity="0.9" />
+                                <TextBlock Text="{Binding TotalItemsSold}" FontSize="32" FontWeight="Bold" Margin="0,10,0,0" />
+                            </StackPanel>
+                        </materialDesign:Card>
+                    </Grid>
+                    
+                    <materialDesign:Card Grid.Row="1" Padding="10" UniformCornerRadius="10">
+                        <DataGrid ItemsSource="{Binding Transactions}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" FontSize="14">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Date &amp; Heure" Binding="{Binding SoldDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="150" />
+                                <DataGridTextColumn Header="N° Transaction" Binding="{Binding TransNo}" Width="150" />
+                                <DataGridTextColumn Header="Produit" Binding="{Binding Description}" Width="*" />
+                                <DataGridTextColumn Header="Qté" Binding="{Binding Qty}" Width="80" />
+                                <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N0} FCFA}" Width="120" />
+                                <DataGridTextColumn Header="Caissier" Binding="{Binding Cashier}" Width="120" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </materialDesign:Card>
+                </Grid>
+            </TabItem>
+            
+            <!-- TAB: PRODUITS (INVENTAIRE) -->
+            <TabItem Header="Produits &amp; État du Stock">
+                <materialDesign:Card Margin="0,15,0,0" Padding="10" UniformCornerRadius="10">
+                    <DataGrid ItemsSource="{Binding ProductsList}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" FontSize="14">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Code Produit" Binding="{Binding ProductCode}" Width="120" />
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
+                            <DataGridTextColumn Header="Marque" Binding="{Binding BrandName}" Width="120" />
+                            <DataGridTextColumn Header="Catégorie" Binding="{Binding CategoryName}" Width="120" />
+                            <DataGridTextColumn Header="En Stock (Qté)" Binding="{Binding Qty}" Width="120" />
+                            <DataGridTextColumn Header="Prix Vente" Binding="{Binding Price, StringFormat={}{0:N0} FCFA}" Width="120" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </materialDesign:Card>
+            </TabItem>
 
-            <materialDesign:Card Grid.Column="0" Margin="0,0,10,0" Padding="20" Background="#43A047" Foreground="White" UniformCornerRadius="10">
-                <StackPanel>
-                    <TextBlock Text="Chiffre d'Affaires Total (Période)" FontSize="16" Opacity="0.9" />
-                    <TextBlock Text="{Binding TotalSalesAmount, StringFormat={}{0:N0} FCFA}" FontSize="32" FontWeight="Bold" Margin="0,10,0,0" />
-                </StackPanel>
-            </materialDesign:Card>
+            <!-- TAB: HISTORIQUE DES STOCKS -->
+            <TabItem Header="Historique des Stocks">
+                <materialDesign:Card Margin="0,15,0,0" Padding="10" UniformCornerRadius="10">
+                    <DataGrid ItemsSource="{Binding StockHistoryList}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" FontSize="14">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Date Ajout" Binding="{Binding StockInDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="150" />
+                            <DataGridTextColumn Header="Réf." Binding="{Binding RefNo}" Width="120" />
+                            <DataGridTextColumn Header="Produit" Binding="{Binding Description}" Width="*" />
+                            <DataGridTextColumn Header="Fournisseur" Binding="{Binding VendorName}" Width="150" />
+                            <DataGridTextColumn Header="Qté Ajoutée" Binding="{Binding Qty}" Width="120" />
+                            <DataGridTextColumn Header="Ajouté Par" Binding="{Binding StockInBy}" Width="120" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </materialDesign:Card>
+            </TabItem>
 
-            <materialDesign:Card Grid.Column="1" Margin="10,0,0,0" Padding="20" Background="#F39C12" Foreground="White" UniformCornerRadius="10">
-                <StackPanel>
-                    <TextBlock Text="Articles Vendus (Période)" FontSize="16" Opacity="0.9" />
-                    <TextBlock Text="{Binding TotalItemsSold}" FontSize="32" FontWeight="Bold" Margin="0,10,0,0" />
-                </StackPanel>
-            </materialDesign:Card>
-        </Grid>
+            <!-- TAB: ANNULATIONS -->
+            <TabItem Header="Ordres Annulés">
+                <materialDesign:Card Margin="0,15,0,0" Padding="10" UniformCornerRadius="10">
+                    <DataGrid ItemsSource="{Binding CancelledOrdersList}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" FontSize="14">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Date Vente" Binding="{Binding SoldDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="150" />
+                            <DataGridTextColumn Header="N° Trans" Binding="{Binding TransNo}" Width="120" />
+                            <DataGridTextColumn Header="Produit" Binding="{Binding Description}" Width="*" />
+                            <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N0} FCFA}" Width="120" />
+                            <DataGridTextColumn Header="Annulé Par" Binding="{Binding CancelledBy}" Width="120" />
+                            <DataGridTextColumn Header="Raison" Binding="{Binding Reason}" Width="150" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </materialDesign:Card>
+            </TabItem>
 
-        <!-- Liste des Transactions -->
-        <materialDesign:Card Grid.Row="2" Padding="10" UniformCornerRadius="10">
-            <DataGrid ItemsSource="{Binding Transactions}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" FontSize="14">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Date &amp; Heure" Binding="{Binding SoldDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="150" />
-                    <DataGridTextColumn Header="N° Transaction" Binding="{Binding TransNo}" Width="150" />
-                    <DataGridTextColumn Header="Code Produit" Binding="{Binding ProductCode}" Width="120" />
-                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
-                    <DataGridTextColumn Header="Qté" Binding="{Binding Qty}" Width="80" />
-                    <DataGridTextColumn Header="Prix Unitaire" Binding="{Binding Price, StringFormat={}{0:N0}}" Width="120" />
-                    <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N0} FCFA}" Width="120" />
-                    <DataGridTextColumn Header="Caissier" Binding="{Binding Cashier}" Width="120" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </materialDesign:Card>
+        </TabControl>
     </Grid>
 </UserControl>

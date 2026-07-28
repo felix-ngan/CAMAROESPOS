@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
-    
+
     <materialDesign:DialogHost IsOpen="{Binding IsAnyDialogOpen}" CloseOnClickAway="False">
         <materialDesign:DialogHost.DialogContent>
             <Grid>
@@ -18,20 +18,20 @@
                 <StackPanel Margin="20" Width="400" Visibility="{Binding IsCheckoutDialogOpen, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="Règlement Espèces" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="{DynamicResource PrimaryHueMidBrush}" />
                     <TextBlock Text="{Binding TotalAmount, StringFormat=Total à payer: {0:N0} FCFA}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" />
-                    
+
                     <!-- Champ de Saisie Editable -->
                     <Grid Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        
+
                         <TextBox Grid.Column="0" Text="{Binding ReceivedAmountString, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Montant donné (FCFA)" FontSize="32" FontWeight="Bold" TextAlignment="Right" Margin="0,0,10,0" />
                         <Button Grid.Column="1" Content="C" Command="{Binding ClearNumpadCommand}" FontSize="20" Foreground="Red" BorderBrush="Red" Style="{StaticResource MaterialDesignOutlinedButton}" Height="55" Width="55" />
                     </Grid>
-                    
+
                     <TextBlock Text="{Binding ChangeAmount, StringFormat=Reste à rendre: {0:N0} FCFA}" FontSize="26" FontWeight="Bold" Foreground="#E53935" HorizontalAlignment="Center" Margin="0,0,0,20" />
-                    
+
                     <!-- Boutons Rapides (Billets / Compte Exact) -->
                     <UniformGrid Columns="4" Rows="1" Margin="0,0,0,20">
                         <Button Content="Exact" Command="{Binding ExactAmountCommand}" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#1E88E5" BorderBrush="#1E88E5" />
@@ -39,26 +39,26 @@
                         <Button Content="10 000" Command="{Binding QuickCashCommand}" CommandParameter="10000" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#43A047" BorderBrush="#43A047" />
                         <Button Content="20 000" Command="{Binding QuickCashCommand}" CommandParameter="20000" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#43A047" BorderBrush="#43A047" />
                     </UniformGrid>
-                    
+
                     <!-- Pavé Numérique Tactile -->
                     <UniformGrid Columns="3" Rows="4" Margin="0,0,0,25">
                         <Button Content="7" Command="{Binding NumpadCommand}" CommandParameter="7" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" Height="65" />
                         <Button Content="8" Command="{Binding NumpadCommand}" CommandParameter="8" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
                         <Button Content="9" Command="{Binding NumpadCommand}" CommandParameter="9" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
-                        
+
                         <Button Content="4" Command="{Binding NumpadCommand}" CommandParameter="4" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" Height="65" />
                         <Button Content="5" Command="{Binding NumpadCommand}" CommandParameter="5" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
                         <Button Content="6" Command="{Binding NumpadCommand}" CommandParameter="6" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
-                        
+
                         <Button Content="1" Command="{Binding NumpadCommand}" CommandParameter="1" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" Height="65" />
                         <Button Content="2" Command="{Binding NumpadCommand}" CommandParameter="2" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
                         <Button Content="3" Command="{Binding NumpadCommand}" CommandParameter="3" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
-                        
+
                         <Button Content="0" Command="{Binding NumpadCommand}" CommandParameter="0" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" Height="65" />
                         <Button Content="00" Command="{Binding NumpadCommand}" CommandParameter="00" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
                         <Button Content="000" Command="{Binding NumpadCommand}" CommandParameter="000" Margin="3" FontSize="24" Style="{StaticResource MaterialDesignFlatLightBgButton}" />
                     </UniformGrid>
-                    
+
                     <!-- Actions Finales -->
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -78,9 +78,9 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        
+
                         <TextBlock Grid.Row="0" Text="Sélectionner des Produits" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueMidBrush}" />
-                        
+
                         <ListBox Grid.Row="1" ItemsSource="{Binding Products}" ScrollViewer.VerticalScrollBarVisibility="Auto" Background="Transparent" BorderThickness="0">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -106,7 +106,7 @@
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
                         </ListBox>
-                        
+
                         <Button Grid.Row="2" Content="TERMINER (FERMER)" Command="{Binding CloseCatalogCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,20,0,0" Height="45" FontSize="16" />
                     </Grid>
                 </Border>
@@ -128,16 +128,16 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                
-                <TextBlock Grid.Column="0" Text="Votre Panier" FontSize="28" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" />
-                
+
+                <TextBlock Grid.Column="0" Text="Votre Panier" FontSize="28" FontWeight="Bold" VerticalAlignment="Top" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,4,0,0" />
+
                 <Button Grid.Column="1" Command="{Binding OpenCatalogCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#1E88E5" BorderBrush="#1E88E5" Height="45" Margin="0,0,15,0">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <materialDesign:PackIcon Kind="PlusCircleOutline" Width="20" Height="20" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="AJOUTER DES PRODUITS" FontSize="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="PRODUITS" FontSize="16" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
-                
+
                 <Button Grid.Column="2" Content="VIDER" Command="{Binding ClearCartCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" Height="45" FontSize="16" />
             </Grid>
 
@@ -170,7 +170,7 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    
+
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
                         <TextBlock Text="Mode de paiement :" FontSize="16" Margin="0,0,0,5" Opacity="0.9"/>
                         <ComboBox SelectedIndex="{Binding PaymentMethodIndex}" Width="250" HorizontalAlignment="Left" Margin="0,0,0,15" Padding="10" FontSize="16" Foreground="White" Background="Transparent">
@@ -184,11 +184,11 @@
                                  Visibility="{Binding IsWalletPayment, Converter={StaticResource BoolToVis}}" 
                                  Width="250" HorizontalAlignment="Left" FontSize="16" Foreground="White" materialDesign:HintAssist.Foreground="White" />
                     </StackPanel>
-                    
+
                     <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <TextBlock Text="MONTANT TOTAL À PAYER" FontSize="16" Opacity="0.9" HorizontalAlignment="Right" />
                         <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} FCFA}" FontSize="42" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,0,15" />
-                        
+
                         <Button Content="VALIDER L'ACHAT" Command="{Binding CheckoutCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Height="60" Width="300" FontSize="20" />
                     </StackPanel>
                 </Grid>

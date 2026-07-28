@@ -74,6 +74,13 @@
                     
                     <TextBlock x:Name="TxtUsername" Text="Connecté : ..." Foreground="White" Opacity="0.8" HorizontalAlignment="Center" Margin="0,0,0,10" />
 
+                    <Button Click="BtnChangePassword_Click" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#1E88E5" BorderBrush="#1E88E5" HorizontalAlignment="Stretch" Height="40" Margin="10,5">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="KeyVariant" Width="20" Height="20" VerticalAlignment="Center"/>
+                            <TextBlock Text="Mot de Passe" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="14"/>
+                        </StackPanel>
+                    </Button>
+
                     <Button Click="BtnLogout_Click" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" HorizontalAlignment="Stretch" Height="40" Margin="10,5">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Logout" Width="20" Height="20" VerticalAlignment="Center"/>

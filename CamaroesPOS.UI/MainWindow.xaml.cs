@@ -91,6 +91,17 @@ namespace CamaroesPOS.UI
             MainContentControl.Content = _settingsView;
         }
 
+        private void BtnChangePassword_Click(object sender, RoutedEventArgs e)
+        {
+            if (Application.Current.Properties.Contains("CurrentUserName"))
+            {
+                string username = Application.Current.Properties["CurrentUserName"].ToString();
+                var changePwdWin = new Views.ChangePasswordWindow(username);
+                changePwdWin.Owner = this;
+                changePwdWin.ShowDialog();
+            }
+        }
+
         private void BtnLogout_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Properties.Remove("CurrentUser");
