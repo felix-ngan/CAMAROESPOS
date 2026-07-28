@@ -73,6 +73,19 @@
                                 <DataGridTextColumn Header="Qté" Binding="{Binding Qty}" Width="80" />
                                 <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N0} FCFA}" Width="120" />
                                 <DataGridTextColumn Header="Caissier" Binding="{Binding Cashier}" Width="120" />
+                                
+                                <DataGridTemplateColumn Header="Action" Width="100">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Style="{StaticResource MaterialDesignFlatButton}" Foreground="#E53935" Command="{Binding DataContext.CancelTransactionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Height="30" Padding="5,0" ToolTip="Annuler cette vente (restaure le stock)">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <materialDesign:PackIcon Kind="Cancel" Width="18" Height="18" VerticalAlignment="Center" />
+                                                    <TextBlock Text="Annuler" Margin="5,0,0,0" VerticalAlignment="Center" FontSize="12" />
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                     </materialDesign:Card>

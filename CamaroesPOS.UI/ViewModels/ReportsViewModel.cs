@@ -34,6 +34,7 @@ namespace CamaroesPOS.UI.ViewModels
 
         public ICommand FilterCommand { get; }
         public ICommand ResetFilterCommand { get; }
+        public ICommand CancelTransactionCommand { get; }
 
         public ReportsViewModel()
         {
@@ -45,6 +46,7 @@ namespace CamaroesPOS.UI.ViewModels
 
             FilterCommand = new RelayCommand<object>(ApplyFilter);
             ResetFilterCommand = new RelayCommand<object>(ResetFilter);
+            CancelTransactionCommand = new RelayCommand<object>(CancelTransaction);
 
             StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             EndDate = DateTime.Now.Date;
@@ -155,6 +157,62 @@ namespace CamaroesPOS.UI.ViewModels
             EndDate = DateTime.Now.Date;
             SearchText = string.Empty;
             ApplyFilter(null);
+        }
+
+        private void CancelTransaction(object obj)
+        {
+            if (obj is SoldItem soldItem)
+            {
+                // Confirmation (using Microsoft.VisualBasic.Interaction or custom dialog for reason).
+                // We'll use a simple confirmation for now and default reason.
+                var result = System.Windows.MessageBox.Show($"Êtes-vous sûr de vouloir annuler la transaction {soldItem.TransNo} pour {soldItem.Description} ?", "Annulation de Commande", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
+                if (result == System.Windows.MessageBoxResult.Yes)
+                {
+                    // For a modern app, we'd prompt for a reason. For simplicity, we use a default.
+                    string reason = "Annulation demandée par l'administrateur.";
+                    string currentUser = System.Windows.Application.Current.Properties["CurrentUserName"]?.ToString() ?? "Admin";
+
+                    using (var context = new PosDbContext())
+                    {
+                        var itemToCancel = context.SoldItems.FirstOrDefault(s => s.Id == soldItem.Id);
+                        if (itemToCancel != null)
+                        {
+                            // 1. Restaurer le stock
+                            var product = context.Products.FirstOrDefault(p => p.ProductCode == itemToCancel.ProductCode);
+                            if (product != null)
+                            {
+                                product.Qty += itemToCancel.Qty;
+                            }
+
+                            // 2. Créer l'entrée dans CancelledOrders
+                            var cancelled = new CancelledOrder
+                            {
+                                TransNo = itemToCancel.TransNo,
+                                ProductCode = itemToCancel.ProductCode,
+                                Description = itemToCancel.Description,
+                                Price = itemToCancel.Price,
+                                Qty = itemToCancel.Qty,
+                                Total = itemToCancel.Total,
+                                SoldDate = itemToCancel.SoldDate,
+                                VoidBy = currentUser,
+                                CancelledBy = currentUser,
+                                Reason = reason,
+                                Action = "Annuler"
+                            };
+                            context.CancelledOrders.Add(cancelled);
+
+                            // 3. Supprimer de SoldItems
+                            context.SoldItems.Remove(itemToCancel);
+                            
+                            context.SaveChanges();
+                            System.Windows.MessageBox.Show("Transaction annulée et stock restauré avec succès.", "Succès", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                            
+                            // Recharger les listes
+                            ApplyFilter(null);
+                        }
+                    }
+                }
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
