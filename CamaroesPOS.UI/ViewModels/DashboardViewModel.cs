@@ -148,11 +148,14 @@ namespace CamaroesPOS.UI.ViewModels
                 ChartLabels = labels;
                 SalesChart = new SeriesCollection
                 {
-                    new ColumnSeries
+                    new LineSeries
                     {
-                        Title = "Ventes (FCFA)",
+                        Title = "Ventes",
                         Values = salesValues,
-                        Fill = System.Windows.Media.Brushes.DodgerBlue,
+                        Stroke = System.Windows.Media.Brushes.DodgerBlue,
+                        StrokeThickness = 3,
+                        PointGeometrySize = 10,
+                        Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(50, 30, 136, 229)),
                         DataLabels = true
                     }
                 };

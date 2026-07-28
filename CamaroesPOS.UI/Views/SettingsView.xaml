@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:viewmodels="clr-namespace:CamaroesPOS.UI.ViewModels"
-             Background="{DynamicResource MaterialDesignPaper}">
+             Background="Transparent">
     <UserControl.DataContext>
         <viewmodels:SettingsViewModel />
     </UserControl.DataContext>
@@ -15,8 +15,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
-            <materialDesign:PackIcon Kind="Settings" Width="30" Height="30" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-            <TextBlock Text="Paramètres Généraux" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" />
+            <materialDesign:PackIcon Kind="Settings" Width="30" Height="30" VerticalAlignment="Center" Foreground="#1E88E5"/>
+            <TextBlock Text="Paramètres Généraux" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#2B3674" />
         </StackPanel>
 
         <TabControl Grid.Row="1" materialDesign:ColorZoneAssist.Mode="PrimaryMid" materialDesign:ColorZoneAssist.Background="Transparent">
@@ -28,7 +28,7 @@
                         <ColumnDefinition Width="400" />
                     </Grid.ColumnDefinitions>
 
-                    <materialDesign:Card Grid.Column="0" Padding="15" UniformCornerRadius="10" Margin="0,0,20,0">
+                    <materialDesign:Card Grid.Column="0" Padding="15" UniformCornerRadius="15" Margin="0,0,20,0" Background="White">
                         <DataGrid ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" materialDesign:DataGridAssist.CellPadding="10">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Identifiant" Binding="{Binding Username}" Width="*" />
@@ -39,10 +39,10 @@
                         </DataGrid>
                     </materialDesign:Card>
 
-                    <materialDesign:Card Grid.Column="1" Padding="20" UniformCornerRadius="10" Background="{DynamicResource MaterialDesignPaper}">
+                    <materialDesign:Card Grid.Column="1" Padding="20" UniformCornerRadius="15" Background="White">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
-                                <TextBlock Text="Détails Utilisateur" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                <TextBlock Text="Détails Utilisateur" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
                                 
                                 <TextBox materialDesign:HintAssist.Hint="Nom d'utilisateur" Text="{Binding NewUsername}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="16" />
                                 <TextBox materialDesign:HintAssist.Hint="Nom Complet" Text="{Binding NewName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="16" />
@@ -79,9 +79,9 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <materialDesign:Card Grid.Column="0" Padding="30" UniformCornerRadius="10">
+                    <materialDesign:Card Grid.Column="0" Padding="30" UniformCornerRadius="15" Background="White">
                         <StackPanel>
-                            <TextBlock Text="Informations de la Boutique" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                            <TextBlock Text="Informations de la Boutique" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
                             
                             <TextBox materialDesign:HintAssist.Hint="Nom de la Boutique / Entreprise" Text="{Binding StoreName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,20" FontSize="18" />
                             <TextBox materialDesign:HintAssist.Hint="Adresse Complète &amp; Contact" Text="{Binding StoreAddress}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,20" FontSize="18" />
@@ -103,9 +103,9 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <materialDesign:Card Grid.Column="0" Padding="30" UniformCornerRadius="10">
+                    <materialDesign:Card Grid.Column="0" Padding="30" UniformCornerRadius="15" Background="White">
                         <StackPanel>
-                            <TextBlock Text="Changer mon Mot de Passe" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                            <TextBlock Text="Changer mon Mot de Passe" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
                             
                             <PasswordBox materialDesign:HintAssist.Hint="Ancien mot de passe" PasswordChanged="OldPassword_Changed" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="0,0,0,20" FontSize="18" />
                             <PasswordBox materialDesign:HintAssist.Hint="Nouveau mot de passe" PasswordChanged="NewPassword_Changed" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="0,0,0,20" FontSize="18" />

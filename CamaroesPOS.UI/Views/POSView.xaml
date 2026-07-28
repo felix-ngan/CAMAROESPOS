@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:viewmodels="clr-namespace:CamaroesPOS.UI.ViewModels"
-             Background="{DynamicResource MaterialDesignPaper}">
+             Background="Transparent">
     <UserControl.DataContext>
         <viewmodels:POSViewModel />
     </UserControl.DataContext>
@@ -15,8 +15,8 @@
         <materialDesign:DialogHost.DialogContent>
             <Grid>
                 <!-- CALCULATOR NUMPAD MODERNE -->
-                <StackPanel Margin="20" Width="400" Visibility="{Binding IsCheckoutDialogOpen, Converter={StaticResource BoolToVis}}">
-                    <TextBlock Text="Règlement Espèces" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                <StackPanel Margin="20" Width="400" Background="White" Visibility="{Binding IsCheckoutDialogOpen, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Règlement Espèces" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="#2B3674" />
                     <TextBlock Text="{Binding TotalAmount, StringFormat=Total à payer: {0:N0} FCFA}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" />
 
                     <!-- Champ de Saisie Editable -->
@@ -71,7 +71,7 @@
                 </StackPanel>
 
                 <!-- CATALOGUE PRODUITS (POPUP) -->
-                <Border Width="600" Height="500" Background="{DynamicResource MaterialDesignPaper}" CornerRadius="10" Padding="20" Visibility="{Binding IsCatalogDialogOpen, Converter={StaticResource BoolToVis}}">
+                <Border Width="600" Height="500" Background="White" CornerRadius="10" Padding="20" Visibility="{Binding IsCatalogDialogOpen, Converter={StaticResource BoolToVis}}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -79,7 +79,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Text="Sélectionner des Produits" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                        <TextBlock Grid.Row="0" Text="Sélectionner des Produits" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
 
                         <DataGrid Grid.Row="1" ItemsSource="{Binding Products}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto" FontSize="14" Background="Transparent">
                             <DataGrid.Columns>
@@ -104,8 +104,8 @@
                 </Border>
 
                 <!-- DIALOGUE DE QUANTITÉ -->
-                <StackPanel Margin="20" Width="300" Visibility="{Binding IsQuantityDialogOpen, Converter={StaticResource BoolToVis}}">
-                    <TextBlock Text="Quelle Quantité ?" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                <StackPanel Margin="20" Width="300" Background="White" Visibility="{Binding IsQuantityDialogOpen, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Quelle Quantité ?" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="#2B3674" />
                     
                     <Grid Margin="0,0,0,25">
                         <Grid.ColumnDefinitions>
@@ -147,7 +147,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="Votre Panier" FontSize="28" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,20,0" />
+                <TextBlock Grid.Column="0" Text="Votre Panier" FontSize="28" FontWeight="Bold" VerticalAlignment="Center" Foreground="#2B3674" Margin="0,0,20,0" />
 
                 <!-- SCAN CODE BARRE -->
                 <TextBox Grid.Column="1" Text="{Binding BarcodeSearch, UpdateSourceTrigger=PropertyChanged}" 
@@ -170,7 +170,7 @@
             </Grid>
 
             <!-- Liste des produits dans le panier -->
-            <materialDesign:Card Grid.Row="1" UniformCornerRadius="10" Padding="15" Margin="0,0,0,20">
+            <materialDesign:Card Grid.Row="1" UniformCornerRadius="15" Padding="15" Margin="0,0,0,20" Background="White">
                 <DataGrid ItemsSource="{Binding Cart}" AutoGenerateColumns="False" CanUserAddRows="False" ScrollViewer.VerticalScrollBarVisibility="Auto" FontSize="16" Background="Transparent">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Description de l'Article" Binding="{Binding ProductDescription}" Width="*" IsReadOnly="True" />
@@ -192,7 +192,7 @@
             </materialDesign:Card>
 
             <!-- Zone de Paiement -->
-            <materialDesign:Card Grid.Row="2" Background="{DynamicResource PrimaryHueLightBrush}" Foreground="White" UniformCornerRadius="15" Padding="25">
+            <materialDesign:Card Grid.Row="2" Background="#2B3674" Foreground="White" UniformCornerRadius="15" Padding="25">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
