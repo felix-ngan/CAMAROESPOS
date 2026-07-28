@@ -132,15 +132,15 @@
                         <Button Grid.Column="1" Content="Vider" Command="{Binding ClearCartCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#EF5350" BorderBrush="#EF5350" Height="30" Padding="10,0" />
                     </Grid>
                     
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding Cart}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,15">
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Cart}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,15" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Article" Binding="{Binding ProductDescription}" Width="*" IsReadOnly="True" />
-                            <DataGridTextColumn Header="Qté" Binding="{Binding Qty}" IsReadOnly="True" />
-                            <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N0} FCFA}" IsReadOnly="True" />
-                            <DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Qté" Binding="{Binding Qty}" Width="40" IsReadOnly="True" />
+                            <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:N0}}" Width="85" IsReadOnly="True" />
+                            <DataGridTemplateColumn Width="45">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Style="{StaticResource MaterialDesignFlatButton}" Foreground="Red" Padding="0" Margin="0" Height="24" Width="24"
+                                        <Button Style="{StaticResource MaterialDesignFlatButton}" Foreground="Red" Padding="0" Margin="0" Height="24" Width="24" HorizontalAlignment="Center"
                                                 Command="{Binding DataContext.RemoveFromCartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}">
                                             <materialDesign:PackIcon Kind="Close" Width="16" Height="16" />
