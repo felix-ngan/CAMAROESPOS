@@ -250,8 +250,11 @@ namespace CamaroesPOS.UI.ViewModels
                     context.SaveChanges();
                 }
 
-                SaveTransaction("Portefeuille");
-                MessageBox.Show("Encaissement réussi par Portefeuille !", "Caisse", MessageBoxButton.OK, MessageBoxImage.Information);
+                string transNo = SaveTransaction("Portefeuille");
+                
+                // Show receipt for Wallet
+                var receiptWin = new CamaroesPOS.UI.Views.ReceiptWindow(transNo, new ObservableCollection<CartItem>(Cart), TotalAmount, TotalAmount, 0, "Portefeuille (Wallet)");
+                receiptWin.ShowDialog();
                 
                 Cart.Clear();
                 UpdateTotalAmount();
@@ -266,12 +269,12 @@ namespace CamaroesPOS.UI.ViewModels
             }
         }
 
-        private void SaveTransaction(string paymentMode)
+        private string SaveTransaction(string paymentMode)
         {
+            string transNo = DateTime.Now.ToString("yyyyMMddHHmmss");
+
             using (var context = new PosDbContext())
             {
-                string transNo = DateTime.Now.ToString("yyyyMMddHHmmss");
-
                 foreach (var item in Cart)
                 {
                     var soldItem = new SoldItem
@@ -297,6 +300,7 @@ namespace CamaroesPOS.UI.ViewModels
 
                 context.SaveChanges(); 
             }
+            return transNo;
         }
 
         private void NumpadPress(string digit)
@@ -349,9 +353,11 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void ConfirmCashPayment(object obj)
         {
-            SaveTransaction("Espèces");
+            string transNo = SaveTransaction("Espèces");
             
-            MessageBox.Show($"Encaissement réussi !\nRendu Monnaie : {ChangeAmount:N0} FCFA", "Caisse", MessageBoxButton.OK, MessageBoxImage.Information);
+            // Show receipt for Cash Payment
+            var receiptWin = new CamaroesPOS.UI.Views.ReceiptWindow(transNo, new ObservableCollection<CartItem>(Cart), TotalAmount, ReceivedAmount, ChangeAmount, "Espèces");
+            receiptWin.ShowDialog();
             
             IsCheckoutDialogOpen = false;
             Cart.Clear();

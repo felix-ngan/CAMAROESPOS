@@ -36,10 +36,10 @@
                         <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="*" IsReadOnly="True" />
                         <DataGridTextColumn Header="Solde Actuel" Binding="{Binding Balance, StringFormat={}{0:N0} FCFA}" Width="150" IsReadOnly="True" />
                         
-                        <DataGridTemplateColumn Header="Recharger" Width="100">
+                        <DataGridTemplateColumn Header="Action" Width="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding DataContext.RechargeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Content="+ Créditer" Height="30" />
+                                    <Button Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding DataContext.RechargeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Content="Recharger" Height="30" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
