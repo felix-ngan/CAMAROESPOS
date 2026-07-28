@@ -13,7 +13,7 @@
         TextOptions.TextRenderingMode="Auto"
         Background="#F4F7FE"
         FontFamily="{DynamicResource MaterialDesignFont}"
-        Title="CAMAROES POS Moderne" Height="700" Width="1200" WindowStartupLocation="CenterScreen">
+        Title="CamareosPOS Moderne" Height="700" Width="1200" WindowStartupLocation="CenterScreen">
     
     <materialDesign:DialogHost Identifier="RootDialog" DialogTheme="Inherit">
         <Grid>
@@ -25,8 +25,15 @@
             <!-- Sidebar -->
             <Border Grid.Column="0" Background="White" BorderBrush="#E0E5F2" BorderThickness="0,0,1,0">
                 <StackPanel Margin="0,30,0,0">
-                    <TextBlock Text="ICarePro POS" Foreground="#2B3674" FontSize="26" FontWeight="ExtraBlack" HorizontalAlignment="Center" Margin="0,0,0,5"/>
-                    <TextBlock Text="Camaroes Edition" Foreground="#A3AED0" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,40"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,40">
+                        <Border Background="#1E88E5" CornerRadius="10" Width="45" Height="45" Margin="0,0,10,0">
+                            <materialDesign:PackIcon Kind="ShoppingOutline" Width="30" Height="30" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Camareos" Foreground="#2B3674" FontSize="24" FontWeight="ExtraBlack" Margin="0,0,0,-5" />
+                            <TextBlock Text="POS SYSTEM" Foreground="#1E88E5" FontSize="12" FontWeight="Bold" />
+                        </StackPanel>
+                    </StackPanel>
 
                     <Button x:Name="BtnDashboard" Click="BtnDashboard_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#8F9BBA" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="15,5" materialDesign:ButtonAssist.CornerRadius="10">
                         <StackPanel Orientation="Horizontal">

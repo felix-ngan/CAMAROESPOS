@@ -4,7 +4,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:viewmodels="clr-namespace:CamaroesPOS.UI.ViewModels"
         Name="LoginWin"
-        Title="Connexion - Camaroes POS" Height="500" Width="400"
+        Title="Connexion - CamareosPOS" Height="500" Width="400"
         WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -18,9 +18,16 @@
     
     <materialDesign:Card Margin="20" UniformCornerRadius="15" Background="{DynamicResource MaterialDesignPaper}">
         <StackPanel Margin="30">
-            <materialDesign:PackIcon Kind="AccountCircleOutline" Width="100" Height="100" HorizontalAlignment="Center" Margin="0,20,0,10" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-            
-            <TextBlock Text="CONNEXION" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,20">
+                <Border Background="#1E88E5" CornerRadius="12" Width="60" Height="60" Margin="0,0,15,0">
+                    <materialDesign:PackIcon Kind="ShoppingOutline" Width="40" Height="40" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Camareos" Foreground="#2B3674" FontSize="32" FontWeight="ExtraBlack" Margin="0,0,0,-5" />
+                    <TextBlock Text="POS SYSTEM" Foreground="#1E88E5" FontSize="14" FontWeight="Bold" />
+                </StackPanel>
+            </StackPanel>
+
             <TextBlock Text="Veuillez vous identifier pour continuer" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,40" Opacity="0.7" />
 
             <TextBox materialDesign:HintAssist.Hint="Nom d'utilisateur" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,25" FontSize="16" />
