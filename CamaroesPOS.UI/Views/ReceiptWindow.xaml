@@ -35,7 +35,7 @@
                     <TextBlock Text="Douala, Cameroun" FontSize="12" HorizontalAlignment="Center" Foreground="Black" />
                     <TextBlock Text="Tél: (+237) 600 000 000" FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="Black" />
                     
-                    <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,0,0,15" BorderDashArray="2,2"/>
+                    <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,0,0,15"/>
 
                     <!-- Transaction Info -->
                     <Grid Margin="0,0,0,15">
@@ -55,7 +55,7 @@
                     
                     <TextBlock x:Name="TxtMode" Text="Mode de Paiement : Espèces" FontSize="12" Margin="0,0,0,15" FontWeight="Bold" Foreground="Black"/>
 
-                    <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,0,0,15" BorderDashArray="2,2"/>
+                    <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,0,0,15"/>
 
                     <!-- Items Table Header -->
                     <Grid Margin="0,0,0,5">
@@ -87,7 +87,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,15,0,15" BorderDashArray="2,2"/>
+                    <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,15,0,15"/>
 
                     <!-- Totals -->
                     <Grid Margin="0,0,0,5">
@@ -117,7 +117,7 @@
                         <TextBlock Grid.Column="1" x:Name="TxtChange" Text="0 FCFA" FontSize="14" HorizontalAlignment="Right" Foreground="Black"/>
                     </Grid>
                     
-                    <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,0,0,15" BorderDashArray="2,2"/>
+                    <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,0,0,15"/>
                     
                     <TextBlock Text="Merci de votre visite !" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="Black"/>
                     <TextBlock Text="Les articles vendus ne sont ni repris ni échangés." FontSize="10" HorizontalAlignment="Center" Foreground="Gray" TextWrapping="Wrap" TextAlignment="Center"/>
