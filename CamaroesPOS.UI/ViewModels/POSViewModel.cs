@@ -23,6 +23,8 @@ namespace CamaroesPOS.UI.ViewModels
         public ICommand ConfirmCashPaymentCommand { get; }
         public ICommand ExactAmountCommand { get; }
         public ICommand QuickCashCommand { get; }
+        public ICommand ClearCartCommand { get; }
+        public ICommand RemoveFromCartCommand { get; }
 
         private double _totalAmount;
         public double TotalAmount
@@ -105,6 +107,8 @@ namespace CamaroesPOS.UI.ViewModels
             ConfirmCashPaymentCommand = new RelayCommand<object>(ConfirmCashPayment, CanConfirmCashPayment);
             ExactAmountCommand = new RelayCommand<object>(ExactAmount);
             QuickCashCommand = new RelayCommand<string>(QuickCash);
+            ClearCartCommand = new RelayCommand<object>(ClearCart, CanClearCart);
+            RemoveFromCartCommand = new RelayCommand<CartItem>(RemoveFromCart);
 
             LoadDataFromDatabase();
         }
@@ -144,6 +148,28 @@ namespace CamaroesPOS.UI.ViewModels
         {
             TotalAmount = Cart.Sum(c => c.Total);
             UpdateChangeAmount(); // To update the popup if it's open (though you can't add to cart while it's open)
+        }
+
+        private bool CanClearCart(object obj)
+        {
+            return Cart.Count > 0;
+        }
+
+        private void ClearCart(object obj)
+        {
+            Cart.Clear();
+            UpdateTotalAmount();
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        private void RemoveFromCart(CartItem item)
+        {
+            if (item != null)
+            {
+                Cart.Remove(item);
+                UpdateTotalAmount();
+                CommandManager.InvalidateRequerySuggested();
+            }
         }
 
         private bool CanCheckout(object obj)
