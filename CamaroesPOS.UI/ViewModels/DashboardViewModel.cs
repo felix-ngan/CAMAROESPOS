@@ -185,7 +185,7 @@ namespace CamaroesPOS.UI.ViewModels
                 {
                     var d = today.AddDays(-i);
                     var nextD = d.AddDays(1);
-                    var dailyCancel = context.CancelledOrders.Where(c => c.CancelledDate >= d && c.CancelledDate < nextD).Sum(c => (double?)c.Total) ?? 0;
+                    var dailyCancel = context.CancelledOrders.Where(c => c.SoldDate >= d && c.SoldDate < nextD).Sum(c => (double?)c.Total) ?? 0;
                     cancelValues.Add(dailyCancel);
                 }
                 CancelledChart = new SeriesCollection
