@@ -158,32 +158,125 @@
             </materialDesign:Card>
         </UniformGrid>
 
-        <!-- Graphique Statistique -->
-        <materialDesign:Card Grid.Row="2" Margin="20,10,20,20" Padding="20" Background="White" UniformCornerRadius="15">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="Évolution du Chiffre d'Affaires" FontSize="18" FontWeight="Bold" Margin="0,0,0,15" Foreground="#2B3674" />
-                
-                <lvc:CartesianChart Grid.Row="1" Series="{Binding SalesChart}" LegendLocation="None" Margin="10">
-                    <lvc:CartesianChart.AxisX>
-                        <lvc:Axis Title="Jours" Labels="{Binding ChartLabels}">
-                            <lvc:Axis.Separator>
-                                <lvc:Separator Step="1" IsEnabled="False" />
-                            </lvc:Axis.Separator>
-                        </lvc:Axis>
-                    </lvc:CartesianChart.AxisX>
-                    <lvc:CartesianChart.AxisY>
-                        <lvc:Axis Title="Ventes" LabelFormatter="{Binding YFormatter}" MinValue="0">
-                            <lvc:Axis.Separator>
-                                <lvc:Separator Stroke="#E0E5F2" StrokeThickness="1" StrokeDashArray="2" />
-                            </lvc:Axis.Separator>
-                        </lvc:Axis>
-                    </lvc:CartesianChart.AxisY>
-                </lvc:CartesianChart>
-            </Grid>
-        </materialDesign:Card>
+        <!-- Graphiques Statistiques -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="10,0,10,10">
+            <UniformGrid Columns="2">
+                <!-- 1. Ventes Aujourd'hui -->
+                <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Répartition Ventes (Auj vs Hier)" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        <lvc:PieChart Grid.Row="1" Series="{Binding TodaySalesChart}" LegendLocation="Right" InnerRadius="40" Margin="5" />
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- 2. Chiffre d'Affaires -->
+                <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Évolution Chiffre d'Affaires (7 j)" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        <lvc:CartesianChart Grid.Row="1" Series="{Binding SalesChart}" LegendLocation="None" Margin="5">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Labels="{Binding ChartLabels}" />
+                            </lvc:CartesianChart.AxisX>
+                        </lvc:CartesianChart>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- 3. Stock Articles -->
+                <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Top 5 Articles en Stock" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        <lvc:CartesianChart Grid.Row="1" Series="{Binding TotalProductsChart}" Margin="5">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Labels="{Binding ProductsLabels}" />
+                            </lvc:CartesianChart.AxisX>
+                        </lvc:CartesianChart>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- 4. Rupture de Stock -->
+                <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Statut du Stock" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        <lvc:PieChart Grid.Row="1" Series="{Binding LowStockChart}" LegendLocation="Right" Margin="5" />
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- 5. Portefeuilles -->
+                <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Top 5 Portefeuilles Clients" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        <lvc:CartesianChart Grid.Row="1" Series="{Binding WalletsChart}" Margin="5">
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Labels="{Binding WalletsLabels}" />
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- 6. Articles Vendus -->
+                <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Top 5 Articles Vendus" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        <lvc:CartesianChart Grid.Row="1" Series="{Binding ItemsSoldTodayChart}" Margin="5">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Labels="{Binding ItemsSoldLabels}" />
+                            </lvc:CartesianChart.AxisX>
+                        </lvc:CartesianChart>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- 7. Annulations -->
+                <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Annulations Récentes (7 j)" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        <lvc:CartesianChart Grid.Row="1" Series="{Binding CancelledChart}" Margin="5">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Labels="{Binding ChartLabels}" />
+                            </lvc:CartesianChart.AxisX>
+                        </lvc:CartesianChart>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- 8. Utilisateurs -->
+                <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Répartition des Rôles" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        <lvc:PieChart Grid.Row="1" Series="{Binding UsersChart}" LegendLocation="Right" InnerRadius="40" Margin="5" />
+                    </Grid>
+                </materialDesign:Card>
+            </UniformGrid>
+        </ScrollViewer>
     </Grid>
 </UserControl>
