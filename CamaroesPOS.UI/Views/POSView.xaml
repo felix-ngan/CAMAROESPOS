@@ -107,9 +107,34 @@
                             </ListBox.ItemsPanel>
                         </ListBox>
 
-                        <Button Grid.Row="2" Content="TERMINER (FERMER)" Command="{Binding CloseCatalogCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,20,0,0" Height="45" FontSize="16" />
+                        <Button Grid.Row="2" Content="FERMER" Command="{Binding CloseCatalogCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,20,0,0" Height="45" FontSize="16" />
                     </Grid>
                 </Border>
+
+                <!-- DIALOGUE DE QUANTITÉ -->
+                <StackPanel Margin="20" Width="300" Visibility="{Binding IsQuantityDialogOpen, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Quelle Quantité ?" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                    
+                    <Grid Margin="0,0,0,25">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="-" Command="{Binding DecreaseQtyCommand}" FontSize="24" FontWeight="Bold" Height="50" Width="50" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                        <TextBlock Grid.Column="1" Text="{Binding SelectedQuantityToAdd}" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Button Grid.Column="2" Content="+" Command="{Binding IncreaseQtyCommand}" FontSize="24" FontWeight="Bold" Height="50" Width="50" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelQuantityCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" Height="45" />
+                        <Button Grid.Column="1" Content="AJOUTER" Command="{Binding ConfirmQuantityCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#1E88E5" BorderBrush="#1E88E5" Height="45" />
+                    </Grid>
+                </StackPanel>
             </Grid>
         </materialDesign:DialogHost.DialogContent>
 
@@ -124,21 +149,32 @@
             <!-- Header du Panier -->
             <Grid Grid.Row="0" Margin="0,0,0,20">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="Votre Panier" FontSize="28" FontWeight="Bold" VerticalAlignment="Top" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,4,0,0" />
+                <TextBlock Grid.Column="0" Text="Votre Panier" FontSize="28" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,20,0" />
 
-                <Button Grid.Column="1" Command="{Binding OpenCatalogCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#1E88E5" BorderBrush="#1E88E5" Height="45" Margin="0,0,15,0">
+                <!-- SCAN CODE BARRE -->
+                <TextBox Grid.Column="1" Text="{Binding BarcodeSearch, UpdateSourceTrigger=PropertyChanged}" 
+                         materialDesign:HintAssist.Hint="Scanner ou saisir un code-barres... (puis Entrée)" 
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         VerticalAlignment="Center" Margin="0,0,20,0" Height="45">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding SearchBarcodeCommand}" />
+                    </TextBox.InputBindings>
+                </TextBox>
+
+                <Button Grid.Column="2" Command="{Binding OpenCatalogCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#1E88E5" BorderBrush="#1E88E5" Height="45" Margin="0,0,15,0">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <materialDesign:PackIcon Kind="PlusCircleOutline" Width="20" Height="20" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="PRODUITS" FontSize="16" VerticalAlignment="Center"/>
+                        <materialDesign:PackIcon Kind="ViewList" Width="20" Height="20" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="CATALOGUE" FontSize="16" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Column="2" Content="VIDER" Command="{Binding ClearCartCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" Height="45" FontSize="16" />
+                <Button Grid.Column="3" Content="VIDER" Command="{Binding ClearCartCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" Height="45" FontSize="16" />
             </Grid>
 
             <!-- Liste des produits dans le panier -->
@@ -175,11 +211,11 @@
                         <TextBlock Text="Mode de paiement :" FontSize="16" Margin="0,0,0,5" Opacity="0.9"/>
                         <ComboBox SelectedIndex="{Binding PaymentMethodIndex}" Width="250" HorizontalAlignment="Left" Margin="0,0,0,15" Padding="10" FontSize="16" Foreground="White" Background="Transparent">
                             <ComboBoxItem Content="Espèces" Foreground="Black" />
-                            <ComboBoxItem Content="Portefeuille Client (Wallet)" Foreground="Black" />
+                            <ComboBoxItem Content="Portefeuille Client" Foreground="Black" />
                         </ComboBox>
 
                         <!-- Visible only if Wallet is selected -->
-                        <TextBox materialDesign:HintAssist.Hint="Numéro de Téléphone (Wallet)" 
+                        <TextBox materialDesign:HintAssist.Hint="Numéro de Téléphone" 
                                  Text="{Binding CustomerPhone}" 
                                  Visibility="{Binding IsWalletPayment, Converter={StaticResource BoolToVis}}" 
                                  Width="250" HorizontalAlignment="Left" FontSize="16" Foreground="White" materialDesign:HintAssist.Foreground="White" />

@@ -95,8 +95,8 @@
                     </materialDesign:Card>
                 </Grid>
             </TabItem>
-            <!-- TAB: SÉCURITÉ (MON PROFIL) -->
-            <TabItem Header="Sécurité (Mon Profil)">
+            <!-- TAB: SÉCURITÉ -->
+            <TabItem Header="Sécurité">
                 <Grid Margin="0,15,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="600" />

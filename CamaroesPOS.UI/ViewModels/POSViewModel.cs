@@ -27,6 +27,11 @@ namespace CamaroesPOS.UI.ViewModels
         public ICommand RemoveFromCartCommand { get; }
         public ICommand OpenCatalogCommand { get; }
         public ICommand CloseCatalogCommand { get; }
+        public ICommand SearchBarcodeCommand { get; }
+        public ICommand ConfirmQuantityCommand { get; }
+        public ICommand CancelQuantityCommand { get; }
+        public ICommand IncreaseQtyCommand { get; }
+        public ICommand DecreaseQtyCommand { get; }
 
         private double _totalAmount;
         public double TotalAmount
@@ -61,6 +66,22 @@ namespace CamaroesPOS.UI.ViewModels
             set { _customerPhone = value; OnPropertyChanged(); }
         }
 
+        private string _barcodeSearch;
+        public string BarcodeSearch
+        {
+            get => _barcodeSearch;
+            set { _barcodeSearch = value; OnPropertyChanged(); }
+        }
+
+        private int _selectedQuantityToAdd = 1;
+        public int SelectedQuantityToAdd
+        {
+            get => _selectedQuantityToAdd;
+            set { _selectedQuantityToAdd = value; OnPropertyChanged(); }
+        }
+
+        private Product _selectedProductToAdd;
+
         // Tactile Calculator variables
         private bool _isCheckoutDialogOpen;
         public bool IsCheckoutDialogOpen
@@ -86,6 +107,18 @@ namespace CamaroesPOS.UI.ViewModels
             }
         }
 
+        private bool _isQuantityDialogOpen;
+        public bool IsQuantityDialogOpen
+        {
+            get => _isQuantityDialogOpen;
+            set
+            {
+                _isQuantityDialogOpen = value;
+                OnPropertyChanged();
+                UpdateAnyDialogOpen();
+            }
+        }
+
         private bool _isAnyDialogOpen;
         public bool IsAnyDialogOpen
         {
@@ -95,7 +128,7 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void UpdateAnyDialogOpen()
         {
-            IsAnyDialogOpen = IsCheckoutDialogOpen || IsCatalogDialogOpen;
+            IsAnyDialogOpen = IsCheckoutDialogOpen || IsCatalogDialogOpen || IsQuantityDialogOpen;
         }
 
         private string _receivedAmountString = "";
@@ -142,6 +175,11 @@ namespace CamaroesPOS.UI.ViewModels
             RemoveFromCartCommand = new RelayCommand<CartItem>(RemoveFromCart);
             OpenCatalogCommand = new RelayCommand<object>(o => IsCatalogDialogOpen = true);
             CloseCatalogCommand = new RelayCommand<object>(o => IsCatalogDialogOpen = false);
+            SearchBarcodeCommand = new RelayCommand<object>(SearchBarcode);
+            ConfirmQuantityCommand = new RelayCommand<object>(ConfirmQuantity);
+            CancelQuantityCommand = new RelayCommand<object>(o => IsQuantityDialogOpen = false);
+            IncreaseQtyCommand = new RelayCommand<object>(o => SelectedQuantityToAdd++);
+            DecreaseQtyCommand = new RelayCommand<object>(o => { if (SelectedQuantityToAdd > 1) SelectedQuantityToAdd--; });
 
             LoadDataFromDatabase();
         }
@@ -149,11 +187,47 @@ namespace CamaroesPOS.UI.ViewModels
         private void AddToCart(Product product)
         {
             if (product == null) return;
+            
+            // Ouvrir le dialogue de quantité
+            _selectedProductToAdd = product;
+            SelectedQuantityToAdd = 1;
+            IsQuantityDialogOpen = true;
+        }
 
+        private void ConfirmQuantity(object obj)
+        {
+            if (_selectedProductToAdd == null || SelectedQuantityToAdd <= 0) return;
+
+            AddProductToCartLogic(_selectedProductToAdd, SelectedQuantityToAdd);
+            IsQuantityDialogOpen = false;
+        }
+
+        private void SearchBarcode(object obj)
+        {
+            if (string.IsNullOrWhiteSpace(BarcodeSearch)) return;
+
+            using (var context = new PosDbContext())
+            {
+                var product = context.Products.FirstOrDefault(p => p.Barcode == BarcodeSearch || p.ProductCode == BarcodeSearch);
+                if (product != null)
+                {
+                    // Scan direct : on ajoute 1 sans demander la quantité
+                    AddProductToCartLogic(product, 1);
+                }
+                else
+                {
+                    MessageBox.Show("Produit introuvable pour ce code-barres.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            BarcodeSearch = ""; // Clear for next scan
+        }
+
+        private void AddProductToCartLogic(Product product, int qty)
+        {
             var existingItem = Cart.FirstOrDefault(c => c.ProductCode == product.ProductCode);
             if (existingItem != null)
             {
-                existingItem.Qty++;
+                existingItem.Qty += qty;
                 existingItem.Total = existingItem.Qty * existingItem.Price;
                 
                 int index = Cart.IndexOf(existingItem);
@@ -167,8 +241,8 @@ namespace CamaroesPOS.UI.ViewModels
                     ProductCode = product.ProductCode,
                     ProductDescription = product.Description,
                     Price = product.Price,
-                    Qty = 1,
-                    Total = product.Price,
+                    Qty = qty,
+                    Total = product.Price * qty,
                     Date = DateTime.Now
                 });
             }

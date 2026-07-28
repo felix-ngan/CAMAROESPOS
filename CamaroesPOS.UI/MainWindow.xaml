@@ -38,7 +38,7 @@
                     <Button x:Name="BtnPOS" Click="BtnPOS_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Cart" Width="24" Height="24" VerticalAlignment="Center"/>
-                            <TextBlock Text="Caisse (POS)" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
+                            <TextBlock Text="Caisse" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
                         </StackPanel>
                     </Button>
                     

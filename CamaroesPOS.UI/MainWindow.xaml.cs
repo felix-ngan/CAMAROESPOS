@@ -57,7 +57,7 @@ namespace CamaroesPOS.UI
 
         private void BtnPOS_Click(object sender, RoutedEventArgs e)
         {
-            TxtHeader.Text = "Caisse (Point of Sale)";
+            TxtHeader.Text = "Point de Vente";
             MainContentControl.Content = _posView;
         }
 
