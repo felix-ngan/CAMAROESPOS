@@ -59,6 +59,16 @@ namespace CamaroesPOS.UI.ViewModels
 
         public ICommand SaveStoreCommand { get; }
 
+        // Form for My Profile (Change Password)
+        private string _oldPassword;
+        public string OldPassword { get => _oldPassword; set { _oldPassword = value; OnPropertyChanged(); } }
+        private string _profileNewPassword;
+        public string ProfileNewPassword { get => _profileNewPassword; set { _profileNewPassword = value; OnPropertyChanged(); } }
+        private string _profileConfirmPassword;
+        public string ProfileConfirmPassword { get => _profileConfirmPassword; set { _profileConfirmPassword = value; OnPropertyChanged(); } }
+
+        public ICommand ChangePasswordCommand { get; }
+
         public SettingsViewModel()
         {
             Users = new ObservableCollection<User>();
@@ -66,6 +76,7 @@ namespace CamaroesPOS.UI.ViewModels
             SaveUserCommand = new RelayCommand<object>(SaveUser, CanSaveUser);
             ClearUserCommand = new RelayCommand<object>(ClearUser);
             SaveStoreCommand = new RelayCommand<object>(SaveStore, CanSaveStore);
+            ChangePasswordCommand = new RelayCommand<object>(ChangePassword);
 
             LoadData();
         }
@@ -174,6 +185,43 @@ namespace CamaroesPOS.UI.ViewModels
                 context.SaveChanges();
             }
             MessageBox.Show("Paramètres système enregistrés !", "Paramètres", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void ChangePassword(object obj)
+        {
+            if (string.IsNullOrWhiteSpace(OldPassword) || string.IsNullOrWhiteSpace(ProfileNewPassword) || string.IsNullOrWhiteSpace(ProfileConfirmPassword))
+            {
+                MessageBox.Show("Veuillez remplir tous les champs de mot de passe.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (ProfileNewPassword != ProfileConfirmPassword)
+            {
+                MessageBox.Show("Le nouveau mot de passe et la confirmation ne correspondent pas.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (Application.Current.Properties.Contains("CurrentUserName"))
+            {
+                string username = Application.Current.Properties["CurrentUserName"].ToString();
+                using (var context = new PosDbContext())
+                {
+                    var user = context.Users.FirstOrDefault(u => u.Username == username && u.Password == OldPassword);
+                    if (user == null)
+                    {
+                        MessageBox.Show("L'ancien mot de passe est incorrect.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    user.Password = ProfileNewPassword;
+                    context.SaveChanges();
+                    MessageBox.Show("Votre mot de passe a été modifié avec succès !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+                    
+                    OldPassword = "";
+                    ProfileNewPassword = "";
+                    ProfileConfirmPassword = "";
+                }
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

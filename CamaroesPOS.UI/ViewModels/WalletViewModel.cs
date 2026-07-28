@@ -46,6 +46,7 @@ namespace CamaroesPOS.UI.ViewModels
         public ICommand RechargeCommand { get; }
         public ICommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
+        public ICommand DeleteWalletCommand { get; }
 
         public WalletViewModel()
         {
@@ -54,6 +55,7 @@ namespace CamaroesPOS.UI.ViewModels
             RechargeCommand = new RelayCommand<CustomerWallet>(OpenRechargeForm);
             SaveCommand = new RelayCommand<object>(SaveWalletAction);
             CancelCommand = new RelayCommand<object>(CancelAction);
+            DeleteWalletCommand = new RelayCommand<object>(DeleteWallet);
 
             LoadDataFromDatabase();
         }
@@ -152,6 +154,32 @@ namespace CamaroesPOS.UI.ViewModels
         {
             IsRecharging = false;
             SelectedWallet = null;
+        }
+
+        private void DeleteWallet(object obj)
+        {
+            if (obj is CustomerWallet wallet)
+            {
+                var result = MessageBox.Show($"Êtes-vous sûr de vouloir supprimer définitivement le portefeuille {wallet.Phone} ?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Yes)
+                {
+                    using (var context = new PosDbContext())
+                    {
+                        var walletToDelete = context.CustomerWallets.FirstOrDefault(w => w.Phone == wallet.Phone);
+                        if (walletToDelete != null)
+                        {
+                            context.CustomerWallets.Remove(walletToDelete);
+                            
+                            var transactions = context.WalletTransactions.Where(t => t.Phone == wallet.Phone).ToList();
+                            context.WalletTransactions.RemoveRange(transactions);
+                            
+                            context.SaveChanges();
+                            LoadDataFromDatabase();
+                            MessageBox.Show("Portefeuille supprimé avec succès.", "Suppression", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                    }
+                }
+            }
         }
 
         private void LoadDataFromDatabase()

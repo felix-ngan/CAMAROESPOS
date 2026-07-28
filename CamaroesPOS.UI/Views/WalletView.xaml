@@ -36,10 +36,16 @@
                         <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="*" IsReadOnly="True" />
                         <DataGridTextColumn Header="Solde Actuel" Binding="{Binding Balance, StringFormat={}{0:N0} FCFA}" Width="150" IsReadOnly="True" />
                         
-                        <DataGridTemplateColumn Header="Action" Width="100">
+                        <DataGridTemplateColumn Header="Action" Width="120">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding DataContext.RechargeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Content="Recharger" Height="30" />
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding DataContext.RechargeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Content="Recharger" Height="30" Margin="0,0,5,0" />
+                                        
+                                        <Button Style="{StaticResource MaterialDesignFlatButton}" Foreground="#E53935" Command="{Binding DataContext.DeleteWalletCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Height="30" Width="30" Padding="0">
+                                            <materialDesign:PackIcon Kind="TrashCanOutline" Width="20" Height="20" />
+                                        </Button>
+                                    </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

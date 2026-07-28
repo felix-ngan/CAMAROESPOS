@@ -127,6 +127,21 @@
                 </materialDesign:Card>
             </TabItem>
 
+            <!-- TAB: PORTEFEUILLES -->
+            <TabItem Header="Opérations Portefeuille">
+                <materialDesign:Card Margin="0,15,0,0" Padding="10" UniformCornerRadius="10">
+                    <DataGrid ItemsSource="{Binding WalletTransactionsList}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" FontSize="14">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Date &amp; Heure" Binding="{Binding CreatedAt, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="150" />
+                            <DataGridTextColumn Header="N° Trans" Binding="{Binding TransNo}" Width="150" />
+                            <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="150" />
+                            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="100" />
+                            <DataGridTextColumn Header="Montant" Binding="{Binding Amount, StringFormat={}{0:N0} FCFA}" Width="150" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </materialDesign:Card>
+            </TabItem>
+
         </TabControl>
     </Grid>
 </UserControl>

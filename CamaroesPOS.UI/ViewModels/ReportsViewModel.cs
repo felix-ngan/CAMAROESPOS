@@ -15,6 +15,7 @@ namespace CamaroesPOS.UI.ViewModels
         public ObservableCollection<Product> ProductsList { get; set; }
         public ObservableCollection<Stock> StockHistoryList { get; set; }
         public ObservableCollection<CancelledOrder> CancelledOrdersList { get; set; }
+        public ObservableCollection<WalletTransaction> WalletTransactionsList { get; set; }
 
         private DateTime? _startDate;
         public DateTime? StartDate { get => _startDate; set { _startDate = value; OnPropertyChanged(); } }
@@ -40,6 +41,7 @@ namespace CamaroesPOS.UI.ViewModels
             ProductsList = new ObservableCollection<Product>();
             StockHistoryList = new ObservableCollection<Stock>();
             CancelledOrdersList = new ObservableCollection<CancelledOrder>();
+            WalletTransactionsList = new ObservableCollection<WalletTransaction>();
 
             FilterCommand = new RelayCommand<object>(ApplyFilter);
             ResetFilterCommand = new RelayCommand<object>(ResetFilter);
@@ -127,6 +129,23 @@ namespace CamaroesPOS.UI.ViewModels
                 var cancelledResults = queryCancelled.OrderByDescending(c => c.SoldDate).ToList();
                 CancelledOrdersList.Clear();
                 foreach (var item in cancelledResults) CancelledOrdersList.Add(item);
+
+                // 5. Transactions Portefeuilles
+                var queryWallet = context.WalletTransactions.AsQueryable();
+                if (StartDate.HasValue) queryWallet = queryWallet.Where(w => w.CreatedAt >= StartDate.Value.Date);
+                if (EndDate.HasValue)
+                {
+                    var end = EndDate.Value.Date.AddDays(1);
+                    queryWallet = queryWallet.Where(w => w.CreatedAt < end);
+                }
+                if (!string.IsNullOrWhiteSpace(SearchText))
+                {
+                    string search = SearchText.ToLower();
+                    queryWallet = queryWallet.Where(w => w.TransNo.ToLower().Contains(search) || w.Phone.ToLower().Contains(search));
+                }
+                var walletResults = queryWallet.OrderByDescending(w => w.CreatedAt).ToList();
+                WalletTransactionsList.Clear();
+                foreach (var item in walletResults) WalletTransactionsList.Add(item);
             }
         }
 
