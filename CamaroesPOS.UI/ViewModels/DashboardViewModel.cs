@@ -38,6 +38,41 @@ namespace CamaroesPOS.UI.ViewModels
             set { _totalWalletsBalance = value; OnPropertyChanged(); }
         }
 
+        private double _totalSalesAllTime;
+        public double TotalSalesAllTime
+        {
+            get => _totalSalesAllTime;
+            set { _totalSalesAllTime = value; OnPropertyChanged(); }
+        }
+
+        private int _totalItemsSoldToday;
+        public int TotalItemsSoldToday
+        {
+            get => _totalItemsSoldToday;
+            set { _totalItemsSoldToday = value; OnPropertyChanged(); }
+        }
+
+        private int _totalItemsSoldAllTime;
+        public int TotalItemsSoldAllTime
+        {
+            get => _totalItemsSoldAllTime;
+            set { _totalItemsSoldAllTime = value; OnPropertyChanged(); }
+        }
+
+        private double _totalCancelledAmount;
+        public double TotalCancelledAmount
+        {
+            get => _totalCancelledAmount;
+            set { _totalCancelledAmount = value; OnPropertyChanged(); }
+        }
+
+        private int _totalUsers;
+        public int TotalUsers
+        {
+            get => _totalUsers;
+            set { _totalUsers = value; OnPropertyChanged(); }
+        }
+
         private SeriesCollection _salesChart;
         public SeriesCollection SalesChart
         {
@@ -80,6 +115,19 @@ namespace CamaroesPOS.UI.ViewModels
 
                 // Solde total des portefeuilles clients
                 TotalWalletsBalance = context.CustomerWallets.Sum(w => (double?)w.Balance) ?? 0;
+
+                // Nouvelles Stats
+                TotalSalesAllTime = context.SoldItems.Sum(s => (double?)s.Total) ?? 0;
+                
+                TotalItemsSoldToday = context.SoldItems
+                    .Where(s => s.SoldDate >= today && s.SoldDate < tomorrow)
+                    .Sum(s => (int?)s.Qty) ?? 0;
+
+                TotalItemsSoldAllTime = context.SoldItems.Sum(s => (int?)s.Qty) ?? 0;
+
+                TotalCancelledAmount = context.CancelledOrders.Sum(c => (double?)c.Total) ?? 0;
+
+                TotalUsers = context.Users.Count();
 
                 // Graphique des ventes des 7 derniers jours
                 var salesValues = new ChartValues<double>();
