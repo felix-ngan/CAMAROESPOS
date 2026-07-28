@@ -11,6 +11,7 @@ namespace CamaroesPOS.UI
         private WalletView _walletView;
         private DashboardView _dashboardView;
         private ReportsView _reportsView;
+        private SettingsView _settingsView;
 
         public MainWindow()
         {
@@ -20,6 +21,7 @@ namespace CamaroesPOS.UI
             _walletView = new WalletView();
             _dashboardView = new DashboardView();
             _reportsView = new ReportsView();
+            _settingsView = new SettingsView();
 
             if (Application.Current.Properties.Contains("CurrentUserName"))
             {
@@ -34,6 +36,7 @@ namespace CamaroesPOS.UI
                     BtnDashboard.Visibility = System.Windows.Visibility.Collapsed;
                     BtnReports.Visibility = System.Windows.Visibility.Collapsed;
                     BtnInventory.Visibility = System.Windows.Visibility.Collapsed;
+                    BtnSettings.Visibility = System.Windows.Visibility.Collapsed;
                     BtnPOS_Click(null, null); // Start directly on POS
                 }
                 else
@@ -80,6 +83,12 @@ namespace CamaroesPOS.UI
             }
 
             MainContentControl.Content = _reportsView;
+        }
+
+        private void BtnSettings_Click(object sender, RoutedEventArgs e)
+        {
+            TxtHeader.Text = "Paramètres Généraux";
+            MainContentControl.Content = _settingsView;
         }
 
         private void BtnLogout_Click(object sender, RoutedEventArgs e)

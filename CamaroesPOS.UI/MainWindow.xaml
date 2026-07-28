@@ -62,6 +62,13 @@
                             <TextBlock Text="Rapports &amp; Ventes" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
                         </StackPanel>
                     </Button>
+
+                    <Button x:Name="BtnSettings" Click="BtnSettings_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="10,5">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Cog" Width="24" Height="24" VerticalAlignment="Center"/>
+                            <TextBlock Text="Paramètres" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15"/>
+                        </StackPanel>
+                    </Button>
                     
                     <Border Height="1" Background="White" Opacity="0.2" Margin="10,20" />
                     
