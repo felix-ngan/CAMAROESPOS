@@ -402,6 +402,19 @@ namespace CamaroesPOS.UI.ViewModels
                     }
                 }
 
+                // CRM : Mise à jour du portefeuille / Points de fidélité
+                if (!string.IsNullOrWhiteSpace(CustomerPhone))
+                {
+                    var wallet = context.CustomerWallets.FirstOrDefault(w => w.Phone == CustomerPhone);
+                    if (wallet != null)
+                    {
+                        wallet.TotalSpent += TotalAmount;
+                        // 1 point pour chaque 1000 FCFA dépensé
+                        int pointsEarned = (int)(TotalAmount / 1000);
+                        wallet.LoyaltyPoints += pointsEarned;
+                    }
+                }
+
                 context.SaveChanges(); 
             }
             return transNo;
@@ -468,6 +481,7 @@ namespace CamaroesPOS.UI.ViewModels
             DiscountPercentage = 0;
             UpdateTotalAmount();
             ReceivedAmountString = "";
+            CustomerPhone = string.Empty;
             LoadDataFromDatabase();
         }
 

@@ -38,6 +38,20 @@ namespace CamaroesPOS.UI.ViewModels
             set { _totalWalletsBalance = value; OnPropertyChanged(); }
         }
 
+        private int _totalCustomers;
+        public int TotalCustomers
+        {
+            get => _totalCustomers;
+            set { _totalCustomers = value; OnPropertyChanged(); }
+        }
+
+        private int _totalLoyaltyPoints;
+        public int TotalLoyaltyPoints
+        {
+            get => _totalLoyaltyPoints;
+            set { _totalLoyaltyPoints = value; OnPropertyChanged(); }
+        }
+
         private double _totalSalesAllTime;
         public double TotalSalesAllTime
         {
@@ -175,13 +189,16 @@ namespace CamaroesPOS.UI.ViewModels
                     new PieSeries { Title = "Normal", Values = new ChartValues<int> { normalStock }, Fill = System.Windows.Media.Brushes.MediumSeaGreen }
                 };
 
-                // 5. Portefeuilles
+                // 5. Portefeuilles et CRM
+                TotalCustomers = context.CustomerWallets.Count();
+                TotalLoyaltyPoints = context.CustomerWallets.Sum(w => (int?)w.LoyaltyPoints) ?? 0;
                 TotalWalletsBalance = context.CustomerWallets.Sum(w => (double?)w.Balance) ?? 0;
-                var topWallets = context.CustomerWallets.OrderByDescending(w => w.Balance).Take(5).ToList();
-                WalletsLabels = topWallets.Select(w => w.Phone).ToArray();
+                
+                var topCustomers = context.CustomerWallets.OrderByDescending(w => w.TotalSpent).Take(5).ToList();
+                WalletsLabels = topCustomers.Select(w => string.IsNullOrEmpty(w.CustomerName) ? w.Phone : w.CustomerName).ToArray();
                 WalletsChart = new SeriesCollection
                 {
-                    new RowSeries { Title = "Solde", Values = new ChartValues<double>(topWallets.Select(w => w.Balance)), Fill = System.Windows.Media.Brushes.Teal }
+                    new RowSeries { Title = "Total Achats", Values = new ChartValues<double>(topCustomers.Select(w => w.TotalSpent)), Fill = System.Windows.Media.Brushes.Teal }
                 };
 
                 // 6. Articles vendus

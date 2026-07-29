@@ -58,8 +58,8 @@
 
                     <Button x:Name="BtnWallet" Click="BtnWallet_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#8F9BBA" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="15,5" materialDesign:ButtonAssist.CornerRadius="10">
                         <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="Wallet" Width="22" Height="22" VerticalAlignment="Center"/>
-                            <TextBlock Text="Portefeuilles" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
+                            <materialDesign:PackIcon Kind="AccountTie" Width="22" Height="22" VerticalAlignment="Center"/>
+                            <TextBlock Text="Clients (CRM)" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
 

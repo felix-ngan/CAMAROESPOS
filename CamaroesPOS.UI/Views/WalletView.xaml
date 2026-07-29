@@ -19,7 +19,7 @@
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
             <materialDesign:PackIcon Kind="Wallet" Width="30" Height="30" VerticalAlignment="Center" Foreground="#1E88E5"/>
-            <TextBlock Text="Portefeuilles Clients" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#2B3674" />
+            <TextBlock Text="CRM &amp; Portefeuilles Clients" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#2B3674" />
             
             <Button Content="CRÉER UN PORTEFEUILLE" Command="{Binding CreateWalletCommand}" Margin="30,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" />
         </StackPanel>
@@ -34,7 +34,10 @@
                 <DataGrid ItemsSource="{Binding Wallets}" AutoGenerateColumns="False" CanUserAddRows="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="*" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Solde Actuel" Binding="{Binding Balance, StringFormat={}{0:N0} FCFA}" Width="150" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Nom Client" Binding="{Binding CustomerName}" Width="*" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Points" Binding="{Binding LoyaltyPoints}" Width="80" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Total Achat" Binding="{Binding TotalSpent, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Solde Wallet" Binding="{Binding Balance, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
                         
                         <DataGridTemplateColumn Header="Action" Width="180">
                             <DataGridTemplateColumn.CellTemplate>
@@ -61,7 +64,11 @@
                         
                         <TextBox materialDesign:HintAssist.Hint="Numéro de Téléphone" Text="{Binding SelectedWallet.Phone}" IsEnabled="{Binding IsNewWallet}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Montant" Text="{Binding RechargeAmount}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
+                        <TextBox materialDesign:HintAssist.Hint="Nom du Client" Text="{Binding SelectedWallet.CustomerName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
+                        
+                        <TextBox materialDesign:HintAssist.Hint="Email (Optionnel)" Text="{Binding SelectedWallet.Email}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
+                        
+                        <TextBox materialDesign:HintAssist.Hint="Montant (Recharge/Solde initial)" Text="{Binding RechargeAmount}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
 
                         <Grid>
                             <Grid.ColumnDefinitions>

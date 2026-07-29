@@ -72,7 +72,7 @@ namespace CamaroesPOS.UI
 
         private void BtnWallet_Click(object sender, RoutedEventArgs e)
         {
-            TxtHeader.Text = "Portefeuilles Clients";
+            TxtHeader.Text = "Gestion des Clients (CRM)";
             MainContentControl.Content = _walletView;
         }
 

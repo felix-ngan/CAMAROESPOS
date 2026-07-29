@@ -100,8 +100,9 @@
                         <materialDesign:PackIcon Kind="Wallet" Width="32" Height="32" Foreground="#8E24AA" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Portefeuilles" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding TotalWalletsBalance, StringFormat={}{0:N0} FCFA}" FontSize="22" FontWeight="Bold" Foreground="#2B3674" Margin="0,5,0,0" />
+                        <TextBlock Text="Clients / Fidélité" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding TotalCustomers, StringFormat={}{0:N0} Clients}" FontSize="20" FontWeight="Bold" Foreground="#2B3674" Margin="0,2,0,0" />
+                        <TextBlock Text="{Binding TotalLoyaltyPoints, StringFormat={}{0:N0} Points offerts}" FontSize="14" Foreground="#8E24AA" FontWeight="SemiBold" Margin="0,2,0,0" />
                     </StackPanel>
                 </Grid>
             </materialDesign:Card>
@@ -292,7 +293,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <TextBlock Text="Top 5 Portefeuilles Clients" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        <TextBlock Text="Top 5 Meilleurs Clients (CRM)" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
                         <lvc:CartesianChart Grid.Row="1" Series="{Binding WalletsChart}" Margin="5">
                             <lvc:CartesianChart.AxisY>
                                 <lvc:Axis Labels="{Binding WalletsLabels}" />
