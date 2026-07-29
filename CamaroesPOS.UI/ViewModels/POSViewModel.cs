@@ -33,6 +33,27 @@ namespace CamaroesPOS.UI.ViewModels
         public ICommand IncreaseQtyCommand { get; }
         public ICommand DecreaseQtyCommand { get; }
 
+        private double _subTotalAmount;
+        public double SubTotalAmount
+        {
+            get => _subTotalAmount;
+            set { _subTotalAmount = value; OnPropertyChanged(); }
+        }
+
+        private double _discountPercentage;
+        public double DiscountPercentage
+        {
+            get => _discountPercentage;
+            set 
+            { 
+                if (value < 0) value = 0;
+                if (value > 100) value = 100;
+                _discountPercentage = value; 
+                OnPropertyChanged(); 
+                UpdateTotalAmount(); 
+            }
+        }
+
         private double _totalAmount;
         public double TotalAmount
         {
@@ -253,7 +274,8 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void UpdateTotalAmount()
         {
-            TotalAmount = Cart.Sum(c => c.Total);
+            SubTotalAmount = Cart.Sum(c => c.Total);
+            TotalAmount = SubTotalAmount - (SubTotalAmount * (DiscountPercentage / 100.0));
             UpdateChangeAmount(); // To update the popup if it's open (though you can't add to cart while it's open)
         }
 
@@ -265,6 +287,7 @@ namespace CamaroesPOS.UI.ViewModels
         private void ClearCart(object obj)
         {
             Cart.Clear();
+            DiscountPercentage = 0;
             UpdateTotalAmount();
             CommandManager.InvalidateRequerySuggested();
         }
@@ -331,6 +354,7 @@ namespace CamaroesPOS.UI.ViewModels
                 receiptWin.ShowDialog();
                 
                 Cart.Clear();
+                DiscountPercentage = 0;
                 UpdateTotalAmount();
                 CustomerPhone = string.Empty;
                 LoadDataFromDatabase();
@@ -351,6 +375,9 @@ namespace CamaroesPOS.UI.ViewModels
             {
                 foreach (var item in Cart)
                 {
+                    double itemDiscount = item.Total * (DiscountPercentage / 100.0);
+                    double netItemTotal = item.Total - itemDiscount;
+
                     var soldItem = new SoldItem
                     {
                         TransNo = transNo,
@@ -358,7 +385,7 @@ namespace CamaroesPOS.UI.ViewModels
                         Description = item.ProductDescription,
                         Price = item.Price,
                         Qty = item.Qty,
-                        Total = item.Total,
+                        Total = netItemTotal,
                         SoldDate = DateTime.Now,
                         Cashier = "Admin"
                     };
@@ -435,6 +462,7 @@ namespace CamaroesPOS.UI.ViewModels
             
             IsCheckoutDialogOpen = false;
             Cart.Clear();
+            DiscountPercentage = 0;
             UpdateTotalAmount();
             ReceivedAmountString = "";
             LoadDataFromDatabase();

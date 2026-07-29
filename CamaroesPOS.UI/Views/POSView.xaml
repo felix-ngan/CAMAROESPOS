@@ -214,6 +214,11 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
+                            <TextBlock Text="Réduction (%) :" FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0" Opacity="0.9" />
+                            <TextBox Text="{Binding DiscountPercentage, UpdateSourceTrigger=PropertyChanged}" Width="60" TextAlignment="Center" FontSize="18" Foreground="White" Background="#1E88E5" materialDesign:TextFieldAssist.DecorationVisibility="Hidden" BorderThickness="0" Padding="5" materialDesign:HintAssist.Foreground="White" />
+                        </StackPanel>
+                        
                         <TextBlock Text="MONTANT TOTAL À PAYER" FontSize="16" Opacity="0.9" HorizontalAlignment="Right" />
                         <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} FCFA}" FontSize="42" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,0,15" />
 
