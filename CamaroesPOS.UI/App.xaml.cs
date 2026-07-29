@@ -32,6 +32,8 @@ namespace CamaroesPOS.UI
                     "CREATE TABLE IF NOT EXISTS Expenses (Id INTEGER NOT NULL CONSTRAINT PK_Expenses PRIMARY KEY AUTOINCREMENT, Date TEXT NOT NULL, Category TEXT, Description TEXT, Amount REAL NOT NULL, AddedBy TEXT);",
                     "CREATE TABLE IF NOT EXISTS Vendors (Id INTEGER NOT NULL CONSTRAINT PK_Vendors PRIMARY KEY AUTOINCREMENT, VendorName TEXT, Address TEXT, ContactPerson TEXT, Phone TEXT, Email TEXT);",
                     "CREATE TABLE IF NOT EXISTS WalletTransactions (Id INTEGER NOT NULL CONSTRAINT PK_WalletTransactions PRIMARY KEY AUTOINCREMENT, Phone TEXT, TransNo TEXT, Type TEXT, Amount REAL NOT NULL, CreatedAt TEXT NOT NULL);",
+                    "CREATE TABLE IF NOT EXISTS Brands (Id INTEGER NOT NULL CONSTRAINT PK_Brands PRIMARY KEY AUTOINCREMENT, BrandName TEXT);",
+                    "CREATE TABLE IF NOT EXISTS Categories (Id INTEGER NOT NULL CONSTRAINT PK_Categories PRIMARY KEY AUTOINCREMENT, CategoryName TEXT);",
                     "UPDATE Products SET VendorName = '' WHERE VendorName IS NULL;",
                     "UPDATE Products SET BrandName = '' WHERE BrandName IS NULL;",
                     "UPDATE Products SET CategoryName = '' WHERE CategoryName IS NULL;",

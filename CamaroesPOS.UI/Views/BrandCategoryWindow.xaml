@@ -1,0 +1,93 @@
+<Window x:Class="CamaroesPOS.UI.Views.BrandCategoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:viewmodels="clr-namespace:CamaroesPOS.UI.ViewModels"
+        Title="Gestion des Marques et Catégories" Height="500" Width="800" WindowStartupLocation="CenterScreen" Background="#F4F7FE">
+    
+    <Window.DataContext>
+        <viewmodels:BrandCategoryViewModel />
+    </Window.DataContext>
+
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Marques -->
+        <materialDesign:Card Grid.Column="0" Padding="15" UniformCornerRadius="10" Background="White">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                
+                <TextBlock Grid.Row="0" Text="MARQUES" FontSize="18" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,15" />
+                
+                <Grid Grid.Row="1" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" materialDesign:HintAssist.Hint="Nouvelle Marque" Text="{Binding NewBrandName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+                    <Button Grid.Column="1" Command="{Binding AddBrandCommand}" Content="AJOUTER" Margin="10,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                </Grid>
+                
+                <DataGrid Grid.Row="2" ItemsSource="{Binding Brands}" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Nom de la Marque" Binding="{Binding BrandName}" Width="*" IsReadOnly="True" />
+                        <DataGridTemplateColumn Header="Action" Width="60">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource MaterialDesignIconButton}" Command="{Binding DataContext.DeleteBrandCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Foreground="#E53935" Height="25" Width="25">
+                                        <materialDesign:PackIcon Kind="Delete" />
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </materialDesign:Card>
+
+        <!-- Catégories -->
+        <materialDesign:Card Grid.Column="2" Padding="15" UniformCornerRadius="10" Background="White">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                
+                <TextBlock Grid.Row="0" Text="CATÉGORIES" FontSize="18" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,15" />
+                
+                <Grid Grid.Row="1" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" materialDesign:HintAssist.Hint="Nouvelle Catégorie" Text="{Binding NewCategoryName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+                    <Button Grid.Column="1" Command="{Binding AddCategoryCommand}" Content="AJOUTER" Margin="10,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                </Grid>
+                
+                <DataGrid Grid.Row="2" ItemsSource="{Binding Categories}" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Nom de la Catégorie" Binding="{Binding CategoryName}" Width="*" IsReadOnly="True" />
+                        <DataGridTemplateColumn Header="Action" Width="60">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource MaterialDesignIconButton}" Command="{Binding DataContext.DeleteCategoryCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Foreground="#E53935" Height="25" Width="25">
+                                        <materialDesign:PackIcon Kind="Delete" />
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </materialDesign:Card>
+    </Grid>
+</Window>

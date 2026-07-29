@@ -22,6 +22,7 @@
             <TextBlock Text="Gestion des Stocks" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#2B3674" />
             
             <Button Content="NOUVEAU PRODUIT" Command="{Binding AddCommand}" Margin="30,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}" />
+            <Button Content="MARQUES / CATÉGORIES" Command="{Binding ManageCatalogCommand}" Margin="10,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}" />
         </StackPanel>
 
         <Grid Grid.Row="1">
@@ -70,8 +71,9 @@
                         <TextBox materialDesign:HintAssist.Hint="Quantité" Text="{Binding SelectedProduct.Qty}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
                         <TextBox materialDesign:HintAssist.Hint="Niveau d'Alerte Stock" Text="{Binding SelectedProduct.Reorder}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
                         <TextBox materialDesign:HintAssist.Hint="Code Barre" Text="{Binding SelectedProduct.Barcode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                        <TextBox materialDesign:HintAssist.Hint="Marque" Text="{Binding SelectedProduct.BrandName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                        <TextBox materialDesign:HintAssist.Hint="Catégorie" Text="{Binding SelectedProduct.CategoryName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        
+                        <ComboBox materialDesign:HintAssist.Hint="Marque" ItemsSource="{Binding Brands}" DisplayMemberPath="BrandName" SelectedValuePath="BrandName" SelectedValue="{Binding SelectedProduct.BrandName}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,15" />
+                        <ComboBox materialDesign:HintAssist.Hint="Catégorie" ItemsSource="{Binding Categories}" DisplayMemberPath="CategoryName" SelectedValuePath="CategoryName" SelectedValue="{Binding SelectedProduct.CategoryName}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,15" />
                         <ComboBox materialDesign:HintAssist.Hint="Fournisseur" ItemsSource="{Binding Vendors}" DisplayMemberPath="VendorName" SelectedValuePath="Id" SelectedValue="{Binding SelectedProduct.VendorId}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,30" />
 
                         <Grid>

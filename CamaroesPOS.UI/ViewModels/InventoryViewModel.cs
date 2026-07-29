@@ -14,6 +14,8 @@ namespace CamaroesPOS.UI.ViewModels
         public ObservableCollection<Product> InventoryList { get; set; }
 
         public ObservableCollection<Vendor> Vendors { get; set; }
+        public ObservableCollection<Brand> Brands { get; set; }
+        public ObservableCollection<Category> Categories { get; set; }
 
         private Product _selectedProduct;
         public Product SelectedProduct
@@ -43,12 +45,16 @@ namespace CamaroesPOS.UI.ViewModels
         {
             InventoryList = new ObservableCollection<Product>();
             Vendors = new ObservableCollection<Vendor>();
+            Brands = new ObservableCollection<Brand>();
+            Categories = new ObservableCollection<Category>();
             
             AddCommand = new RelayCommand<object>(OpenAddForm);
             EditCommand = new RelayCommand<Product>(OpenEditForm);
             DeleteCommand = new RelayCommand<Product>(DeleteProduct);
             SaveCommand = new RelayCommand<object>(SaveProduct);
             CancelCommand = new RelayCommand<object>(CancelEdit);
+            
+            ManageCatalogCommand = new RelayCommand<object>(OpenCatalogManager);
 
             LoadDataFromDatabase();
         }
@@ -70,7 +76,24 @@ namespace CamaroesPOS.UI.ViewModels
                 {
                     Vendors.Add(v);
                 }
+                
+                var brands = context.Brands.ToList();
+                Brands.Clear();
+                foreach(var b in brands) Brands.Add(b);
+
+                var categories = context.Categories.ToList();
+                Categories.Clear();
+                foreach(var c in categories) Categories.Add(c);
             }
+        }
+
+        public ICommand ManageCatalogCommand { get; }
+
+        private void OpenCatalogManager(object obj)
+        {
+            var win = new CamaroesPOS.UI.Views.BrandCategoryWindow();
+            win.ShowDialog();
+            LoadDataFromDatabase(); // Rafraîchir les listes après la fermeture
         }
 
         private void OpenAddForm(object obj)
