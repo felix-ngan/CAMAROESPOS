@@ -20,212 +20,113 @@
                 Style="{StaticResource MaterialDesignOutlinedButton}" 
                 Content="Rafraîchir" Click="BtnRefresh_Click"/>
         
-        <UniformGrid Grid.Row="1" Columns="4" Margin="10">
-            <!-- Card 1 -->
-            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Background="#E3F2FD" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
-                        <materialDesign:PackIcon Kind="CashRegister" Width="32" Height="32" Foreground="#1E88E5" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Ventes Aujourd'hui" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding TodaySales, StringFormat={}{0:N0} FCFA}" FontSize="22" FontWeight="Bold" Foreground="#2B3674" Margin="0,5,0,0" />
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
-            
-            <!-- Card 2 -->
-            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Background="#E0F2F1" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
-                        <materialDesign:PackIcon Kind="Bank" Width="32" Height="32" Foreground="#00897B" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Chiffre d'Affaires" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding TotalSalesAllTime, StringFormat={}{0:N0} FCFA}" FontSize="22" FontWeight="Bold" Foreground="#2B3674" Margin="0,5,0,0" />
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="5">
+            <StackPanel Orientation="Horizontal">
+                <!-- Card 1 -->
+                <materialDesign:Card Margin="5" Padding="15" Background="White" UniformCornerRadius="15" Width="260">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="#E3F2FD" CornerRadius="12" Width="50" Height="50" Margin="0,0,10,0">
+                            <materialDesign:PackIcon Kind="CashRegister" Width="30" Height="30" Foreground="#1E88E5" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Ventes Aujourd'hui" FontSize="13" Foreground="#8F9BBA" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding TodaySales, StringFormat={}{0:N0} FCFA}" FontSize="18" FontWeight="Bold" Foreground="#2B3674" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
+                
+                <!-- Card 2 -->
+                <materialDesign:Card Margin="5" Padding="15" Background="White" UniformCornerRadius="15" Width="260">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="#E0F2F1" CornerRadius="12" Width="50" Height="50" Margin="0,0,10,0">
+                            <materialDesign:PackIcon Kind="Bank" Width="30" Height="30" Foreground="#00897B" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Chiffre d'Affaires" FontSize="13" Foreground="#8F9BBA" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding TotalSalesAllTime, StringFormat={}{0:N0} FCFA}" FontSize="18" FontWeight="Bold" Foreground="#2B3674" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
 
-            <!-- Card 3 -->
-            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Background="#E8F5E9" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
-                        <materialDesign:PackIcon Kind="PackageVariantClosed" Width="32" Height="32" Foreground="#43A047" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Total Articles" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding TotalProducts}" FontSize="24" FontWeight="Bold" Foreground="#2B3674" Margin="0,5,0,0" />
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
+                <!-- Card 12 : Bénéfice Net -->
+                <materialDesign:Card Margin="5" Padding="15" Background="White" UniformCornerRadius="15" Width="260">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="#E8F5E9" CornerRadius="12" Width="50" Height="50" Margin="0,0,10,0">
+                            <materialDesign:PackIcon Kind="Finance" Width="30" Height="30" Foreground="#2E7D32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Bénéfice Net" FontSize="13" Foreground="#8F9BBA" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding NetProfit, StringFormat={}{0:N0} FCFA}" FontSize="18" FontWeight="Bold" Foreground="#2E7D32" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
 
-            <!-- Card 4 -->
-            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Background="#FFEBEE" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
-                        <materialDesign:PackIcon Kind="AlertDecagram" Width="32" Height="32" Foreground="#E53935" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Rupture de Stock" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding LowStockItems}" FontSize="24" FontWeight="Bold" Foreground="#E53935" Margin="0,5,0,0" />
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
+                <!-- Card 5 : CRM -->
+                <materialDesign:Card Margin="5" Padding="15" Background="White" UniformCornerRadius="15" Width="260">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="#F3E5F5" CornerRadius="12" Width="50" Height="50" Margin="0,0,10,0">
+                            <materialDesign:PackIcon Kind="AccountTie" Width="30" Height="30" Foreground="#8E24AA" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Clients / Fidélité" FontSize="13" Foreground="#8F9BBA" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding TotalCustomers, StringFormat={}{0:N0} Clients}" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,2,0,0" />
+                            <TextBlock Text="{Binding TotalLoyaltyPoints, StringFormat={}{0:N0} Pts}" FontSize="12" Foreground="#8E24AA" FontWeight="SemiBold" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
 
-            <!-- Card 5 -->
-            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Background="#F3E5F5" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
-                        <materialDesign:PackIcon Kind="Wallet" Width="32" Height="32" Foreground="#8E24AA" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Clients / Fidélité" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding TotalCustomers, StringFormat={}{0:N0} Clients}" FontSize="20" FontWeight="Bold" Foreground="#2B3674" Margin="0,2,0,0" />
-                        <TextBlock Text="{Binding TotalLoyaltyPoints, StringFormat={}{0:N0} Points offerts}" FontSize="14" Foreground="#8E24AA" FontWeight="SemiBold" Margin="0,2,0,0" />
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
+                <!-- Card 11 : Dépenses -->
+                <materialDesign:Card Margin="5" Padding="15" Background="White" UniformCornerRadius="15" Width="260">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="#FFEBEE" CornerRadius="12" Width="50" Height="50" Margin="0,0,10,0">
+                            <materialDesign:PackIcon Kind="CashMinus" Width="30" Height="30" Foreground="#D32F2F" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Total Dépenses" FontSize="13" Foreground="#8F9BBA" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding TotalExpensesDashboard, StringFormat={}{0:N0} FCFA}" FontSize="18" FontWeight="Bold" Foreground="#D32F2F" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
 
-            <!-- Card 6 -->
-            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Background="#FFF3E0" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
-                        <materialDesign:PackIcon Kind="CartOutline" Width="32" Height="32" Foreground="#F39C12" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Articles Vendus" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding TotalItemsSoldToday}" FontSize="24" FontWeight="Bold" Foreground="#2B3674" Margin="0,5,0,0" />
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
+                <!-- Card 4 : Rupture -->
+                <materialDesign:Card Margin="5" Padding="15" Background="White" UniformCornerRadius="15" Width="260">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="#FFEBEE" CornerRadius="12" Width="50" Height="50" Margin="0,0,10,0">
+                            <materialDesign:PackIcon Kind="AlertDecagram" Width="30" Height="30" Foreground="#E53935" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Rupture de Stock" FontSize="13" Foreground="#8F9BBA" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding LowStockItems}" FontSize="18" FontWeight="Bold" Foreground="#E53935" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
 
-            <!-- Card 7 -->
-            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Background="#FFEBEE" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
-                        <materialDesign:PackIcon Kind="Cancel" Width="32" Height="32" Foreground="#D32F2F" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Total Annulations" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding TotalCancelledAmount, StringFormat={}{0:N0} FCFA}" FontSize="22" FontWeight="Bold" Foreground="#D32F2F" Margin="0,5,0,0" />
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
-
-            <!-- Card 8 -->
-            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Background="#ECEFF1" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
-                        <materialDesign:PackIcon Kind="AccountMultiple" Width="32" Height="32" Foreground="#607D8B" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Utilisateurs" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding TotalUsers}" FontSize="24" FontWeight="Bold" Foreground="#2B3674" Margin="0,5,0,0" />
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
-
-            <!-- Card 9 : Réductions -->
-            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Background="#FFF3E0" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
-                        <materialDesign:PackIcon Kind="TicketPercent" Width="32" Height="32" Foreground="#FF9800" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Total Réductions" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding TotalDiscountAmount, StringFormat={}{0:N0} FCFA}" FontSize="22" FontWeight="Bold" Foreground="#FF9800" Margin="0,5,0,0" />
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
-
-            <!-- Card 10 : Fournisseurs -->
-            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Background="#E8F5E9" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
-                        <materialDesign:PackIcon Kind="TruckDelivery" Width="32" Height="32" Foreground="#4CAF50" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Total Fournisseurs" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding TotalVendors}" FontSize="24" FontWeight="Bold" Foreground="#2B3674" Margin="0,5,0,0" />
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
-
-            <!-- Card 11 : Dépenses -->
-            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Background="#FFEBEE" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
-                        <materialDesign:PackIcon Kind="CashMinus" Width="32" Height="32" Foreground="#D32F2F" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Total Dépenses" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding TotalExpensesDashboard, StringFormat={}{0:N0} FCFA}" FontSize="22" FontWeight="Bold" Foreground="#D32F2F" Margin="0,5,0,0" />
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
-
-            <!-- Card 12 : Bénéfice Net -->
-            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Background="#E8F5E9" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
-                        <materialDesign:PackIcon Kind="Finance" Width="32" Height="32" Foreground="#2E7D32" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Bénéfice Net" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding NetProfit, StringFormat={}{0:N0} FCFA}" FontSize="22" FontWeight="Bold" Foreground="#2E7D32" Margin="0,5,0,0" />
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
-        </UniformGrid>
+            </StackPanel>
+        </ScrollViewer>
 
         <!-- Graphiques Statistiques -->
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="10,0,10,10">

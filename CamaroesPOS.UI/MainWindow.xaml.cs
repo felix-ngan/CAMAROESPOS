@@ -125,7 +125,7 @@ namespace CamaroesPOS.UI
 
         private void ShowDashboard()
         {
-            TxtHeader.Text = "Tableau de Bord";
+            TxtHeader.Text = "";
             
             if (_dashboardView.DataContext is CamaroesPOS.UI.ViewModels.DashboardViewModel vm)
             {

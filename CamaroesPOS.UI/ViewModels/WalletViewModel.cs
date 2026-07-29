@@ -130,6 +130,8 @@ namespace CamaroesPOS.UI.ViewModels
                     if (dbWallet != null)
                     {
                         dbWallet.Balance += RechargeAmount;
+                        dbWallet.CustomerName = SelectedWallet.CustomerName;
+                        dbWallet.Email = SelectedWallet.Email;
                         
                         context.WalletTransactions.Add(new WalletTransaction
                         {
