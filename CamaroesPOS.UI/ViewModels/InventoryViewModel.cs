@@ -13,6 +13,8 @@ namespace CamaroesPOS.UI.ViewModels
     {
         public ObservableCollection<Product> InventoryList { get; set; }
 
+        public ObservableCollection<Vendor> Vendors { get; set; }
+
         private Product _selectedProduct;
         public Product SelectedProduct
         {
@@ -38,6 +40,7 @@ namespace CamaroesPOS.UI.ViewModels
         public InventoryViewModel()
         {
             InventoryList = new ObservableCollection<Product>();
+            Vendors = new ObservableCollection<Vendor>();
             
             AddCommand = new RelayCommand<object>(OpenAddForm);
             EditCommand = new RelayCommand<Product>(OpenEditForm);
@@ -58,6 +61,13 @@ namespace CamaroesPOS.UI.ViewModels
                 {
                     InventoryList.Add(p);
                 }
+
+                var vendors = context.Vendors.ToList();
+                Vendors.Clear();
+                foreach(var v in vendors)
+                {
+                    Vendors.Add(v);
+                }
             }
         }
 
@@ -74,7 +84,6 @@ namespace CamaroesPOS.UI.ViewModels
         private void OpenEditForm(Product product)
         {
             if (product == null) return;
-            // On crée une copie pour l'édition afin de ne pas modifier la ligne en direct
             SelectedProduct = new Product
             {
                 ProductCode = product.ProductCode,
@@ -84,7 +93,9 @@ namespace CamaroesPOS.UI.ViewModels
                 Reorder = product.Reorder,
                 Barcode = product.Barcode,
                 BrandName = product.BrandName,
-                CategoryName = product.CategoryName
+                CategoryName = product.CategoryName,
+                VendorId = product.VendorId,
+                VendorName = product.VendorName
             };
             _isNewProduct = false;
             IsEditing = true;
@@ -118,6 +129,12 @@ namespace CamaroesPOS.UI.ViewModels
                 return;
             }
 
+            var vendor = Vendors.FirstOrDefault(v => v.Id == SelectedProduct.VendorId);
+            if(vendor != null)
+            {
+                SelectedProduct.VendorName = vendor.VendorName;
+            }
+
             using (var context = new PosDbContext())
             {
                 if (_isNewProduct)
@@ -141,6 +158,8 @@ namespace CamaroesPOS.UI.ViewModels
                         dbProduct.Barcode = SelectedProduct.Barcode;
                         dbProduct.BrandName = SelectedProduct.BrandName;
                         dbProduct.CategoryName = SelectedProduct.CategoryName;
+                        dbProduct.VendorId = SelectedProduct.VendorId;
+                        dbProduct.VendorName = SelectedProduct.VendorName;
                     }
                 }
                 context.SaveChanges();

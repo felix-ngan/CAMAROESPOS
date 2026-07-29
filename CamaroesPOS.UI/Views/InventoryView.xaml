@@ -38,6 +38,7 @@
                         <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" IsReadOnly="True" />
                         <DataGridTextColumn Header="Prix" Binding="{Binding Price, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
                         <DataGridTextColumn Header="Stock" Binding="{Binding Qty}" Width="80" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Fournisseur" Binding="{Binding VendorName}" Width="*" IsReadOnly="True" />
                         
                         <DataGridTemplateColumn Header="Actions" Width="100">
                             <DataGridTemplateColumn.CellTemplate>
@@ -70,7 +71,8 @@
                         <TextBox materialDesign:HintAssist.Hint="Niveau d'Alerte Stock" Text="{Binding SelectedProduct.Reorder}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
                         <TextBox materialDesign:HintAssist.Hint="Code Barre" Text="{Binding SelectedProduct.Barcode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
                         <TextBox materialDesign:HintAssist.Hint="Marque" Text="{Binding SelectedProduct.BrandName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                        <TextBox materialDesign:HintAssist.Hint="Catégorie" Text="{Binding SelectedProduct.CategoryName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" />
+                        <TextBox materialDesign:HintAssist.Hint="Catégorie" Text="{Binding SelectedProduct.CategoryName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <ComboBox materialDesign:HintAssist.Hint="Fournisseur" ItemsSource="{Binding Vendors}" DisplayMemberPath="VendorName" SelectedValuePath="Id" SelectedValue="{Binding SelectedProduct.VendorId}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,30" />
 
                         <Grid>
                             <Grid.ColumnDefinitions>

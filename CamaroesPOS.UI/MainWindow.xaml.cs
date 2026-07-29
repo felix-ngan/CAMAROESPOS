@@ -12,6 +12,7 @@ namespace CamaroesPOS.UI
         private DashboardView _dashboardView;
         private ReportsView _reportsView;
         private SettingsView _settingsView;
+        private VendorView _vendorView;
 
         public MainWindow()
         {
@@ -22,6 +23,7 @@ namespace CamaroesPOS.UI
             _dashboardView = new DashboardView();
             _reportsView = new ReportsView();
             _settingsView = new SettingsView();
+            _vendorView = new VendorView();
 
             if (Application.Current.Properties.Contains("CurrentUserName"))
             {
@@ -37,6 +39,7 @@ namespace CamaroesPOS.UI
                     BtnReports.Visibility = System.Windows.Visibility.Collapsed;
                     BtnInventory.Visibility = System.Windows.Visibility.Collapsed;
                     BtnSettings.Visibility = System.Windows.Visibility.Collapsed;
+                    BtnVendors.Visibility = System.Windows.Visibility.Collapsed;
                     BtnPOS_Click(null, null); // Start directly on POS
                 }
                 else
@@ -71,6 +74,12 @@ namespace CamaroesPOS.UI
         {
             TxtHeader.Text = "Portefeuilles Clients";
             MainContentControl.Content = _walletView;
+        }
+
+        private void BtnVendors_Click(object sender, RoutedEventArgs e)
+        {
+            TxtHeader.Text = "Gestion des Fournisseurs";
+            MainContentControl.Content = _vendorView;
         }
 
         private void BtnReports_Click(object sender, RoutedEventArgs e)

@@ -12,5 +12,7 @@ namespace CamaroesPOS.Domain.Entities
         public double Price { get; set; }
         public int Qty { get; set; }
         public int Reorder { get; set; }
+        public int VendorId { get; set; }
+        public string VendorName { get; set; }
     }
 }

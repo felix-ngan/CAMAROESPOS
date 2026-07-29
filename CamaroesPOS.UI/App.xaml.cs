@@ -11,6 +11,8 @@ namespace CamaroesPOS.UI
         {
             base.OnStartup(e);
 
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
             using (var context = new PosDbContext())
             {
                 // Créer la base de données SQLite si elle n'existe pas

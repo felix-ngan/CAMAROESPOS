@@ -35,6 +35,7 @@ namespace CamaroesPOS.UI.ViewModels
         public ICommand FilterCommand { get; }
         public ICommand ResetFilterCommand { get; }
         public ICommand CancelTransactionCommand { get; }
+        public ICommand ExportPdfCommand { get; }
 
         public ReportsViewModel()
         {
@@ -47,6 +48,7 @@ namespace CamaroesPOS.UI.ViewModels
             FilterCommand = new RelayCommand<object>(ApplyFilter);
             ResetFilterCommand = new RelayCommand<object>(ResetFilter);
             CancelTransactionCommand = new RelayCommand<object>(CancelTransaction);
+            ExportPdfCommand = new RelayCommand<object>(ExportPdf);
 
             StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             EndDate = DateTime.Now.Date;
@@ -57,6 +59,41 @@ namespace CamaroesPOS.UI.ViewModels
         public void LoadTransactions()
         {
             ApplyFilter(null);
+        }
+
+        private void ExportPdf(object obj)
+        {
+            try
+            {
+                var dialog = new Microsoft.Win32.SaveFileDialog
+                {
+                    Filter = "Fichiers PDF (*.pdf)|*.pdf",
+                    DefaultExt = ".pdf",
+                    FileName = $"RapportVentes_{DateTime.Now:yyyyMMdd}.pdf"
+                };
+
+                if (dialog.ShowDialog() == true)
+                {
+                    var pdfService = new CamaroesPOS.UI.Services.PdfService();
+                    
+                    double totalDiscounts = Transactions.Sum(t => (double?)t.Discount) ?? 0;
+                    
+                    pdfService.GenerateSalesReportPdf(
+                        StartDate ?? DateTime.Now, 
+                        EndDate ?? DateTime.Now, 
+                        TotalSalesAmount, 
+                        totalDiscounts, 
+                        Transactions.Count, 
+                        Transactions, 
+                        dialog.FileName);
+                    
+                    System.Windows.MessageBox.Show("Le rapport a été exporté en PDF avec succès !", "Succès", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Erreur lors de l'exportation PDF : {ex.Message}", "Erreur", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
         }
 
         private void ApplyFilter(object obj)

@@ -224,8 +224,32 @@ namespace CamaroesPOS.UI.ViewModels
                 {
                     new LineSeries { Title = "Réductions", Values = discountValues, Stroke = System.Windows.Media.Brushes.Orange, Fill = System.Windows.Media.Brushes.Transparent }
                 };
+                // 10. Fournisseurs
+                TotalVendors = context.Vendors.Count();
+                var productsByVendor = context.Products
+                    .Where(p => p.VendorId > 0)
+                    .GroupBy(p => p.VendorName)
+                    .Select(g => new { Vendor = g.Key, Count = g.Count() })
+                    .OrderByDescending(x => x.Count)
+                    .Take(5)
+                    .ToList();
+                
+                VendorsChart = new SeriesCollection();
+                foreach (var pv in productsByVendor)
+                {
+                    VendorsChart.Add(new PieSeries { Title = pv.Vendor ?? "Inconnu", Values = new ChartValues<int> { pv.Count } });
+                }
             }
         }
+
+        private int _totalVendors;
+        public int TotalVendors
+        {
+            get => _totalVendors;
+            set { _totalVendors = value; OnPropertyChanged(); }
+        }
+
+        public SeriesCollection VendorsChart { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)

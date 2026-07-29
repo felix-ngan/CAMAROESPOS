@@ -23,6 +23,7 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <DatePicker Grid.Column="0" materialDesign:HintAssist.Hint="Date de début" SelectedDate="{Binding StartDate}" Margin="0,0,20,0" Width="150" FontSize="16" />
@@ -31,7 +32,17 @@
                 <TextBox Grid.Column="2" materialDesign:HintAssist.Hint="Recherche globale" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,20,0" FontSize="16" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
 
                 <Button Grid.Column="3" Content="FILTRER" Command="{Binding FilterCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#1E88E5" BorderBrush="#1E88E5" Margin="0,0,10,0" Height="40" />
-                <Button Grid.Column="4" Content="RÉINITIALISER" Command="{Binding ResetFilterCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" Height="40" />
+                <Button Grid.Column="4" Content="RÉINITIALISER" Command="{Binding ResetFilterCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" Margin="0,0,10,0" Height="40" />
+                <Button Grid.Column="5" Content="EXPORTER PDF" Command="{Binding ExportPdfCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#43A047" BorderBrush="#43A047" Height="40">
+                    <Button.ContentTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="FilePdfBox" Width="20" Height="20" Margin="0,0,5,0" />
+                                <TextBlock Text="EXPORTER PDF" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </Button.ContentTemplate>
+                </Button>
             </Grid>
         </materialDesign:Card>
 
