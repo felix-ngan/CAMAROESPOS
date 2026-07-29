@@ -39,6 +39,8 @@ namespace CamaroesPOS.UI.ViewModels
             set { _isNewVendor = value; OnPropertyChanged(); }
         }
 
+        public bool IsAdmin => System.Windows.Application.Current.Properties["CurrentUserRole"]?.ToString() == "Admin";
+
         public VendorViewModel()
         {
             Vendors = new ObservableCollection<Vendor>();
@@ -91,6 +93,12 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void SaveVendor(object obj)
         {
+            if (!IsAdmin)
+            {
+                MessageBox.Show("Seul l'administrateur peut modifier ou ajouter des fournisseurs.", "Accès Refusé", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             using (var context = new PosDbContext())
             {
                 if (IsNewVendor)
@@ -117,6 +125,12 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void DeleteVendor(Vendor vendor)
         {
+            if (!IsAdmin)
+            {
+                MessageBox.Show("Seul l'administrateur peut supprimer un fournisseur.", "Accès Refusé", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             if (vendor == null) return;
 
             var result = MessageBox.Show($"Êtes-vous sûr de vouloir supprimer le fournisseur {vendor.VendorName} ?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);

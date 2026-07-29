@@ -32,6 +32,8 @@ namespace CamaroesPOS.UI.ViewModels
         private int _totalItemsSold;
         public int TotalItemsSold { get => _totalItemsSold; set { _totalItemsSold = value; OnPropertyChanged(); } }
 
+        public bool IsAdmin => System.Windows.Application.Current.Properties["CurrentUserRole"]?.ToString() == "Admin";
+
         public ICommand FilterCommand { get; }
         public ICommand ResetFilterCommand { get; }
         public ICommand CancelTransactionCommand { get; }
@@ -198,6 +200,12 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void CancelTransaction(object obj)
         {
+            if (!IsAdmin)
+            {
+                System.Windows.MessageBox.Show("Seul l'administrateur peut annuler une transaction.", "Accès Refusé", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                return;
+            }
+
             if (obj is SoldItem soldItem)
             {
                 // Confirmation (using Microsoft.VisualBasic.Interaction or custom dialog for reason).

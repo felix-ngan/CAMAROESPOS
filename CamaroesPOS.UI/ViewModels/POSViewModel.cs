@@ -261,6 +261,7 @@ namespace CamaroesPOS.UI.ViewModels
                 {
                     ProductCode = product.ProductCode,
                     ProductDescription = product.Description,
+                    CostPrice = product.CostPrice,
                     Price = product.Price,
                     Qty = qty,
                     Total = product.Price * qty,
@@ -383,6 +384,7 @@ namespace CamaroesPOS.UI.ViewModels
                         TransNo = transNo,
                         ProductCode = item.ProductCode,
                         Description = item.ProductDescription,
+                        CostPrice = item.CostPrice,
                         Price = item.Price,
                         Qty = item.Qty,
                         Discount = itemDiscount,

@@ -31,6 +31,8 @@ namespace CamaroesPOS.UI.ViewModels
 
         private bool _isNewProduct;
 
+        public bool IsAdmin => System.Windows.Application.Current.Properties["CurrentUserRole"]?.ToString() == "Admin";
+
         public ICommand AddCommand { get; }
         public ICommand EditCommand { get; }
         public ICommand DeleteCommand { get; }
@@ -103,6 +105,12 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void DeleteProduct(Product product)
         {
+            if (!IsAdmin)
+            {
+                MessageBox.Show("Seul l'administrateur peut supprimer un produit.", "Accès Refusé", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             if (product == null) return;
             
             var result = MessageBox.Show($"Êtes-vous sûr de vouloir supprimer définitivement le produit '{product.Description}' ?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
@@ -123,6 +131,12 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void SaveProduct(object obj)
         {
+            if (!IsAdmin)
+            {
+                MessageBox.Show("Seul l'administrateur peut modifier ou ajouter des produits.", "Accès Refusé", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(SelectedProduct.ProductCode) || string.IsNullOrWhiteSpace(SelectedProduct.Description))
             {
                 MessageBox.Show("Le code produit et la description sont obligatoires.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);

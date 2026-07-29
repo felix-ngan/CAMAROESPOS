@@ -9,6 +9,7 @@ namespace CamaroesPOS.Domain.Entities
         public string BrandName { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
+        public double CostPrice { get; set; }
         public double Price { get; set; }
         public int Qty { get; set; }
         public int Reorder { get; set; }

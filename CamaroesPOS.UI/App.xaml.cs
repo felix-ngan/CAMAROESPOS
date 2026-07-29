@@ -18,6 +18,27 @@ namespace CamaroesPOS.UI
                 // Créer la base de données SQLite si elle n'existe pas
                 context.Database.EnsureCreated();
 
+                // Migrations manuelles pour s'assurer que toutes les nouvelles colonnes et tables existent dans la BD SQLite locale existante
+                var migrations = new string[]
+                {
+                    "ALTER TABLE Products ADD COLUMN CostPrice REAL NOT NULL DEFAULT 0;",
+                    "ALTER TABLE Products ADD COLUMN VendorId INTEGER NOT NULL DEFAULT 0;",
+                    "ALTER TABLE Products ADD COLUMN VendorName TEXT;",
+                    "ALTER TABLE SoldItems ADD COLUMN CostPrice REAL NOT NULL DEFAULT 0;",
+                    "CREATE TABLE IF NOT EXISTS Expenses (Id INTEGER NOT NULL CONSTRAINT PK_Expenses PRIMARY KEY AUTOINCREMENT, Date TEXT NOT NULL, Category TEXT, Description TEXT, Amount REAL NOT NULL, AddedBy TEXT);",
+                    "CREATE TABLE IF NOT EXISTS Vendors (Id INTEGER NOT NULL CONSTRAINT PK_Vendors PRIMARY KEY AUTOINCREMENT, VendorName TEXT, Address TEXT, ContactPerson TEXT, Phone TEXT, Email TEXT);",
+                    "CREATE TABLE IF NOT EXISTS WalletTransactions (Id INTEGER NOT NULL CONSTRAINT PK_WalletTransactions PRIMARY KEY AUTOINCREMENT, Phone TEXT, TransNo TEXT, Type TEXT, Amount REAL NOT NULL, CreatedAt TEXT NOT NULL);",
+                    "UPDATE Products SET VendorName = '' WHERE VendorName IS NULL;",
+                    "UPDATE Products SET BrandName = '' WHERE BrandName IS NULL;",
+                    "UPDATE Products SET CategoryName = '' WHERE CategoryName IS NULL;",
+                    "UPDATE Products SET Barcode = '' WHERE Barcode IS NULL;"
+                };
+
+                foreach (var sql in migrations)
+                {
+                    try { Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(context.Database, sql); } catch { }
+                }
+
                 // Injecter des données de démonstration dans SQLite si la base est vide
                 if (!context.Products.Any())
                 {

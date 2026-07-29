@@ -21,7 +21,7 @@
             <materialDesign:PackIcon Kind="PackageVariant" Width="30" Height="30" VerticalAlignment="Center" Foreground="#1E88E5"/>
             <TextBlock Text="Gestion des Stocks" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#2B3674" />
             
-            <Button Content="NOUVEAU PRODUIT" Command="{Binding AddCommand}" Margin="30,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" />
+            <Button Content="NOUVEAU PRODUIT" Command="{Binding AddCommand}" Margin="30,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}" />
         </StackPanel>
 
         <Grid Grid.Row="1">
@@ -43,7 +43,7 @@
                         <DataGridTemplateColumn Header="Actions" Width="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
+                                    <StackPanel Orientation="Horizontal" Visibility="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}">
                                         <Button Style="{StaticResource MaterialDesignIconButton}" Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="Éditer le produit" Height="30" Width="30" Foreground="#1E88E5">
                                             <materialDesign:PackIcon Kind="Pencil" />
                                         </Button>

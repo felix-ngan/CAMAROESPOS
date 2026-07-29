@@ -100,6 +100,18 @@ namespace CamaroesPOS.UI.ViewModels
         public string[] ItemsSoldLabels { get; set; }
         public string[] WalletsLabels { get; set; }
         public string[] ProductsLabels { get; set; }
+
+        private double _totalCogs;
+        public double TotalCOGS { get => _totalCogs; set { _totalCogs = value; OnPropertyChanged(); } }
+
+        private double _totalExpenses;
+        public double TotalExpensesDashboard { get => _totalExpenses; set { _totalExpenses = value; OnPropertyChanged(); } }
+
+        private double _netProfit;
+        public double NetProfit { get => _netProfit; set { _netProfit = value; OnPropertyChanged(); } }
+
+        public SeriesCollection ProfitChart { get; set; }
+        public string[] ProfitLabels { get; set; }
         
         public Func<double, string> YFormatter { get; set; }
 
@@ -239,6 +251,22 @@ namespace CamaroesPOS.UI.ViewModels
                 {
                     VendorsChart.Add(new PieSeries { Title = pv.Vendor ?? "Inconnu", Values = new ChartValues<int> { pv.Count } });
                 }
+
+                // 11. Calcul du Bénéfice Net (Revenus - Coûts d'achat - Dépenses)
+                TotalCOGS = context.SoldItems.Sum(s => (double?)(s.CostPrice * s.Qty)) ?? 0;
+                TotalExpensesDashboard = context.Expenses.Sum(e => (double?)e.Amount) ?? 0;
+                NetProfit = TotalSalesAllTime - TotalCOGS - TotalExpensesDashboard;
+
+                ProfitLabels = new[] { "Revenus", "Coûts", "Dépenses", "Bénéfice Net" };
+                ProfitChart = new SeriesCollection
+                {
+                    new ColumnSeries 
+                    { 
+                        Title = "Montants", 
+                        Values = new ChartValues<double> { TotalSalesAllTime, TotalCOGS, TotalExpensesDashboard, NetProfit },
+                        Fill = System.Windows.Media.Brushes.DodgerBlue
+                    }
+                };
             }
         }
 

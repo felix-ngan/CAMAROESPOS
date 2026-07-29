@@ -13,6 +13,7 @@ namespace CamaroesPOS.UI
         private ReportsView _reportsView;
         private SettingsView _settingsView;
         private VendorView _vendorView;
+        private ExpenseView _expenseView;
 
         public MainWindow()
         {
@@ -24,6 +25,7 @@ namespace CamaroesPOS.UI
             _reportsView = new ReportsView();
             _settingsView = new SettingsView();
             _vendorView = new VendorView();
+            _expenseView = new ExpenseView();
 
             if (Application.Current.Properties.Contains("CurrentUserName"))
             {
@@ -36,10 +38,8 @@ namespace CamaroesPOS.UI
                 if (role == "Cashier")
                 {
                     BtnDashboard.Visibility = System.Windows.Visibility.Collapsed;
-                    BtnReports.Visibility = System.Windows.Visibility.Collapsed;
-                    BtnInventory.Visibility = System.Windows.Visibility.Collapsed;
                     BtnSettings.Visibility = System.Windows.Visibility.Collapsed;
-                    BtnVendors.Visibility = System.Windows.Visibility.Collapsed;
+                    BtnExpenses.Visibility = System.Windows.Visibility.Collapsed;
                     BtnPOS_Click(null, null); // Start directly on POS
                 }
                 else
@@ -98,6 +98,18 @@ namespace CamaroesPOS.UI
         {
             TxtHeader.Text = "Paramètres Généraux";
             MainContentControl.Content = _settingsView;
+        }
+
+        private void BtnExpenses_Click(object sender, RoutedEventArgs e)
+        {
+            TxtHeader.Text = "Dépenses & Charges";
+            
+            if (_expenseView.DataContext is CamaroesPOS.UI.ViewModels.ExpenseViewModel vm)
+            {
+                vm.LoadExpenses(); // Recharger à l'ouverture
+            }
+
+            MainContentControl.Content = _expenseView;
         }
 
         private void BtnLogout_Click(object sender, RoutedEventArgs e)

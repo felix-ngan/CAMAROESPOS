@@ -8,6 +8,7 @@ namespace CamaroesPOS.Domain.Entities
         public string TransNo { get; set; }
         public string ProductCode { get; set; }
         public string Description { get; set; }
+        public double CostPrice { get; set; }
         public double Price { get; set; }
         public int Qty { get; set; }
         public double Discount { get; set; }
