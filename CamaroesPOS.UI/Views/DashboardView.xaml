@@ -156,6 +156,23 @@
                     </StackPanel>
                 </Grid>
             </materialDesign:Card>
+
+            <!-- Card 9 : Réductions -->
+            <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Background="#FFF3E0" CornerRadius="12" Width="55" Height="55" Margin="0,0,15,0">
+                        <materialDesign:PackIcon Kind="TicketPercent" Width="32" Height="32" Foreground="#FF9800" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Total Réductions" FontSize="14" Foreground="#8F9BBA" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding TotalDiscountAmount, StringFormat={}{0:N0} FCFA}" FontSize="22" FontWeight="Bold" Foreground="#FF9800" Margin="0,5,0,0" />
+                    </StackPanel>
+                </Grid>
+            </materialDesign:Card>
         </UniformGrid>
 
         <!-- Graphiques Statistiques -->
@@ -274,6 +291,22 @@
                         </Grid.RowDefinitions>
                         <TextBlock Text="Répartition des Rôles" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
                         <lvc:PieChart Grid.Row="1" Series="{Binding UsersChart}" LegendLocation="Right" InnerRadius="40" Margin="5" />
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- 9. Réductions -->
+                <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Évolution des Réductions (7 j)" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        <lvc:CartesianChart Grid.Row="1" Series="{Binding DiscountChart}" Margin="5">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Labels="{Binding ChartLabels}" />
+                            </lvc:CartesianChart.AxisX>
+                        </lvc:CartesianChart>
                     </Grid>
                 </materialDesign:Card>
             </UniformGrid>

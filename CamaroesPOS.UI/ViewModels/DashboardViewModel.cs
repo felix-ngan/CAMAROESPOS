@@ -87,6 +87,14 @@ namespace CamaroesPOS.UI.ViewModels
         public SeriesCollection ItemsSoldTodayChart { get; set; }
         public SeriesCollection CancelledChart { get; set; }
         public SeriesCollection UsersChart { get; set; }
+        public SeriesCollection DiscountChart { get; set; }
+
+        private double _totalDiscountAmount;
+        public double TotalDiscountAmount
+        {
+            get => _totalDiscountAmount;
+            set { _totalDiscountAmount = value; OnPropertyChanged(); }
+        }
 
         public string[] ChartLabels { get; set; }
         public string[] ItemsSoldLabels { get; set; }
@@ -201,6 +209,21 @@ namespace CamaroesPOS.UI.ViewModels
                 {
                     UsersChart.Add(new PieSeries { Title = ur.Role, Values = new ChartValues<int> { ur.Count } });
                 }
+
+                // 9. Réductions
+                TotalDiscountAmount = context.SoldItems.Sum(s => (double?)s.Discount) ?? 0;
+                var discountValues = new ChartValues<double>();
+                for (int i = 6; i >= 0; i--)
+                {
+                    var d = today.AddDays(-i);
+                    var nextD = d.AddDays(1);
+                    var dailyDiscount = context.SoldItems.Where(s => s.SoldDate >= d && s.SoldDate < nextD).Sum(s => (double?)s.Discount) ?? 0;
+                    discountValues.Add(dailyDiscount);
+                }
+                DiscountChart = new SeriesCollection
+                {
+                    new LineSeries { Title = "Réductions", Values = discountValues, Stroke = System.Windows.Media.Brushes.Orange, Fill = System.Windows.Media.Brushes.Transparent }
+                };
             }
         }
 

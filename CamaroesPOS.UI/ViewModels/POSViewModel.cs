@@ -385,6 +385,7 @@ namespace CamaroesPOS.UI.ViewModels
                         Description = item.ProductDescription,
                         Price = item.Price,
                         Qty = item.Qty,
+                        Discount = itemDiscount,
                         Total = netItemTotal,
                         SoldDate = DateTime.Now,
                         Cashier = "Admin"
