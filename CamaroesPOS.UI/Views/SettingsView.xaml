@@ -62,8 +62,13 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <Button Grid.Column="0" Content="NOUVEAU" Command="{Binding ClearUserCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
-                                    <Button Grid.Column="1" Content="ENREGISTRER" Command="{Binding SaveUserCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#1E88E5" BorderBrush="#1E88E5" />
+                                     <Button Grid.Column="0" Content="NOUVEAU" Command="{Binding ClearUserCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" Height="45" FontSize="14" FontWeight="Bold" />
+                                     <Button Grid.Column="1" Command="{Binding SaveUserCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#1E88E5" BorderBrush="#1E88E5" Height="45">
+                                         <StackPanel Orientation="Horizontal">
+                                             <materialDesign:PackIcon Kind="ContentSave" Width="20" Height="20" VerticalAlignment="Center" Foreground="White" />
+                                             <TextBlock Text="ENREGISTRER" Margin="8,0,0,0" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="White" />
+                                         </StackPanel>
+                                     </Button>
                                 </Grid>
                             </StackPanel>
                         </ScrollViewer>
@@ -90,7 +95,12 @@
                             <TextBox materialDesign:HintAssist.Hint="Code Marchand MTN MoMo" Text="{Binding MomoCode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,20" FontSize="18" />
                             <TextBox materialDesign:HintAssist.Hint="Code Marchand Orange Money" Text="{Binding OrangeCode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
 
-                            <Button Content="ENREGISTRER LES PARAMÈTRES" Command="{Binding SaveStoreCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#43A047" BorderBrush="#43A047" Height="45" FontSize="16"/>
+                            <Button Command="{Binding SaveStoreCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#43A047" BorderBrush="#43A047" Height="55" Margin="0,15,0,0" materialDesign:ButtonAssist.CornerRadius="10">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="ContentSaveAll" Width="26" Height="26" VerticalAlignment="Center" Foreground="White" />
+                                    <TextBlock Text="ENREGISTRER LES PARAMÈTRES" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" Foreground="White" />
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
                     </materialDesign:Card>
                 </Grid>
@@ -111,7 +121,12 @@
                             <PasswordBox materialDesign:HintAssist.Hint="Nouveau mot de passe" PasswordChanged="NewPassword_Changed" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="0,0,0,20" FontSize="18" />
                             <PasswordBox materialDesign:HintAssist.Hint="Confirmer le nouveau mot de passe" PasswordChanged="ConfirmPassword_Changed" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="0,0,0,30" FontSize="18" />
 
-                            <Button Content="METTRE À JOUR LE MOT DE PASSE" Command="{Binding ChangePasswordCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#E53935" BorderBrush="#E53935" Height="45" FontSize="16"/>
+                            <Button Command="{Binding ChangePasswordCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#E53935" BorderBrush="#E53935" Height="55" Margin="0,15,0,0" materialDesign:ButtonAssist.CornerRadius="10">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="KeyVariant" Width="26" Height="26" VerticalAlignment="Center" Foreground="White" />
+                                    <TextBlock Text="METTRE À JOUR LE MOT DE PASSE" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" Foreground="White" />
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
                     </materialDesign:Card>
                 </Grid>
