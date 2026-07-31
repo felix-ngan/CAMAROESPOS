@@ -380,6 +380,10 @@ namespace CamaroesPOS.UI.ViewModels
                     double itemDiscount = item.Total * (DiscountPercentage / 100.0);
                     double netItemTotal = item.Total - itemDiscount;
 
+                    string cashierName = Application.Current.Properties.Contains("CurrentUserName") 
+                        ? Application.Current.Properties["CurrentUserName"].ToString() 
+                        : "Admin";
+
                     var soldItem = new SoldItem
                     {
                         TransNo = transNo,
@@ -391,7 +395,7 @@ namespace CamaroesPOS.UI.ViewModels
                         Discount = itemDiscount,
                         Total = netItemTotal,
                         SoldDate = DateTime.Now,
-                        Cashier = "Admin",
+                        Cashier = cashierName,
                         PaymentMode = paymentMode
                     };
                     context.SoldItems.Add(soldItem);

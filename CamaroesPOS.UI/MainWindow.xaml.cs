@@ -29,7 +29,10 @@ namespace CamaroesPOS.UI
 
             if (Application.Current.Properties.Contains("CurrentUserName"))
             {
-                TxtUsername.Text = $"Connecté : {Application.Current.Properties["CurrentUserName"]}";
+                var role = Application.Current.Properties.Contains("CurrentUserRole") 
+                           ? Application.Current.Properties["CurrentUserRole"].ToString() 
+                           : "Inconnu";
+                TxtUsername.Text = $"Connecté : {Application.Current.Properties["CurrentUserName"]} ({role})";
             }
 
             if (Application.Current.Properties.Contains("CurrentUserRole"))
