@@ -164,6 +164,28 @@
                     </Grid>
                 </materialDesign:Card>
 
+                <!-- Card 8 : Utilisateurs et Rôles -->
+                <materialDesign:Card Margin="5" Padding="15" Background="White" UniformCornerRadius="15" Width="260">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="#E1F5FE" CornerRadius="12" Width="50" Height="50" Margin="0,0,10,0">
+                            <materialDesign:PackIcon Kind="AccountGroup" Width="30" Height="30" Foreground="#0288D1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Utilisateurs (Système)" FontSize="13" Foreground="#8F9BBA" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding TotalUsers, StringFormat={}{0} Comptes}" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,2,0,0" />
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                <TextBlock Text="{Binding AdminCount, StringFormat={}{0} Admins}" FontSize="11" Foreground="#D32F2F" FontWeight="SemiBold" Margin="0,0,5,0" />
+                                <TextBlock Text="|" FontSize="11" Foreground="#B0BEC5" Margin="0,0,5,0" />
+                                <TextBlock Text="{Binding CashierCount, StringFormat={}{0} Caissiers}" FontSize="11" Foreground="#388E3C" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
+
             </StackPanel>
         </ScrollViewer>
 

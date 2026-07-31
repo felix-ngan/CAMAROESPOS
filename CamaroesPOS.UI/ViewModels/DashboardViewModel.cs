@@ -153,6 +153,20 @@ namespace CamaroesPOS.UI.ViewModels
             set { _totalUsers = value; OnPropertyChanged(); }
         }
 
+        private int _adminCount;
+        public int AdminCount
+        {
+            get => _adminCount;
+            set { _adminCount = value; OnPropertyChanged(); }
+        }
+
+        private int _cashierCount;
+        public int CashierCount
+        {
+            get => _cashierCount;
+            set { _cashierCount = value; OnPropertyChanged(); }
+        }
+
         private SeriesCollection _salesChart;
         public SeriesCollection SalesChart
         {
@@ -329,6 +343,8 @@ namespace CamaroesPOS.UI.ViewModels
                 var users = context.Users.ToList();
                 _allUsers = users;
                 TotalUsers = users.Count;
+                AdminCount = users.Count(u => u.Role == "Admin");
+                CashierCount = users.Count(u => u.Role == "Cashier");
                 
                 FilterUsers();
                 
