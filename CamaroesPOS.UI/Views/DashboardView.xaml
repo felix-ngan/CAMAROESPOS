@@ -378,6 +378,18 @@
                         </lvc:CartesianChart>
                     </Grid>
                 </materialDesign:Card>
+
+                <!-- 12. Modes de Paiement -->
+                <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Répartition des Modes de Paiement" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        <lvc:PieChart Grid.Row="1" Series="{Binding PaymentModesChart}" LegendLocation="Right" InnerRadius="40" Margin="5" />
+                    </Grid>
+                </materialDesign:Card>
             </UniformGrid>
         </ScrollViewer>
     </Grid>

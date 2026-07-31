@@ -15,5 +15,6 @@ namespace CamaroesPOS.Domain.Entities
         public double Total { get; set; }
         public DateTime SoldDate { get; set; }
         public string Cashier { get; set; }
+        public string PaymentMode { get; set; }
     }
 }

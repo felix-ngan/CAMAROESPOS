@@ -391,7 +391,8 @@ namespace CamaroesPOS.UI.ViewModels
                         Discount = itemDiscount,
                         Total = netItemTotal,
                         SoldDate = DateTime.Now,
-                        Cashier = "Admin"
+                        Cashier = "Admin",
+                        PaymentMode = paymentMode
                     };
                     context.SoldItems.Add(soldItem);
 

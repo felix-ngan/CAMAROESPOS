@@ -168,6 +168,7 @@ namespace CamaroesPOS.UI.ViewModels
         public SeriesCollection CancelledChart { get; set; }
         public SeriesCollection UsersChart { get; set; }
         public SeriesCollection DiscountChart { get; set; }
+        public SeriesCollection PaymentModesChart { get; set; }
 
         private double _totalDiscountAmount;
         public double TotalDiscountAmount
@@ -383,6 +384,23 @@ namespace CamaroesPOS.UI.ViewModels
                         Fill = System.Windows.Media.Brushes.DodgerBlue
                     }
                 };
+
+                // 12. Statistiques des modes de paiement
+                var payments = context.SoldItems
+                    .GroupBy(s => s.PaymentMode ?? "Espèces")
+                    .Select(g => new { Mode = g.Key, Total = g.Sum(s => s.Total) })
+                    .ToList();
+
+                PaymentModesChart = new SeriesCollection();
+                foreach (var p in payments)
+                {
+                    PaymentModesChart.Add(new PieSeries 
+                    { 
+                        Title = p.Mode, 
+                        Values = new ChartValues<double> { p.Total }, 
+                        DataLabels = true 
+                    });
+                }
             }
         }
 

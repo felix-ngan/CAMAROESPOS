@@ -25,6 +25,7 @@ namespace CamaroesPOS.UI
                     "ALTER TABLE Products ADD COLUMN VendorId INTEGER NOT NULL DEFAULT 0;",
                     "ALTER TABLE Products ADD COLUMN VendorName TEXT;",
                     "ALTER TABLE SoldItems ADD COLUMN CostPrice REAL NOT NULL DEFAULT 0;",
+                    "ALTER TABLE SoldItems ADD COLUMN PaymentMode TEXT;",
                     "ALTER TABLE CustomerWallets ADD COLUMN CustomerName TEXT;",
                     "ALTER TABLE CustomerWallets ADD COLUMN Email TEXT;",
                     "ALTER TABLE CustomerWallets ADD COLUMN LoyaltyPoints INTEGER NOT NULL DEFAULT 0;",
@@ -39,7 +40,8 @@ namespace CamaroesPOS.UI
                     "UPDATE Products SET CategoryName = '' WHERE CategoryName IS NULL;",
                     "UPDATE Products SET Barcode = '' WHERE Barcode IS NULL;",
                     "UPDATE CustomerWallets SET CustomerName = '' WHERE CustomerName IS NULL;",
-                    "UPDATE CustomerWallets SET Email = '' WHERE Email IS NULL;"
+                    "UPDATE CustomerWallets SET Email = '' WHERE Email IS NULL;",
+                    "UPDATE SoldItems SET PaymentMode = 'Espèces' WHERE PaymentMode IS NULL;"
                 };
 
                 foreach (var sql in migrations)
