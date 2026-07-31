@@ -91,6 +91,24 @@
                     <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,15,0,15"/>
 
                     <!-- Totals -->
+                    <Grid Margin="0,0,0,5" x:Name="GridSubTotal" Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Sous-total :" FontSize="14" Foreground="Black"/>
+                        <TextBlock Grid.Column="1" x:Name="TxtSubTotal" Text="0 FCFA" FontSize="14" HorizontalAlignment="Right" Foreground="Black"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10" x:Name="GridDiscount" Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Réduction :" FontSize="14" Foreground="Black"/>
+                        <TextBlock Grid.Column="1" x:Name="TxtDiscount" Text="0 FCFA" FontSize="14" HorizontalAlignment="Right" Foreground="Orange"/>
+                    </Grid>
+
                     <Grid Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />

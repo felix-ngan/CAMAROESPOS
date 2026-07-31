@@ -8,6 +8,10 @@
     <UserControl.DataContext>
         <viewmodels:DashboardViewModel />
     </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
     
     <Grid>
         <Grid.RowDefinitions>
@@ -108,6 +112,41 @@
                     </Grid>
                 </materialDesign:Card>
 
+                <!-- Card 6 : Réductions Accordées -->
+                <materialDesign:Card Margin="5" Padding="15" Background="White" UniformCornerRadius="15" Width="260">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="#FFF3E0" CornerRadius="12" Width="50" Height="50" Margin="0,0,10,0">
+                            <materialDesign:PackIcon Kind="TagOutline" Width="30" Height="30" Foreground="#F57C00" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Réductions Accordées" FontSize="13" Foreground="#8F9BBA" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding TotalDiscountAmount, StringFormat={}{0:N0} FCFA}" FontSize="18" FontWeight="Bold" Foreground="#F57C00" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- Card 7 : Volume du Stock -->
+                <materialDesign:Card Margin="5" Padding="15" Background="White" UniformCornerRadius="15" Width="260">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="#E8EAF6" CornerRadius="12" Width="50" Height="50" Margin="0,0,10,0">
+                            <materialDesign:PackIcon Kind="PackageVariant" Width="30" Height="30" Foreground="#3F51B5" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Volume du Stock" FontSize="13" Foreground="#8F9BBA" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding TotalStockQuantity, StringFormat={}{0:N0} Unités}" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,2,0,0" />
+                            <TextBlock Text="{Binding TotalProducts, StringFormat={}{0:N0} Références}" FontSize="12" Foreground="#3F51B5" FontWeight="SemiBold" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
+
                 <!-- Card 4 : Rupture -->
                 <materialDesign:Card Margin="5" Padding="15" Background="White" UniformCornerRadius="15" Width="260">
                     <Grid>
@@ -175,15 +214,43 @@
                     </Grid>
                 </materialDesign:Card>
 
-                <!-- 4. Rupture de Stock -->
+                <!-- 4. Mouvements de Stock (Graphique Comparatif) -->
                 <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <TextBlock Text="Statut du Stock" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
-                        <lvc:PieChart Grid.Row="1" Series="{Binding LowStockChart}" LegendLocation="Right" Margin="5" />
+                        <TextBlock Text="Mouvements de Stock (7 j)" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        <lvc:CartesianChart Grid.Row="1" Series="{Binding StockMovementsChart}" Margin="5">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Labels="{Binding ChartLabels}" />
+                            </lvc:CartesianChart.AxisX>
+                        </lvc:CartesianChart>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- 4b. Alertes de Stock (Critique) -->
+                <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="Alertes de Stock (Critique)" FontSize="16" FontWeight="Bold" Foreground="#2B3674" />
+                            <Border Background="#E53935" CornerRadius="10" Padding="5,2" Margin="10,0,0,0" Visibility="{Binding HasCriticalStock, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Text="{Binding LowStockItems, StringFormat={}{0} Alertes}" Foreground="White" FontSize="12" FontWeight="Bold" />
+                            </Border>
+                        </StackPanel>
+                        
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding CriticalStockList}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Background="Transparent" BorderThickness="0" HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Produit" Binding="{Binding Description}" Width="*" />
+                                <DataGridTextColumn Header="Stock" Binding="{Binding Qty}" Width="Auto" />
+                                <DataGridTextColumn Header="Seuil" Binding="{Binding Reorder}" Width="Auto" />
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </Grid>
                 </materialDesign:Card>
 
@@ -235,7 +302,28 @@
                     </Grid>
                 </materialDesign:Card>
 
-                <!-- 8. Utilisateurs -->
+                <!-- 8. Utilisateurs (Liste) -->
+                <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Liste des Utilisateurs" FontSize="16" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,10" />
+                        
+                        <TextBox Grid.Row="1" materialDesign:HintAssist.Hint="Rechercher un utilisateur..." Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+                        
+                        <DataGrid Grid.Row="2" ItemsSource="{Binding UsersList}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Background="Transparent" BorderThickness="0" HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Nom / Identifiant" Binding="{Binding Username}" Width="*" />
+                                <DataGridTextColumn Header="Rôle" Binding="{Binding Role}" Width="Auto" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </materialDesign:Card>
+                
+                <!-- 8b. Utilisateurs (Graphique) -->
                 <materialDesign:Card Margin="10" Padding="15" Background="White" UniformCornerRadius="15" Height="250">
                     <Grid>
                         <Grid.RowDefinitions>

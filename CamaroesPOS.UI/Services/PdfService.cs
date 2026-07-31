@@ -11,7 +11,7 @@ namespace CamaroesPOS.UI.Services
 {
     public class PdfService
     {
-        public void GenerateReceiptPdf(string transactionNo, string cashier, double totalAmount, double receivedAmount, double changeAmount, string customerPhone, IEnumerable<CartItem> items, string path)
+        public void GenerateReceiptPdf(string transactionNo, string cashier, double totalAmount, double receivedAmount, double changeAmount, string customerPhone, IEnumerable<CartItem> items, string path, double discountAmount = 0)
         {
             Document.Create(container =>
             {
@@ -23,7 +23,7 @@ namespace CamaroesPOS.UI.Services
                     page.DefaultTextStyle(x => x.FontSize(10));
 
                     page.Header().Element(c => ComposeReceiptHeader(c, transactionNo, cashier, customerPhone));
-                    page.Content().Element(c => ComposeReceiptContent(c, items, totalAmount, receivedAmount, changeAmount));
+                    page.Content().Element(c => ComposeReceiptContent(c, items, totalAmount, receivedAmount, changeAmount, discountAmount));
                     page.Footer().Element(ComposeReceiptFooter);
                 });
             })
@@ -53,7 +53,7 @@ namespace CamaroesPOS.UI.Services
             });
         }
 
-        private void ComposeReceiptContent(IContainer container, IEnumerable<CartItem> items, double totalAmount, double receivedAmount, double changeAmount)
+        private void ComposeReceiptContent(IContainer container, IEnumerable<CartItem> items, double totalAmount, double receivedAmount, double changeAmount, double discountAmount)
         {
             container.PaddingVertical(10).Column(column =>
             {
@@ -88,7 +88,14 @@ namespace CamaroesPOS.UI.Services
 
                 column.Item().PaddingVertical(10).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
                 
-                column.Item().AlignRight().Text($"Total : {totalAmount:N0} FCFA").FontSize(14).Bold();
+                if (discountAmount > 0)
+                {
+                    double subTotal = totalAmount + discountAmount;
+                    column.Item().AlignRight().Text($"Sous-total : {subTotal:N0} FCFA");
+                    column.Item().AlignRight().Text($"Réduction : -{discountAmount:N0} FCFA").FontColor(Colors.Orange.Darken1);
+                }
+                
+                column.Item().AlignRight().Text($"TOTAL À PAYER : {totalAmount:N0} FCFA").FontSize(14).Bold();
                 if (receivedAmount > 0)
                 {
                     column.Item().AlignRight().Text($"Reçu : {receivedAmount:N0} FCFA");

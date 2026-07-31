@@ -28,9 +28,42 @@ namespace CamaroesPOS.UI.ViewModels
             set { _newCategoryName = value; OnPropertyChanged(); }
         }
 
-        public ICommand AddBrandCommand { get; }
+        private Brand _selectedBrand;
+        public Brand SelectedBrand
+        {
+            get => _selectedBrand;
+            set { _selectedBrand = value; OnPropertyChanged(); }
+        }
+
+        private bool _isEditingBrand;
+        public bool IsEditingBrand
+        {
+            get => _isEditingBrand;
+            set { _isEditingBrand = value; OnPropertyChanged(); }
+        }
+
+        private Category _selectedCategory;
+        public Category SelectedCategory
+        {
+            get => _selectedCategory;
+            set { _selectedCategory = value; OnPropertyChanged(); }
+        }
+
+        private bool _isEditingCategory;
+        public bool IsEditingCategory
+        {
+            get => _isEditingCategory;
+            set { _isEditingCategory = value; OnPropertyChanged(); }
+        }
+
+        public ICommand SaveBrandCommand { get; }
+        public ICommand EditBrandCommand { get; }
+        public ICommand CancelEditBrandCommand { get; }
         public ICommand DeleteBrandCommand { get; }
-        public ICommand AddCategoryCommand { get; }
+        
+        public ICommand SaveCategoryCommand { get; }
+        public ICommand EditCategoryCommand { get; }
+        public ICommand CancelEditCategoryCommand { get; }
         public ICommand DeleteCategoryCommand { get; }
 
         public BrandCategoryViewModel()
@@ -38,9 +71,14 @@ namespace CamaroesPOS.UI.ViewModels
             Brands = new ObservableCollection<Brand>();
             Categories = new ObservableCollection<Category>();
 
-            AddBrandCommand = new RelayCommand<object>(AddBrand, o => !string.IsNullOrWhiteSpace(NewBrandName));
+            SaveBrandCommand = new RelayCommand<object>(SaveBrand, o => !string.IsNullOrWhiteSpace(NewBrandName));
+            EditBrandCommand = new RelayCommand<Brand>(EditBrand);
+            CancelEditBrandCommand = new RelayCommand<object>(CancelEditBrand);
             DeleteBrandCommand = new RelayCommand<Brand>(DeleteBrand);
-            AddCategoryCommand = new RelayCommand<object>(AddCategory, o => !string.IsNullOrWhiteSpace(NewCategoryName));
+
+            SaveCategoryCommand = new RelayCommand<object>(SaveCategory, o => !string.IsNullOrWhiteSpace(NewCategoryName));
+            EditCategoryCommand = new RelayCommand<Category>(EditCategory);
+            CancelEditCategoryCommand = new RelayCommand<object>(CancelEditCategory);
             DeleteCategoryCommand = new RelayCommand<Category>(DeleteCategory);
 
             LoadData();
@@ -60,20 +98,58 @@ namespace CamaroesPOS.UI.ViewModels
             }
         }
 
-        private void AddBrand(object obj)
+        private void SaveBrand(object obj)
         {
             using (var context = new PosDbContext())
             {
-                if (context.Brands.Any(b => b.BrandName == NewBrandName))
+                if (IsEditingBrand && SelectedBrand != null)
                 {
-                    MessageBox.Show("Cette marque existe déjà.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+                    var b = context.Brands.FirstOrDefault(x => x.Id == SelectedBrand.Id);
+                    if (b != null)
+                    {
+                        if (context.Brands.Any(x => x.BrandName == NewBrandName && x.Id != SelectedBrand.Id))
+                        {
+                            MessageBox.Show("Cette marque existe déjà.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                        b.BrandName = NewBrandName;
+                        context.SaveChanges();
+                        
+                        // Also update associated products
+                        var products = context.Products.Where(p => p.BrandName == SelectedBrand.BrandName).ToList();
+                        foreach(var p in products) p.BrandName = NewBrandName;
+                        context.SaveChanges();
+                    }
+                    CancelEditBrand(null);
                 }
-                context.Brands.Add(new Brand { BrandName = NewBrandName });
-                context.SaveChanges();
+                else
+                {
+                    if (context.Brands.Any(b => b.BrandName == NewBrandName))
+                    {
+                        MessageBox.Show("Cette marque existe déjà.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    context.Brands.Add(new Brand { BrandName = NewBrandName });
+                    context.SaveChanges();
+                    NewBrandName = string.Empty;
+                }
             }
-            NewBrandName = string.Empty;
             LoadData();
+        }
+
+        private void EditBrand(Brand brand)
+        {
+            if (brand == null) return;
+            SelectedBrand = brand;
+            NewBrandName = brand.BrandName;
+            IsEditingBrand = true;
+        }
+
+        private void CancelEditBrand(object obj)
+        {
+            SelectedBrand = null;
+            NewBrandName = string.Empty;
+            IsEditingBrand = false;
         }
 
         private void DeleteBrand(Brand brand)
@@ -95,20 +171,58 @@ namespace CamaroesPOS.UI.ViewModels
             }
         }
 
-        private void AddCategory(object obj)
+        private void SaveCategory(object obj)
         {
             using (var context = new PosDbContext())
             {
-                if (context.Categories.Any(c => c.CategoryName == NewCategoryName))
+                if (IsEditingCategory && SelectedCategory != null)
                 {
-                    MessageBox.Show("Cette catégorie existe déjà.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+                    var c = context.Categories.FirstOrDefault(x => x.Id == SelectedCategory.Id);
+                    if (c != null)
+                    {
+                        if (context.Categories.Any(x => x.CategoryName == NewCategoryName && x.Id != SelectedCategory.Id))
+                        {
+                            MessageBox.Show("Cette catégorie existe déjà.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                        c.CategoryName = NewCategoryName;
+                        context.SaveChanges();
+                        
+                        // Also update associated products
+                        var products = context.Products.Where(p => p.CategoryName == SelectedCategory.CategoryName).ToList();
+                        foreach(var p in products) p.CategoryName = NewCategoryName;
+                        context.SaveChanges();
+                    }
+                    CancelEditCategory(null);
                 }
-                context.Categories.Add(new Category { CategoryName = NewCategoryName });
-                context.SaveChanges();
+                else
+                {
+                    if (context.Categories.Any(c => c.CategoryName == NewCategoryName))
+                    {
+                        MessageBox.Show("Cette catégorie existe déjà.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    context.Categories.Add(new Category { CategoryName = NewCategoryName });
+                    context.SaveChanges();
+                    NewCategoryName = string.Empty;
+                }
             }
-            NewCategoryName = string.Empty;
             LoadData();
+        }
+
+        private void EditCategory(Category category)
+        {
+            if (category == null) return;
+            SelectedCategory = category;
+            NewCategoryName = category.CategoryName;
+            IsEditingCategory = true;
+        }
+
+        private void CancelEditCategory(object obj)
+        {
+            SelectedCategory = null;
+            NewCategoryName = string.Empty;
+            IsEditingCategory = false;
         }
 
         private void DeleteCategory(Category category)

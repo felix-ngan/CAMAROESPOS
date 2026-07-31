@@ -17,13 +17,21 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
-            <materialDesign:PackIcon Kind="PackageVariant" Width="30" Height="30" VerticalAlignment="Center" Foreground="#1E88E5"/>
-            <TextBlock Text="Gestion des Stocks" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#2B3674" />
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Gestion des Stocks" FontSize="28" FontWeight="Bold" Foreground="#2B3674" VerticalAlignment="Center" />
             
-            <Button Content="NOUVEAU PRODUIT" Command="{Binding AddCommand}" Margin="30,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}" />
-            <Button Content="MARQUES / CATÉGORIES" Command="{Binding ManageCatalogCommand}" Margin="10,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}" />
-        </StackPanel>
+            <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="Rechercher un produit, marque..." Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="20,0,20,0" FontSize="16" Style="{StaticResource MaterialDesignFloatingHintTextBox}" MaxWidth="400" HorizontalAlignment="Right" />
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}">
+                <Button Content="MARQUES / CATÉGORIES" Command="{Binding ManageCatalogCommand}" Margin="0,0,10,0" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#3F51B5" BorderBrush="#3F51B5" />
+                <Button Content="AJOUTER PRODUIT" Command="{Binding AddCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#4318FF" Foreground="White" />
+            </StackPanel>
+        </Grid>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -41,10 +49,13 @@
                         <DataGridTextColumn Header="Stock" Binding="{Binding Qty}" Width="80" IsReadOnly="True" />
                         <DataGridTextColumn Header="Fournisseur" Binding="{Binding VendorName}" Width="*" IsReadOnly="True" />
                         
-                        <DataGridTemplateColumn Header="Actions" Width="100">
+                        <DataGridTemplateColumn Header="Actions" Width="130">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" Visibility="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}">
+                                        <Button Style="{StaticResource MaterialDesignIconButton}" Command="{Binding DataContext.AdjustStockCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="Ajuster le stock" Height="30" Width="30" Foreground="#43A047">
+                                            <materialDesign:PackIcon Kind="SwapVertical" />
+                                        </Button>
                                         <Button Style="{StaticResource MaterialDesignIconButton}" Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="Éditer le produit" Height="30" Width="30" Foreground="#1E88E5">
                                             <materialDesign:PackIcon Kind="Pencil" />
                                         </Button>
@@ -86,6 +97,28 @@
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>
+            </materialDesign:Card>
+            <!-- Right Adjust Stock Panel -->
+            <materialDesign:Card Grid.Column="1" Padding="20" UniformCornerRadius="15" Visibility="{Binding IsAdjustingStock, Converter={StaticResource BoolToVis}}" Background="White">
+                <StackPanel>
+                    <TextBlock Text="Ajustement de Stock" FontSize="20" FontWeight="Bold" Margin="0,0,0,5" Foreground="#2B3674" />
+                    <TextBlock Text="{Binding SelectedProduct.Description}" FontSize="16" Foreground="Gray" Margin="0,0,0,20" />
+                    
+                    <ComboBox materialDesign:HintAssist.Hint="Type d'Opération" ItemsSource="{Binding AdjustmentTypes}" SelectedItem="{Binding AdjustmentType}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,15" />
+                    
+                    <TextBox materialDesign:HintAssist.Hint="Quantité" Text="{Binding AdjustmentQuantity}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                    
+                    <TextBox materialDesign:HintAssist.Hint="Justification / Motif" Text="{Binding AdjustmentJustification}" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Height="80" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelAdjustmentCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
+                        <Button Grid.Column="1" Content="VALIDER" Command="{Binding SaveAdjustmentCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
+                    </Grid>
+                </StackPanel>
             </materialDesign:Card>
         </Grid>
     </Grid>

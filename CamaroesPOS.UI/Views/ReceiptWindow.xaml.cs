@@ -14,8 +14,9 @@ namespace CamaroesPOS.UI.Views
         private double _receivedAmount;
         private double _changeAmount;
         private string _paymentMode;
-
-        public ReceiptWindow(string transNo, IEnumerable<CartItem> items, double totalAmount, double receivedAmount, double changeAmount, string paymentMode)
+        private double _discountAmount;
+        
+        public ReceiptWindow(string transNo, IEnumerable<CartItem> items, double totalAmount, double receivedAmount, double changeAmount, string paymentMode, double discountAmount = 0)
         {
             InitializeComponent();
             
@@ -25,12 +26,22 @@ namespace CamaroesPOS.UI.Views
             _receivedAmount = receivedAmount;
             _changeAmount = changeAmount;
             _paymentMode = paymentMode;
+            _discountAmount = discountAmount;
 
             TxtTransNo.Text = transNo;
             TxtDate.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
             TxtMode.Text = $"Mode de Paiement : {paymentMode}";
             
             ItemsList.ItemsSource = items;
+            
+            if (_discountAmount > 0)
+            {
+                double subTotal = totalAmount + discountAmount;
+                GridSubTotal.Visibility = Visibility.Visible;
+                GridDiscount.Visibility = Visibility.Visible;
+                TxtSubTotal.Text = $"{subTotal:N0} FCFA";
+                TxtDiscount.Text = $"-{discountAmount:N0} FCFA";
+            }
             
             TxtTotal.Text = $"{totalAmount:N0} FCFA";
             
@@ -69,7 +80,7 @@ namespace CamaroesPOS.UI.Views
                         : "Caissier";
                         
                     var pdfService = new CamaroesPOS.UI.Services.PdfService();
-                    pdfService.GenerateReceiptPdf(_transNo, cashier, _totalAmount, _receivedAmount, _changeAmount, "", _items, dialog.FileName);
+                    pdfService.GenerateReceiptPdf(_transNo, cashier, _totalAmount, _receivedAmount, _changeAmount, "", _items, dialog.FileName, _discountAmount);
                     
                     MessageBox.Show("Le reçu a été exporté avec succès !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
                 }

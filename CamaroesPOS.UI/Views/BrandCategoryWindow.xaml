@@ -9,6 +9,32 @@
         <viewmodels:BrandCategoryViewModel />
     </Window.DataContext>
 
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        
+        <Style x:Key="SaveButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEditingBrand}" Value="True">
+                    <Setter Property="Content" Value="ENREGISTRER" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsEditingBrand}" Value="False">
+                    <Setter Property="Content" Value="AJOUTER" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SaveCategoryButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEditingCategory}" Value="True">
+                    <Setter Property="Content" Value="ENREGISTRER" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsEditingCategory}" Value="False">
+                    <Setter Property="Content" Value="AJOUTER" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid Margin="20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -31,20 +57,27 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Column="0" materialDesign:HintAssist.Hint="Nouvelle Marque" Text="{Binding NewBrandName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
-                    <Button Grid.Column="1" Command="{Binding AddBrandCommand}" Content="AJOUTER" Margin="10,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                    <Button Grid.Column="1" Command="{Binding CancelEditBrandCommand}" Content="ANNULER" Margin="10,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" Visibility="{Binding IsEditingBrand, Converter={StaticResource BoolToVis}}" Foreground="Gray" BorderBrush="Gray" />
+                    <Button Grid.Column="2" Command="{Binding SaveBrandCommand}" Margin="10,0,0,0" Style="{StaticResource SaveButtonStyle}" />
                 </Grid>
                 
                 <DataGrid Grid.Row="2" ItemsSource="{Binding Brands}" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Nom de la Marque" Binding="{Binding BrandName}" Width="*" IsReadOnly="True" />
-                        <DataGridTemplateColumn Header="Action" Width="60">
+                        <DataGridTemplateColumn Header="Action" Width="90">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Style="{StaticResource MaterialDesignIconButton}" Command="{Binding DataContext.DeleteBrandCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Foreground="#E53935" Height="25" Width="25">
-                                        <materialDesign:PackIcon Kind="Delete" />
-                                    </Button>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Style="{StaticResource MaterialDesignIconButton}" Command="{Binding DataContext.EditBrandCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Foreground="#1E88E5" Height="25" Width="25" ToolTip="Modifier">
+                                            <materialDesign:PackIcon Kind="Pencil" />
+                                        </Button>
+                                        <Button Style="{StaticResource MaterialDesignIconButton}" Command="{Binding DataContext.DeleteBrandCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Foreground="#E53935" Height="25" Width="25" ToolTip="Supprimer">
+                                            <materialDesign:PackIcon Kind="Delete" />
+                                        </Button>
+                                    </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -68,20 +101,27 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Column="0" materialDesign:HintAssist.Hint="Nouvelle Catégorie" Text="{Binding NewCategoryName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
-                    <Button Grid.Column="1" Command="{Binding AddCategoryCommand}" Content="AJOUTER" Margin="10,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                    <Button Grid.Column="1" Command="{Binding CancelEditCategoryCommand}" Content="ANNULER" Margin="10,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" Visibility="{Binding IsEditingCategory, Converter={StaticResource BoolToVis}}" Foreground="Gray" BorderBrush="Gray" />
+                    <Button Grid.Column="2" Command="{Binding SaveCategoryCommand}" Margin="10,0,0,0" Style="{StaticResource SaveCategoryButtonStyle}" />
                 </Grid>
                 
                 <DataGrid Grid.Row="2" ItemsSource="{Binding Categories}" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Nom de la Catégorie" Binding="{Binding CategoryName}" Width="*" IsReadOnly="True" />
-                        <DataGridTemplateColumn Header="Action" Width="60">
+                        <DataGridTemplateColumn Header="Action" Width="90">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Style="{StaticResource MaterialDesignIconButton}" Command="{Binding DataContext.DeleteCategoryCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Foreground="#E53935" Height="25" Width="25">
-                                        <materialDesign:PackIcon Kind="Delete" />
-                                    </Button>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Style="{StaticResource MaterialDesignIconButton}" Command="{Binding DataContext.EditCategoryCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Foreground="#1E88E5" Height="25" Width="25" ToolTip="Modifier">
+                                            <materialDesign:PackIcon Kind="Pencil" />
+                                        </Button>
+                                        <Button Style="{StaticResource MaterialDesignIconButton}" Command="{Binding DataContext.DeleteCategoryCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Foreground="#E53935" Height="25" Width="25" ToolTip="Supprimer">
+                                            <materialDesign:PackIcon Kind="Delete" />
+                                        </Button>
+                                    </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

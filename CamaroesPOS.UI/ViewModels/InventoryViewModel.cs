@@ -11,7 +11,20 @@ namespace CamaroesPOS.UI.ViewModels
 {
     public class InventoryViewModel : INotifyPropertyChanged
     {
+        private ObservableCollection<Product> _allProducts;
         public ObservableCollection<Product> InventoryList { get; set; }
+
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                _searchText = value;
+                OnPropertyChanged();
+                FilterProducts();
+            }
+        }
 
         public ObservableCollection<Vendor> Vendors { get; set; }
         public ObservableCollection<Brand> Brands { get; set; }
@@ -33,6 +46,36 @@ namespace CamaroesPOS.UI.ViewModels
 
         private bool _isNewProduct;
 
+        private bool _isAdjustingStock;
+        public bool IsAdjustingStock
+        {
+            get => _isAdjustingStock;
+            set { _isAdjustingStock = value; OnPropertyChanged(); }
+        }
+
+        private int _adjustmentQuantity;
+        public int AdjustmentQuantity
+        {
+            get => _adjustmentQuantity;
+            set { _adjustmentQuantity = value; OnPropertyChanged(); }
+        }
+
+        private string _adjustmentJustification;
+        public string AdjustmentJustification
+        {
+            get => _adjustmentJustification;
+            set { _adjustmentJustification = value; OnPropertyChanged(); }
+        }
+
+        private string _adjustmentType;
+        public string AdjustmentType
+        {
+            get => _adjustmentType;
+            set { _adjustmentType = value; OnPropertyChanged(); }
+        }
+
+        public ObservableCollection<string> AdjustmentTypes { get; set; }
+
         public bool IsAdmin => System.Windows.Application.Current.Properties["CurrentUserRole"]?.ToString() == "Admin";
 
         public ICommand AddCommand { get; }
@@ -41,8 +84,13 @@ namespace CamaroesPOS.UI.ViewModels
         public ICommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
 
+        public ICommand AdjustStockCommand { get; }
+        public ICommand SaveAdjustmentCommand { get; }
+        public ICommand CancelAdjustmentCommand { get; }
+
         public InventoryViewModel()
         {
+            _allProducts = new ObservableCollection<Product>();
             InventoryList = new ObservableCollection<Product>();
             Vendors = new ObservableCollection<Vendor>();
             Brands = new ObservableCollection<Brand>();
@@ -56,7 +104,32 @@ namespace CamaroesPOS.UI.ViewModels
             
             ManageCatalogCommand = new RelayCommand<object>(OpenCatalogManager);
 
+            AdjustmentTypes = new ObservableCollection<string> { "Entrée", "Sortie", "Ajustement (Inventaire)" };
+            AdjustStockCommand = new RelayCommand<Product>(OpenAdjustForm);
+            SaveAdjustmentCommand = new RelayCommand<object>(SaveAdjustment);
+            CancelAdjustmentCommand = new RelayCommand<object>(CancelAdjustment);
+
             LoadDataFromDatabase();
+        }
+
+        private void FilterProducts()
+        {
+            InventoryList.Clear();
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                foreach (var p in _allProducts) InventoryList.Add(p);
+            }
+            else
+            {
+                var lower = SearchText.ToLower();
+                var filtered = _allProducts.Where(p => 
+                    (p.ProductCode != null && p.ProductCode.ToLower().Contains(lower)) ||
+                    (p.Description != null && p.Description.ToLower().Contains(lower)) ||
+                    (p.CategoryName != null && p.CategoryName.ToLower().Contains(lower)) ||
+                    (p.BrandName != null && p.BrandName.ToLower().Contains(lower))
+                ).ToList();
+                foreach (var p in filtered) InventoryList.Add(p);
+            }
         }
 
         private void LoadDataFromDatabase()
@@ -64,10 +137,10 @@ namespace CamaroesPOS.UI.ViewModels
             using (var context = new PosDbContext())
             {
                 var products = context.Products.ToList();
-                InventoryList.Clear();
+                _allProducts.Clear();
                 foreach (var p in products)
                 {
-                    InventoryList.Add(p);
+                    _allProducts.Add(p);
                 }
 
                 var vendors = context.Vendors.ToList();
@@ -85,6 +158,7 @@ namespace CamaroesPOS.UI.ViewModels
                 Categories.Clear();
                 foreach(var c in categories) Categories.Add(c);
             }
+            FilterProducts();
         }
 
         public ICommand ManageCatalogCommand { get; }
@@ -103,6 +177,7 @@ namespace CamaroesPOS.UI.ViewModels
                 Reorder = 5
             };
             _isNewProduct = true;
+            IsAdjustingStock = false;
             IsEditing = true;
         }
 
@@ -123,6 +198,7 @@ namespace CamaroesPOS.UI.ViewModels
                 VendorName = product.VendorName
             };
             _isNewProduct = false;
+            IsAdjustingStock = false;
             IsEditing = true;
         }
 
@@ -209,6 +285,95 @@ namespace CamaroesPOS.UI.ViewModels
         private void CancelEdit(object obj)
         {
             IsEditing = false;
+            SelectedProduct = null;
+        }
+
+        private void OpenAdjustForm(Product product)
+        {
+            if (product == null) return;
+            if (!IsAdmin)
+            {
+                MessageBox.Show("Seul l'administrateur peut ajuster les stocks.", "Accès Refusé", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            SelectedProduct = product;
+            AdjustmentQuantity = 0;
+            AdjustmentJustification = "";
+            AdjustmentType = "Entrée";
+            IsAdjustingStock = true;
+            IsEditing = false;
+        }
+
+        private void SaveAdjustment(object obj)
+        {
+            if (SelectedProduct == null) return;
+
+            if (AdjustmentQuantity <= 0 && AdjustmentType != "Ajustement (Inventaire)")
+            {
+                MessageBox.Show("La quantité doit être supérieure à zéro.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(AdjustmentJustification))
+            {
+                MessageBox.Show("Une justification est requise pour cette opération.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            using (var context = new PosDbContext())
+            {
+                var dbProduct = context.Products.FirstOrDefault(p => p.ProductCode == SelectedProduct.ProductCode);
+                if (dbProduct != null)
+                {
+                    int diff = 0;
+                    if (AdjustmentType == "Entrée")
+                    {
+                        diff = AdjustmentQuantity;
+                        dbProduct.Qty += diff;
+                    }
+                    else if (AdjustmentType == "Sortie")
+                    {
+                        diff = -AdjustmentQuantity;
+                        if (dbProduct.Qty < AdjustmentQuantity)
+                        {
+                            MessageBox.Show("Stock insuffisant pour cette sortie.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                        dbProduct.Qty -= AdjustmentQuantity;
+                    }
+                    else // Ajustement (Inventaire)
+                    {
+                        diff = AdjustmentQuantity - dbProduct.Qty; // Difference par rapport à la valeur entrée
+                        dbProduct.Qty = AdjustmentQuantity; // La valeur entrée devient la nouvelle Qty absolue
+                    }
+
+                    // Enregistrer l'historique
+                    context.Stocks.Add(new Stock
+                    {
+                        ProductCode = dbProduct.ProductCode,
+                        Description = dbProduct.Description,
+                        Qty = diff,
+                        StockInDate = System.DateTime.Now,
+                        StockInBy = Application.Current.Properties["CurrentUser"]?.ToString() ?? "Admin",
+                        Status = $"{AdjustmentType} - {AdjustmentJustification}",
+                        RefNo = System.DateTime.Now.ToString("yyyyMMddHHmmss"),
+                        VendorId = dbProduct.VendorId,
+                        VendorName = dbProduct.VendorName
+                    });
+
+                    context.SaveChanges();
+                    MessageBox.Show("Le stock a été ajusté avec succès.", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+
+            IsAdjustingStock = false;
+            LoadDataFromDatabase();
+        }
+
+        private void CancelAdjustment(object obj)
+        {
+            IsAdjustingStock = false;
             SelectedProduct = null;
         }
 

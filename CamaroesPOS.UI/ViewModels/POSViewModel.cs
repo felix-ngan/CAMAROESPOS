@@ -351,7 +351,8 @@ namespace CamaroesPOS.UI.ViewModels
                 string transNo = SaveTransaction("Portefeuille");
                 
                 // Show receipt for Wallet
-                var receiptWin = new CamaroesPOS.UI.Views.ReceiptWindow(transNo, new ObservableCollection<CartItem>(Cart), TotalAmount, TotalAmount, 0, "Portefeuille (Wallet)");
+                double totalDiscountWallet = SubTotalAmount * (DiscountPercentage / 100.0);
+                var receiptWin = new CamaroesPOS.UI.Views.ReceiptWindow(transNo, new ObservableCollection<CartItem>(Cart), TotalAmount, TotalAmount, 0, "Portefeuille (Wallet)", totalDiscountWallet);
                 receiptWin.ShowDialog();
                 
                 Cart.Clear();
@@ -473,7 +474,8 @@ namespace CamaroesPOS.UI.ViewModels
             string transNo = SaveTransaction("Espèces");
             
             // Show receipt for Cash Payment
-            var receiptWin = new CamaroesPOS.UI.Views.ReceiptWindow(transNo, new ObservableCollection<CartItem>(Cart), TotalAmount, ReceivedAmount, ChangeAmount, "Espèces");
+            double totalDiscountCash = SubTotalAmount * (DiscountPercentage / 100.0);
+            var receiptWin = new CamaroesPOS.UI.Views.ReceiptWindow(transNo, new ObservableCollection<CartItem>(Cart), TotalAmount, ReceivedAmount, ChangeAmount, "Espèces", totalDiscountCash);
             receiptWin.ShowDialog();
             
             IsCheckoutDialogOpen = false;

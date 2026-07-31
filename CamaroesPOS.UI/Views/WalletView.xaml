@@ -31,16 +31,17 @@
             </Grid.ColumnDefinitions>
 
             <materialDesign:Card Grid.Column="0" Padding="15" UniformCornerRadius="15" Margin="0,0,20,0" Background="White">
-                <DataGrid ItemsSource="{Binding Wallets}" AutoGenerateColumns="False" CanUserAddRows="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="*" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Nom Client" Binding="{Binding CustomerName}" Width="*" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Points" Binding="{Binding LoyaltyPoints}" Width="80" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Total Achat" Binding="{Binding TotalSpent, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Solde Wallet" Binding="{Binding Balance, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
-                        
-                        <DataGridTemplateColumn Header="Action" Width="180">
-                            <DataGridTemplateColumn.CellTemplate>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <DataGrid ItemsSource="{Binding Wallets}" AutoGenerateColumns="False" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="120" IsReadOnly="True" />
+                            <DataGridTextColumn Header="Nom Client" Binding="{Binding CustomerName}" Width="150" IsReadOnly="True" />
+                            <DataGridTextColumn Header="Points" Binding="{Binding LoyaltyPoints}" Width="80" IsReadOnly="True" />
+                            <DataGridTextColumn Header="Total Achat" Binding="{Binding TotalSpent, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
+                            <DataGridTextColumn Header="Solde Wallet" Binding="{Binding Balance, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
+                            
+                            <DataGridTemplateColumn Header="Action" Width="180">
+                                <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                         <Button Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding DataContext.RechargeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Content="Modifier / Recharger" Height="30" Margin="0,0,5,0" />
@@ -51,9 +52,10 @@
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </ScrollViewer>
             </materialDesign:Card>
 
             <!-- Right Panel: Form -->

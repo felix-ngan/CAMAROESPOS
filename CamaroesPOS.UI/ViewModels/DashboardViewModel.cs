@@ -24,11 +24,77 @@ namespace CamaroesPOS.UI.ViewModels
             set { _totalProducts = value; OnPropertyChanged(); }
         }
 
+        private int _totalStockQuantity;
+        public int TotalStockQuantity
+        {
+            get => _totalStockQuantity;
+            set { _totalStockQuantity = value; OnPropertyChanged(); }
+        }
+
+        private System.Collections.Generic.List<CamaroesPOS.Domain.Entities.User> _allUsers;
+        
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                _searchText = value;
+                OnPropertyChanged();
+                FilterUsers();
+            }
+        }
+
+        private void FilterUsers()
+        {
+            if (_allUsers == null) return;
+            if (UsersList == null) UsersList = new System.Collections.ObjectModel.ObservableCollection<CamaroesPOS.Domain.Entities.User>();
+            
+            UsersList.Clear();
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                foreach (var u in _allUsers) UsersList.Add(u);
+            }
+            else
+            {
+                var lower = SearchText.ToLower();
+                var filtered = _allUsers.Where(u => 
+                    (u.Username != null && u.Username.ToLower().Contains(lower)) ||
+                    (u.Role != null && u.Role.ToLower().Contains(lower)) ||
+                    (u.Name != null && u.Name.ToLower().Contains(lower))
+                ).ToList();
+                foreach (var u in filtered) UsersList.Add(u);
+            }
+        }
+
+        private System.Collections.ObjectModel.ObservableCollection<CamaroesPOS.Domain.Entities.User> _usersList;
+        public System.Collections.ObjectModel.ObservableCollection<CamaroesPOS.Domain.Entities.User> UsersList
+        {
+            get => _usersList;
+            set { _usersList = value; OnPropertyChanged(); }
+        }
+
+        public SeriesCollection StockMovementsChart { get; set; }
+
         private int _lowStockItems;
         public int LowStockItems
         {
             get => _lowStockItems;
             set { _lowStockItems = value; OnPropertyChanged(); }
+        }
+
+        private bool _hasCriticalStock;
+        public bool HasCriticalStock
+        {
+            get => _hasCriticalStock;
+            set { _hasCriticalStock = value; OnPropertyChanged(); }
+        }
+
+        private System.Collections.ObjectModel.ObservableCollection<CamaroesPOS.Domain.Entities.Product> _criticalStockList;
+        public System.Collections.ObjectModel.ObservableCollection<CamaroesPOS.Domain.Entities.Product> CriticalStockList
+        {
+            get => _criticalStockList;
+            set { _criticalStockList = value; OnPropertyChanged(); }
         }
 
         private double _totalWalletsBalance;
@@ -173,6 +239,7 @@ namespace CamaroesPOS.UI.ViewModels
 
                 // 3. Total produits
                 TotalProducts = context.Products.Count();
+                TotalStockQuantity = context.Products.Sum(p => (int?)p.Qty) ?? 0;
                 var topProducts = context.Products.OrderByDescending(p => p.Qty).Take(5).ToList();
                 ProductsLabels = topProducts.Select(p => p.ProductCode).ToArray();
                 TotalProductsChart = new SeriesCollection
@@ -180,14 +247,41 @@ namespace CamaroesPOS.UI.ViewModels
                     new ColumnSeries { Title = "Stock", Values = new ChartValues<int>(topProducts.Select(p => p.Qty)), Fill = System.Windows.Media.Brushes.MediumPurple }
                 };
 
+                // Graphique des Mouvements de Stock
+                var stockInValues = new ChartValues<int>();
+                var stockOutValues = new ChartValues<int>();
+                for (int i = 6; i >= 0; i--)
+                {
+                    var d = today.AddDays(-i);
+                    var nextD = d.AddDays(1);
+                    
+                    int stockIn = context.Stocks.Where(s => s.StockInDate >= d && s.StockInDate < nextD && s.Qty > 0).Sum(s => (int?)s.Qty) ?? 0;
+                    stockInValues.Add(stockIn);
+                    
+                    int manualStockOut = context.Stocks.Where(s => s.StockInDate >= d && s.StockInDate < nextD && s.Qty < 0).Sum(s => (int?)s.Qty) ?? 0;
+                    int salesStockOut = context.SoldItems.Where(s => s.SoldDate >= d && s.SoldDate < nextD).Sum(s => (int?)s.Qty) ?? 0;
+                    
+                    stockOutValues.Add(Math.Abs(manualStockOut) + salesStockOut);
+                }
+                StockMovementsChart = new SeriesCollection
+                {
+                    new LineSeries { Title = "Entrées", Values = stockInValues, Stroke = System.Windows.Media.Brushes.MediumSeaGreen, StrokeThickness = 3, PointGeometrySize = 10, Fill = System.Windows.Media.Brushes.Transparent, DataLabels = true },
+                    new LineSeries { Title = "Sorties", Values = stockOutValues, Stroke = System.Windows.Media.Brushes.Crimson, StrokeThickness = 3, PointGeometrySize = 10, Fill = System.Windows.Media.Brushes.Transparent, DataLabels = true }
+                };
+
                 // 4. Alertes stock
                 LowStockItems = context.Products.Count(p => p.Qty <= p.Reorder);
                 int normalStock = TotalProducts - LowStockItems;
                 LowStockChart = new SeriesCollection
                 {
-                    new PieSeries { Title = "Faible", Values = new ChartValues<int> { LowStockItems }, Fill = System.Windows.Media.Brushes.OrangeRed },
+                    new PieSeries { Title = "Critique", Values = new ChartValues<int> { LowStockItems }, Fill = System.Windows.Media.Brushes.OrangeRed },
                     new PieSeries { Title = "Normal", Values = new ChartValues<int> { normalStock }, Fill = System.Windows.Media.Brushes.MediumSeaGreen }
                 };
+
+                var criticalItems = context.Products.Where(p => p.Qty <= p.Reorder).ToList();
+                CriticalStockList = new System.Collections.ObjectModel.ObservableCollection<CamaroesPOS.Domain.Entities.Product>(criticalItems);
+                HasCriticalStock = CriticalStockList.Any();
+
 
                 // 5. Portefeuilles et CRM
                 TotalCustomers = context.CustomerWallets.Count();
@@ -231,8 +325,13 @@ namespace CamaroesPOS.UI.ViewModels
                 };
 
                 // 8. Utilisateurs
-                TotalUsers = context.Users.Count();
-                var usersByRole = context.Users.GroupBy(u => u.Role).Select(g => new { Role = g.Key, Count = g.Count() }).ToList();
+                var users = context.Users.ToList();
+                _allUsers = users;
+                TotalUsers = users.Count;
+                
+                FilterUsers();
+                
+                var usersByRole = users.GroupBy(u => u.Role).Select(g => new { Role = g.Key, Count = g.Count() }).ToList();
                 UsersChart = new SeriesCollection();
                 foreach (var ur in usersByRole)
                 {

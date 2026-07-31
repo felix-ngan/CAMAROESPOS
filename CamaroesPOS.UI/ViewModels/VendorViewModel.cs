@@ -11,7 +11,20 @@ namespace CamaroesPOS.UI.ViewModels
 {
     public class VendorViewModel : INotifyPropertyChanged
     {
+        private ObservableCollection<Vendor> _allVendors;
         public ObservableCollection<Vendor> Vendors { get; set; }
+
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                _searchText = value;
+                OnPropertyChanged();
+                FilterVendors();
+            }
+        }
         public ICommand CreateVendorCommand { get; }
         public ICommand EditVendorCommand { get; }
         public ICommand DeleteVendorCommand { get; }
@@ -43,6 +56,7 @@ namespace CamaroesPOS.UI.ViewModels
 
         public VendorViewModel()
         {
+            _allVendors = new ObservableCollection<Vendor>();
             Vendors = new ObservableCollection<Vendor>();
             
             CreateVendorCommand = new RelayCommand<object>(o => {
@@ -75,15 +89,35 @@ namespace CamaroesPOS.UI.ViewModels
             LoadVendors();
         }
 
+        private void FilterVendors()
+        {
+            Vendors.Clear();
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                foreach (var v in _allVendors) Vendors.Add(v);
+            }
+            else
+            {
+                var lower = SearchText.ToLower();
+                var filtered = _allVendors.Where(v => 
+                    (v.VendorName != null && v.VendorName.ToLower().Contains(lower)) ||
+                    (v.ContactPerson != null && v.ContactPerson.ToLower().Contains(lower)) ||
+                    (v.Email != null && v.Email.ToLower().Contains(lower))
+                ).ToList();
+                foreach (var v in filtered) Vendors.Add(v);
+            }
+        }
+
         private void LoadVendors()
         {
             using (var context = new PosDbContext())
             {
                 var list = context.Vendors.ToList();
-                Vendors.Clear();
+                _allVendors.Clear();
                 foreach(var v in list)
-                    Vendors.Add(v);
+                    _allVendors.Add(v);
             }
+            FilterVendors();
         }
 
         private bool CanSave(object obj)
