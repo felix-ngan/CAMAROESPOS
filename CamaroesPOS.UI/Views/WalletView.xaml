@@ -19,9 +19,9 @@
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
             <materialDesign:PackIcon Kind="Wallet" Width="30" Height="30" VerticalAlignment="Center" Foreground="#1E88E5"/>
-            <TextBlock Text="CRM &amp; Portefeuilles Clients" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#2B3674" />
+            <TextBlock Text="{DynamicResource Str_CRMampPortefeui_cf84}" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#2B3674" />
             
-            <Button Content="CRÉER UN PORTEFEUILLE" Command="{Binding CreateWalletCommand}" Margin="30,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" />
+            <Button Content="{DynamicResource Str_CRERUNPORTEFEUI_003d}" Command="{Binding CreateWalletCommand}" Margin="30,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" />
         </StackPanel>
 
         <Grid Grid.Row="1">
@@ -34,17 +34,17 @@
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                     <DataGrid ItemsSource="{Binding Wallets}" AutoGenerateColumns="False" CanUserAddRows="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="120" IsReadOnly="True" />
-                            <DataGridTextColumn Header="Nom Client" Binding="{Binding CustomerName}" Width="150" IsReadOnly="True" />
-                            <DataGridTextColumn Header="Points" Binding="{Binding LoyaltyPoints}" Width="80" IsReadOnly="True" />
-                            <DataGridTextColumn Header="Total Achat" Binding="{Binding TotalSpent, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
-                            <DataGridTextColumn Header="Solde Wallet" Binding="{Binding Balance, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
+                            <DataGridTextColumn Header="{DynamicResource Str_Tlphone_301d}" Binding="{Binding Phone}" Width="120" IsReadOnly="True" />
+                            <DataGridTextColumn Header="{DynamicResource Str_NomClient_0e66}" Binding="{Binding CustomerName}" Width="150" IsReadOnly="True" />
+                            <DataGridTextColumn Header="{DynamicResource Str_Points_75dd}" Binding="{Binding LoyaltyPoints}" Width="80" IsReadOnly="True" />
+                            <DataGridTextColumn Header="{DynamicResource Str_TotalAchat_54cb}" Binding="{Binding TotalSpent, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
+                            <DataGridTextColumn Header="{DynamicResource Str_SoldeWallet_32ee}" Binding="{Binding Balance, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
                             
-                            <DataGridTemplateColumn Header="Action" Width="180">
+                            <DataGridTemplateColumn Header="{DynamicResource Str_Action_004b}" Width="180">
                                 <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding DataContext.RechargeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Content="Modifier / Recharger" Height="30" Margin="0,0,5,0" />
+                                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding DataContext.RechargeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Content="{DynamicResource Str_ModifierRecharg_99e4}" Height="30" Margin="0,0,5,0" />
                                         
                                         <Button Style="{StaticResource MaterialDesignFlatButton}" Foreground="#E53935" Command="{Binding DataContext.DeleteWalletCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Height="30" Width="30" Padding="0">
                                             <materialDesign:PackIcon Kind="TrashCanOutline" Width="20" Height="20" />
@@ -62,23 +62,23 @@
             <materialDesign:Card Grid.Column="1" Padding="20" UniformCornerRadius="15" Visibility="{Binding IsRecharging, Converter={StaticResource BoolToVis}}" Background="White">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <TextBlock Text="Opération Portefeuille" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
+                        <TextBlock Text="{DynamicResource Str_OprationPortefe_dc9c}" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Numéro de Téléphone" Text="{Binding SelectedWallet.Phone}" IsEnabled="{Binding IsNewWallet}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_NumrodeTlphone_3b7b}" Text="{Binding SelectedWallet.Phone}" IsEnabled="{Binding IsNewWallet}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Nom du Client" Text="{Binding SelectedWallet.CustomerName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_NomduClient_b154}" Text="{Binding SelectedWallet.CustomerName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Email (Optionnel)" Text="{Binding SelectedWallet.Email}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_EmailOptionnel_18ea}" Text="{Binding SelectedWallet.Email}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Montant (Recharge/Solde initial)" Text="{Binding RechargeAmount}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_MontantRecharge_a8d5}" Text="{Binding RechargeAmount}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
 
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
-                            <Button Grid.Column="1" Content="VALIDER" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
+                            <Button Grid.Column="0" Content="{DynamicResource Str_ANNULER_1ce3}" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
+                            <Button Grid.Column="1" Content="{DynamicResource Str_VALIDER_aedd}" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>

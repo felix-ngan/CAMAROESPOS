@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using CamaroesPOS.UI.Views;
+using System.Linq;
 
 namespace CamaroesPOS.UI
 {
@@ -136,6 +137,29 @@ namespace CamaroesPOS.UI
             }
             
             MainContentControl.Content = _dashboardView;
+        }
+
+        private void BtnLangToggle_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            string targetLang = btn.Content.ToString() == "EN" ? "en" : "fr";
+            btn.Content = targetLang == "en" ? "FR" : "EN";
+
+            // Find and remove existing language dictionary
+            var existingDict = Application.Current.Resources.MergedDictionaries
+                .FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("/Resources/Langs/Strings."));
+            
+            if (existingDict != null)
+            {
+                Application.Current.Resources.MergedDictionaries.Remove(existingDict);
+            }
+
+            // Load new dictionary
+            var newDict = new ResourceDictionary
+            {
+                Source = new System.Uri($"/Resources/Langs/Strings.{targetLang}.xaml", System.UriKind.Relative)
+            };
+            Application.Current.Resources.MergedDictionaries.Add(newDict);
         }
     }
 }

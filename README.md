@@ -29,6 +29,7 @@ L'interface graphique s'appuie sur `MaterialDesignInXamlToolkit` pour un design 
 *   🧾 **Génération de PDF Professionnels** : Reçus de caisse détaillés et rapports des ventes (quotidiens, hebdomadaires, mensuels) exportables en PDF.
 *   🔒 **Sécurité et Rôles** : Accès différencié (Administrateur / Caissier) protégeant les opérations sensibles comme l'ajustement des stocks, la gestion des utilisateurs ou l'annulation de commandes.
 *   🔍 **Recherche Globale Intelligente** : Recherche instantanée et filtrage en temps réel dans les listes de produits, fournisseurs et utilisateurs.
+*   🌍 **Bilingue (Français / Anglais)** : Basculez l'interface instantanément d'une langue à l'autre grâce à un système dynamique de ressources XAML (i18n), idéal pour le contexte bilingue du Cameroun.
 
 ---
 

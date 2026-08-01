@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Title="Reçu de Caisse" Height="700" Width="450" 
+        Title="{DynamicResource Str_ReudeCaisse_62fa}" Height="700" Width="450" 
         WindowStartupLocation="CenterScreen" 
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}">
@@ -17,11 +17,11 @@
         <!-- Toolbar -->
         <Border Grid.Row="0" Background="{DynamicResource PrimaryHueMidBrush}" Padding="10">
             <Grid>
-                <TextBlock Text="Reçu de Caisse" Foreground="White" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+                <TextBlock Text="{DynamicResource Str_ReudeCaisse_62fa}" Foreground="White" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Exporter PDF" Click="BtnExportPdf_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Margin="0,0,10,0"/>
-                    <Button Content="Imprimer" Click="BtnPrint_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Margin="0,0,10,0"/>
-                    <Button Content="Fermer" Click="BtnClose_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White"/>
+                    <Button Content="{DynamicResource Str_ExporterPDF_94c4}" Click="BtnExportPdf_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Margin="0,0,10,0"/>
+                    <Button Content="{DynamicResource Str_Imprimer_9430}" Click="BtnPrint_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Margin="0,0,10,0"/>
+                    <Button Content="{DynamicResource Str_Fermer_7d20}" Click="BtnClose_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -31,10 +31,10 @@
             <Border x:Name="PrintArea" Background="White" Margin="20" Padding="20" BorderBrush="LightGray" BorderThickness="1">
                 <StackPanel>
                     <!-- Header -->
-                    <TextBlock Text="CAMAROES" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="Black" />
-                    <TextBlock Text="Votre Partenaire de Confiance" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,15" Foreground="Gray" />
-                    <TextBlock Text="Douala, Cameroun" FontSize="12" HorizontalAlignment="Center" Foreground="Black" />
-                    <TextBlock Text="Tél: +237 600 000 000" FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="Black" />
+                    <TextBlock Text="{DynamicResource Str_CAMAROES_f245}" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="Black" />
+                    <TextBlock Text="{DynamicResource Str_VotrePartenaire_7c9f}" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,15" Foreground="Gray" />
+                    <TextBlock Text="{DynamicResource Str_DoualaCameroun_c28d}" FontSize="12" HorizontalAlignment="Center" Foreground="Black" />
+                    <TextBlock Text="{DynamicResource Str_Tl237600000000_2edf}" FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="Black" />
                     
                     <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,0,0,15"/>
 
@@ -45,16 +45,16 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="Reçu N° :" FontSize="12" Foreground="Black"/>
-                            <TextBlock x:Name="TxtTransNo" Text="2026..." FontWeight="Bold" FontSize="12" Foreground="Black"/>
+                            <TextBlock Text="{DynamicResource Str_ReuN_b54d}" FontSize="12" Foreground="Black"/>
+                            <TextBlock x:Name="TxtTransNo" Text="{DynamicResource Str_2026_5901}" FontWeight="Bold" FontSize="12" Foreground="Black"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                            <TextBlock Text="Date :" FontSize="12" Foreground="Black"/>
-                            <TextBlock x:Name="TxtDate" Text="28/07/2026 15:30" FontWeight="Bold" FontSize="12" Foreground="Black"/>
+                            <TextBlock Text="{DynamicResource Str_Date_a16b}" FontSize="12" Foreground="Black"/>
+                            <TextBlock x:Name="TxtDate" Text="{DynamicResource Str_280720261530_1a9a}" FontWeight="Bold" FontSize="12" Foreground="Black"/>
                         </StackPanel>
                     </Grid>
                     
-                    <TextBlock x:Name="TxtMode" Text="Mode de Paiement : Espèces" FontSize="12" Margin="0,0,0,15" FontWeight="Bold" Foreground="Black"/>
+                    <TextBlock x:Name="TxtMode" Text="{DynamicResource Str_ModedePaiementE_69c2}" FontSize="12" Margin="0,0,0,15" FontWeight="Bold" Foreground="Black"/>
 
                     <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,0,0,15"/>
 
@@ -65,9 +65,9 @@
                             <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="2*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Article" FontWeight="Bold" FontSize="12" Foreground="Black"/>
-                        <TextBlock Grid.Column="1" Text="Qté" FontWeight="Bold" HorizontalAlignment="Center" FontSize="12" Foreground="Black"/>
-                        <TextBlock Grid.Column="2" Text="Total" FontWeight="Bold" HorizontalAlignment="Right" FontSize="12" Foreground="Black"/>
+                        <TextBlock Grid.Column="0" Text="{DynamicResource Str_Article_5e2f}" FontWeight="Bold" FontSize="12" Foreground="Black"/>
+                        <TextBlock Grid.Column="1" Text="{DynamicResource Str_Qt_493a}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="12" Foreground="Black"/>
+                        <TextBlock Grid.Column="2" Text="{DynamicResource Str_Total_96b0}" FontWeight="Bold" HorizontalAlignment="Right" FontSize="12" Foreground="Black"/>
                     </Grid>
 
                     <!-- Items List -->
@@ -96,8 +96,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Sous-total :" FontSize="14" Foreground="Black"/>
-                        <TextBlock Grid.Column="1" x:Name="TxtSubTotal" Text="0 FCFA" FontSize="14" HorizontalAlignment="Right" Foreground="Black"/>
+                        <TextBlock Grid.Column="0" Text="{DynamicResource Str_Soustotal_f804}" FontSize="14" Foreground="Black"/>
+                        <TextBlock Grid.Column="1" x:Name="TxtSubTotal" Text="{DynamicResource Str_0FCFA_3b62}" FontSize="14" HorizontalAlignment="Right" Foreground="Black"/>
                     </Grid>
 
                     <Grid Margin="0,0,0,10" x:Name="GridDiscount" Visibility="Collapsed">
@@ -105,8 +105,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Réduction :" FontSize="14" Foreground="Black"/>
-                        <TextBlock Grid.Column="1" x:Name="TxtDiscount" Text="0 FCFA" FontSize="14" HorizontalAlignment="Right" Foreground="Orange"/>
+                        <TextBlock Grid.Column="0" Text="{DynamicResource Str_Rduction_1fbd}" FontSize="14" Foreground="Black"/>
+                        <TextBlock Grid.Column="1" x:Name="TxtDiscount" Text="{DynamicResource Str_0FCFA_3b62}" FontSize="14" HorizontalAlignment="Right" Foreground="Orange"/>
                     </Grid>
 
                     <Grid Margin="0,0,0,5">
@@ -114,8 +114,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="TOTAL À PAYER :" FontWeight="Bold" FontSize="16" Foreground="Black"/>
-                        <TextBlock Grid.Column="1" x:Name="TxtTotal" Text="0 FCFA" FontWeight="Bold" FontSize="16" HorizontalAlignment="Right" Foreground="Black"/>
+                        <TextBlock Grid.Column="0" Text="{DynamicResource Str_TOTALPAYER_6722}" FontWeight="Bold" FontSize="16" Foreground="Black"/>
+                        <TextBlock Grid.Column="1" x:Name="TxtTotal" Text="{DynamicResource Str_0FCFA_3b62}" FontWeight="Bold" FontSize="16" HorizontalAlignment="Right" Foreground="Black"/>
                     </Grid>
 
                     <Grid Margin="0,0,0,5" x:Name="GridReceived">
@@ -123,8 +123,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Montant Reçu :" FontSize="14" Foreground="Black"/>
-                        <TextBlock Grid.Column="1" x:Name="TxtReceived" Text="0 FCFA" FontSize="14" HorizontalAlignment="Right" Foreground="Black"/>
+                        <TextBlock Grid.Column="0" Text="{DynamicResource Str_MontantReu_2e3b}" FontSize="14" Foreground="Black"/>
+                        <TextBlock Grid.Column="1" x:Name="TxtReceived" Text="{DynamicResource Str_0FCFA_3b62}" FontSize="14" HorizontalAlignment="Right" Foreground="Black"/>
                     </Grid>
 
                     <Grid Margin="0,0,0,20" x:Name="GridChange">
@@ -132,14 +132,14 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Monnaie Rendue :" FontSize="14" Foreground="Black"/>
-                        <TextBlock Grid.Column="1" x:Name="TxtChange" Text="0 FCFA" FontSize="14" HorizontalAlignment="Right" Foreground="Black"/>
+                        <TextBlock Grid.Column="0" Text="{DynamicResource Str_MonnaieRendue_8852}" FontSize="14" Foreground="Black"/>
+                        <TextBlock Grid.Column="1" x:Name="TxtChange" Text="{DynamicResource Str_0FCFA_3b62}" FontSize="14" HorizontalAlignment="Right" Foreground="Black"/>
                     </Grid>
                     
                     <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,0,0,15"/>
                     
-                    <TextBlock Text="Merci de votre visite !" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="Black"/>
-                    <TextBlock Text="Les articles vendus ne sont ni repris ni échangés." FontSize="10" HorizontalAlignment="Center" Foreground="Gray" TextWrapping="Wrap" TextAlignment="Center"/>
+                    <TextBlock Text="{DynamicResource Str_Mercidevotrevis_4a05}" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="Black"/>
+                    <TextBlock Text="{DynamicResource Str_Lesarticlesvend_ba7a}" FontSize="10" HorizontalAlignment="Center" Foreground="Gray" TextWrapping="Wrap" TextAlignment="Center"/>
                     
                 </StackPanel>
             </Border>

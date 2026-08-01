@@ -16,7 +16,7 @@
             <Grid>
                 <!-- CALCULATOR NUMPAD MODERNE -->
                 <StackPanel Margin="20" Width="400" Background="White" Visibility="{Binding IsCheckoutDialogOpen, Converter={StaticResource BoolToVis}}">
-                    <TextBlock Text="Règlement Espèces" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="#2B3674" />
+                    <TextBlock Text="{DynamicResource Str_RglementEspces_94b9}" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="#2B3674" />
                     <TextBlock Text="{Binding TotalAmount, StringFormat=Total à payer: {0:N0} FCFA}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" />
 
                     <!-- Champ de Saisie Editable -->
@@ -26,18 +26,18 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBox Grid.Column="0" Text="{Binding ReceivedAmountString, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Montant donné" FontSize="32" FontWeight="Bold" TextAlignment="Right" Margin="0,0,10,0" />
-                        <Button Grid.Column="1" Content="C" Command="{Binding ClearNumpadCommand}" FontSize="20" Foreground="Red" BorderBrush="Red" Style="{StaticResource MaterialDesignOutlinedButton}" Height="55" Width="55" />
+                        <TextBox Grid.Column="0" Text="{Binding ReceivedAmountString, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="{DynamicResource Str_Montantdonn_3471}" FontSize="32" FontWeight="Bold" TextAlignment="Right" Margin="0,0,10,0" />
+                        <Button Grid.Column="1" Content="{DynamicResource Str_C_0d61}" Command="{Binding ClearNumpadCommand}" FontSize="20" Foreground="Red" BorderBrush="Red" Style="{StaticResource MaterialDesignOutlinedButton}" Height="55" Width="55" />
                     </Grid>
 
                     <TextBlock Text="{Binding ChangeAmount, StringFormat=Reste à rendre: {0:N0} FCFA}" FontSize="26" FontWeight="Bold" Foreground="#E53935" HorizontalAlignment="Center" Margin="0,0,0,20" />
 
                     <!-- Boutons Rapides (Billets / Compte Exact) -->
                     <UniformGrid Columns="4" Rows="1" Margin="0,0,0,20">
-                        <Button Content="Exact" Command="{Binding ExactAmountCommand}" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#1E88E5" BorderBrush="#1E88E5" />
-                        <Button Content="5 000" Command="{Binding QuickCashCommand}" CommandParameter="5000" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#43A047" BorderBrush="#43A047" />
-                        <Button Content="10 000" Command="{Binding QuickCashCommand}" CommandParameter="10000" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#43A047" BorderBrush="#43A047" />
-                        <Button Content="20 000" Command="{Binding QuickCashCommand}" CommandParameter="20000" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#43A047" BorderBrush="#43A047" />
+                        <Button Content="{DynamicResource Str_Exact_1649}" Command="{Binding ExactAmountCommand}" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#1E88E5" BorderBrush="#1E88E5" />
+                        <Button Content="{DynamicResource Str_5000_e4f6}" Command="{Binding QuickCashCommand}" CommandParameter="5000" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#43A047" BorderBrush="#43A047" />
+                        <Button Content="{DynamicResource Str_10000_03fc}" Command="{Binding QuickCashCommand}" CommandParameter="10000" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#43A047" BorderBrush="#43A047" />
+                        <Button Content="{DynamicResource Str_20000_09b2}" Command="{Binding QuickCashCommand}" CommandParameter="20000" Margin="2" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#43A047" BorderBrush="#43A047" />
                     </UniformGrid>
 
                     <!-- Pavé Numérique Tactile -->
@@ -65,8 +65,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCheckoutCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" Height="50" FontSize="18" />
-                        <Button Grid.Column="1" Content="VALIDER" Command="{Binding ConfirmCashPaymentCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" Height="50" FontSize="18" />
+                        <Button Grid.Column="0" Content="{DynamicResource Str_ANNULER_1ce3}" Command="{Binding CancelCheckoutCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" Height="50" FontSize="18" />
+                        <Button Grid.Column="1" Content="{DynamicResource Str_VALIDER_aedd}" Command="{Binding ConfirmCashPaymentCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" Height="50" FontSize="18" />
                     </Grid>
                 </StackPanel>
 
@@ -79,15 +79,15 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Text="Sélectionner des Produits" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
+                        <TextBlock Grid.Row="0" Text="{DynamicResource Str_SlectionnerdesP_3125}" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
 
                         <DataGrid Grid.Row="1" ItemsSource="{Binding Products}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto" FontSize="14" Background="Transparent">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Code" Binding="{Binding ProductCode}" Width="80" />
-                                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
-                                <DataGridTextColumn Header="En Stock" Binding="{Binding Qty}" Width="80" />
-                                <DataGridTextColumn Header="Prix" Binding="{Binding Price, StringFormat={}{0:N0} FCFA}" Width="100" />
-                                <DataGridTemplateColumn Width="90" Header="Action">
+                                <DataGridTextColumn Header="{DynamicResource Str_Code_ca0d}" Binding="{Binding ProductCode}" Width="80" />
+                                <DataGridTextColumn Header="{DynamicResource Str_Description_b5a7}" Binding="{Binding Description}" Width="*" />
+                                <DataGridTextColumn Header="{DynamicResource Str_EnStock_d898}" Binding="{Binding Qty}" Width="80" />
+                                <DataGridTextColumn Header="{DynamicResource Str_Prix_bc13}" Binding="{Binding Price, StringFormat={}{0:N0} FCFA}" Width="100" />
+                                <DataGridTemplateColumn Width="90" Header="{DynamicResource Str_Action_004b}">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <Button Style="{StaticResource MaterialDesignFlatButton}" Foreground="#1E88E5" Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Height="30" Padding="5,0" ToolTip="Ajouter au panier">
@@ -99,13 +99,13 @@
                             </DataGrid.Columns>
                         </DataGrid>
 
-                        <Button Grid.Row="2" Content="FERMER" Command="{Binding CloseCatalogCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,20,0,0" Height="45" FontSize="16" />
+                        <Button Grid.Row="2" Content="{DynamicResource Str_FERMER_76c2}" Command="{Binding CloseCatalogCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,20,0,0" Height="45" FontSize="16" />
                     </Grid>
                 </Border>
 
                 <!-- DIALOGUE DE QUANTITÉ -->
                 <StackPanel Margin="20" Width="300" Background="White" Visibility="{Binding IsQuantityDialogOpen, Converter={StaticResource BoolToVis}}">
-                    <TextBlock Text="Quelle Quantité ?" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="#2B3674" />
+                    <TextBlock Text="{DynamicResource Str_QuelleQuantit_d2d7}" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="#2B3674" />
                     
                     <Grid Margin="0,0,0,25">
                         <Grid.ColumnDefinitions>
@@ -113,9 +113,9 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Content="-" Command="{Binding DecreaseQtyCommand}" FontSize="24" FontWeight="Bold" Height="50" Width="50" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                        <Button Grid.Column="0" Content="{DynamicResource Str_336d5ebc}" Command="{Binding DecreaseQtyCommand}" FontSize="24" FontWeight="Bold" Height="50" Width="50" Style="{StaticResource MaterialDesignOutlinedButton}" />
                         <TextBlock Grid.Column="1" Text="{Binding SelectedQuantityToAdd}" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        <Button Grid.Column="2" Content="+" Command="{Binding IncreaseQtyCommand}" FontSize="24" FontWeight="Bold" Height="50" Width="50" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                        <Button Grid.Column="2" Content="{DynamicResource Str_26b17225}" Command="{Binding IncreaseQtyCommand}" FontSize="24" FontWeight="Bold" Height="50" Width="50" Style="{StaticResource MaterialDesignOutlinedButton}" />
                     </Grid>
 
                     <Grid>
@@ -123,8 +123,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelQuantityCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" Height="45" />
-                        <Button Grid.Column="1" Content="AJOUTER" Command="{Binding ConfirmQuantityCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#1E88E5" BorderBrush="#1E88E5" Height="45" />
+                        <Button Grid.Column="0" Content="{DynamicResource Str_ANNULER_1ce3}" Command="{Binding CancelQuantityCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" Height="45" />
+                        <Button Grid.Column="1" Content="{DynamicResource Str_AJOUTER_c312}" Command="{Binding ConfirmQuantityCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#1E88E5" BorderBrush="#1E88E5" Height="45" />
                     </Grid>
                 </StackPanel>
             </Grid>
@@ -147,11 +147,11 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="Votre Panier" FontSize="28" FontWeight="Bold" VerticalAlignment="Center" Foreground="#2B3674" Margin="0,0,20,0" />
+                <TextBlock Grid.Column="0" Text="{DynamicResource Str_VotrePanier_6ba3}" FontSize="28" FontWeight="Bold" VerticalAlignment="Center" Foreground="#2B3674" Margin="0,0,20,0" />
 
                 <!-- SCAN CODE BARRE -->
                 <TextBox Grid.Column="1" Text="{Binding BarcodeSearch, UpdateSourceTrigger=PropertyChanged}" 
-                         materialDesign:HintAssist.Hint="Scanner ou saisir un code-barres..." 
+                         materialDesign:HintAssist.Hint="{DynamicResource Str_Scannerousaisir_da72}" 
                          Style="{StaticResource MaterialDesignOutlinedTextBox}"
                          VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,20,0" Height="45">
                     <TextBox.InputBindings>
@@ -162,20 +162,20 @@
                 <Button Grid.Column="2" Command="{Binding OpenCatalogCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#1E88E5" BorderBrush="#1E88E5" Height="45" Margin="0,0,15,0">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <materialDesign:PackIcon Kind="ViewList" Width="20" Height="20" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="CATALOGUE" FontSize="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="{DynamicResource Str_CATALOGUE_f192}" FontSize="16" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Column="3" Content="VIDER" Command="{Binding ClearCartCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" Height="45" FontSize="16" />
+                <Button Grid.Column="3" Content="{DynamicResource Str_VIDER_9b69}" Command="{Binding ClearCartCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" Height="45" FontSize="16" />
             </Grid>
 
             <!-- Liste des produits dans le panier -->
             <materialDesign:Card Grid.Row="1" UniformCornerRadius="15" Padding="15" Margin="0,0,0,20" Background="White">
                 <DataGrid ItemsSource="{Binding Cart}" AutoGenerateColumns="False" CanUserAddRows="False" ScrollViewer.VerticalScrollBarVisibility="Auto" FontSize="16" Background="Transparent">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Description de l'Article" Binding="{Binding ProductDescription}" Width="*" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Quantité" Binding="{Binding Qty}" Width="100" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Prix Total" Binding="{Binding Total, StringFormat={}{0:N0} FCFA}" Width="150" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_DescriptiondelA_2b9a}" Binding="{Binding ProductDescription}" Width="*" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Quantit_1b27}" Binding="{Binding Qty}" Width="100" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_PrixTotal_8294}" Binding="{Binding Total, StringFormat={}{0:N0} FCFA}" Width="150" IsReadOnly="True" />
                         <DataGridTemplateColumn Width="70">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -200,28 +200,28 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <TextBlock Text="Mode de paiement :" FontSize="16" Margin="0,0,0,5" Opacity="0.9"/>
+                        <TextBlock Text="{DynamicResource Str_Modedepaiement_994f}" FontSize="16" Margin="0,0,0,5" Opacity="0.9"/>
                         <ComboBox SelectedIndex="{Binding PaymentMethodIndex}" Width="250" HorizontalAlignment="Left" Margin="0,0,0,15" Padding="10" FontSize="16" Foreground="White" Background="Transparent">
-                            <ComboBoxItem Content="Espèces" Foreground="Black" />
-                            <ComboBoxItem Content="Portefeuille Client" Foreground="Black" />
+                            <ComboBoxItem Content="{DynamicResource Str_Espces_80bd}" Foreground="Black" />
+                            <ComboBoxItem Content="{DynamicResource Str_PortefeuilleCli_8884}" Foreground="Black" />
                         </ComboBox>
 
                         <!-- Phone Number input (Always visible for CRM tracking) -->
-                        <TextBox materialDesign:HintAssist.Hint="Numéro Téléphone Client (Optionnel en Espèces)" 
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_NumroTlphoneCli_5e08}" 
                                  Text="{Binding CustomerPhone}" 
                                  Width="250" HorizontalAlignment="Left" FontSize="16" Foreground="White" materialDesign:HintAssist.Foreground="White" Margin="0,5,0,0" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
-                            <TextBlock Text="Réduction (%) :" FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0" Opacity="0.9" />
+                            <TextBlock Text="{DynamicResource Str_Rduction_b2fc}" FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0" Opacity="0.9" />
                             <TextBox Text="{Binding DiscountPercentage, UpdateSourceTrigger=PropertyChanged}" Width="60" TextAlignment="Center" FontSize="18" Foreground="White" Background="#1E88E5" materialDesign:TextFieldAssist.DecorationVisibility="Hidden" BorderThickness="0" Padding="5" materialDesign:HintAssist.Foreground="White" />
                         </StackPanel>
                         
-                        <TextBlock Text="MONTANT TOTAL À PAYER" FontSize="16" Opacity="0.9" HorizontalAlignment="Right" />
+                        <TextBlock Text="{DynamicResource Str_MONTANTTOTALPAY_0e5f}" FontSize="16" Opacity="0.9" HorizontalAlignment="Right" />
                         <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} FCFA}" FontSize="42" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,0,15" />
 
-                        <Button Content="VALIDER L'ACHAT" Command="{Binding CheckoutCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Height="60" Width="300" FontSize="20" />
+                        <Button Content="{DynamicResource Str_VALIDERLACHAT_14b2}" Command="{Binding CheckoutCommand}" Style="{StaticResource MaterialDesignRaisedDarkButton}" Height="60" Width="300" FontSize="20" />
                     </StackPanel>
                 </Grid>
             </materialDesign:Card>

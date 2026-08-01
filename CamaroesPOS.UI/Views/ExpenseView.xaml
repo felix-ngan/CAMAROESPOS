@@ -20,9 +20,9 @@
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
             <materialDesign:PackIcon Kind="CashMinus" Width="30" Height="30" VerticalAlignment="Center" Foreground="#E53935"/>
-            <TextBlock Text="Dépenses &amp; Charges" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#2B3674" />
+            <TextBlock Text="{DynamicResource Str_DpensesampCharg_8873}" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#2B3674" />
             
-            <Button Content="NOUVELLE DÉPENSE" Command="{Binding CreateCommand}" Margin="30,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" Background="#E53935" BorderBrush="#E53935" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}" />
+            <Button Content="{DynamicResource Str_NOUVELLEDPENSE_6ea0}" Command="{Binding CreateCommand}" Margin="30,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" Background="#E53935" BorderBrush="#E53935" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}" />
         </StackPanel>
 
         <!-- Filtres et Résumé -->
@@ -36,14 +36,14 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <DatePicker Grid.Column="0" materialDesign:HintAssist.Hint="Date de début" SelectedDate="{Binding StartDate}" Margin="0,0,20,0" Width="150" FontSize="16" />
-                <DatePicker Grid.Column="1" materialDesign:HintAssist.Hint="Date de fin" SelectedDate="{Binding EndDate}" Margin="0,0,20,0" Width="150" FontSize="16" />
+                <DatePicker Grid.Column="0" materialDesign:HintAssist.Hint="{DynamicResource Str_Datededbut_b9af}" SelectedDate="{Binding StartDate}" Margin="0,0,20,0" Width="150" FontSize="16" />
+                <DatePicker Grid.Column="1" materialDesign:HintAssist.Hint="{DynamicResource Str_Datedefin_806e}" SelectedDate="{Binding EndDate}" Margin="0,0,20,0" Width="150" FontSize="16" />
                 
-                <Button Grid.Column="2" Content="FILTRER" Command="{Binding FilterCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#1E88E5" BorderBrush="#1E88E5" Margin="0,0,10,0" Height="40" />
-                <Button Grid.Column="3" Content="RÉINITIALISER" Command="{Binding ResetFilterCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" Margin="0,0,10,0" Height="40" />
+                <Button Grid.Column="2" Content="{DynamicResource Str_FILTRER_d94c}" Command="{Binding FilterCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#1E88E5" BorderBrush="#1E88E5" Margin="0,0,10,0" Height="40" />
+                <Button Grid.Column="3" Content="{DynamicResource Str_RINITIALISER_6f47}" Command="{Binding ResetFilterCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" Margin="0,0,10,0" Height="40" />
 
                 <StackPanel Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
-                    <TextBlock Text="Total Dépenses :" FontSize="16" Foreground="Gray" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock Text="{DynamicResource Str_TotalDpenses_bc82}" FontSize="16" Foreground="Gray" VerticalAlignment="Center" Margin="0,0,10,0"/>
                     <TextBlock Text="{Binding TotalExpenses, StringFormat={}{0:N0} FCFA}" FontSize="22" FontWeight="Bold" Foreground="#E53935" VerticalAlignment="Center" />
                 </StackPanel>
             </Grid>
@@ -58,13 +58,13 @@
             <materialDesign:Card Grid.Column="0" Padding="15" UniformCornerRadius="15" Margin="0,0,20,0" Background="White">
                 <DataGrid ItemsSource="{Binding Expenses}" AutoGenerateColumns="False" CanUserAddRows="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="150" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Catégorie" Binding="{Binding Category}" Width="120" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Montant" Binding="{Binding Amount, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Ajouté par" Binding="{Binding AddedBy}" Width="100" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Date_4474}" Binding="{Binding Date, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="150" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Catgorie_8c6b}" Binding="{Binding Category}" Width="120" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Description_b5a7}" Binding="{Binding Description}" Width="*" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Montant_4dd4}" Binding="{Binding Amount, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Ajoutpar_cd9c}" Binding="{Binding AddedBy}" Width="100" IsReadOnly="True" />
                         
-                        <DataGridTemplateColumn Header="Action" Width="120">
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Action_004b}" Width="120">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Visibility="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}">
@@ -87,23 +87,23 @@
             <materialDesign:Card Grid.Column="1" Padding="20" UniformCornerRadius="15" Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}" Background="White">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <TextBlock Text="Détails de la Dépense" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
+                        <TextBlock Text="{DynamicResource Str_DtailsdelaDpens_6c0d}" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
                         
-                        <DatePicker materialDesign:HintAssist.Hint="Date de la dépense" SelectedDate="{Binding SelectedExpense.Date}" Style="{StaticResource MaterialDesignFloatingHintDatePicker}" Margin="0,0,0,15" FontSize="18" />
+                        <DatePicker materialDesign:HintAssist.Hint="{DynamicResource Str_Datedeladpense_ae5c}" SelectedDate="{Binding SelectedExpense.Date}" Style="{StaticResource MaterialDesignFloatingHintDatePicker}" Margin="0,0,0,15" FontSize="18" />
                         
-                        <ComboBox materialDesign:HintAssist.Hint="Catégorie" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedExpense.Category}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,15" FontSize="18" />
+                        <ComboBox materialDesign:HintAssist.Hint="{DynamicResource Str_Catgorie_8c6b}" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedExpense.Category}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,15" FontSize="18" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Description" Text="{Binding SelectedExpense.Description}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" TextWrapping="Wrap" AcceptsReturn="True" Height="80" VerticalScrollBarVisibility="Auto" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_Description_b5a7}" Text="{Binding SelectedExpense.Description}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" TextWrapping="Wrap" AcceptsReturn="True" Height="80" VerticalScrollBarVisibility="Auto" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Montant" Text="{Binding SelectedExpense.Amount}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_Montant_4dd4}" Text="{Binding SelectedExpense.Amount}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
 
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
-                            <Button Grid.Column="1" Content="VALIDER" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
+                            <Button Grid.Column="0" Content="{DynamicResource Str_ANNULER_1ce3}" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
+                            <Button Grid.Column="1" Content="{DynamicResource Str_VALIDER_aedd}" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>

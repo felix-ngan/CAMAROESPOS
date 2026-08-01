@@ -25,12 +25,12 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal">
                 <materialDesign:PackIcon Kind="TruckDelivery" Width="30" Height="30" VerticalAlignment="Center" Foreground="#1E88E5"/>
-                <TextBlock Text="Fournisseurs" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#2B3674" />
+                <TextBlock Text="{DynamicResource Str_Fournisseurs_20a5}" FontSize="24" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#2B3674" />
             </StackPanel>
             
-            <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="Rechercher (Nom, Contact, Email)..." Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="20,0,20,0" FontSize="16" Style="{StaticResource MaterialDesignFloatingHintTextBox}" MaxWidth="400" HorizontalAlignment="Right" />
+            <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="{DynamicResource Str_RechercherNomCo_1d25}" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="20,0,20,0" FontSize="16" Style="{StaticResource MaterialDesignFloatingHintTextBox}" MaxWidth="400" HorizontalAlignment="Right" />
             
-            <Button Grid.Column="2" Content="AJOUTER UN FOURNISSEUR" Command="{Binding CreateVendorCommand}" Margin="10,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}" />
+            <Button Grid.Column="2" Content="{DynamicResource Str_AJOUTERUNFOURNI_781e}" Command="{Binding CreateVendorCommand}" Margin="10,0,0,0" Style="{StaticResource MaterialDesignRaisedButton}" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}" />
         </Grid>
 
         <Grid Grid.Row="1">
@@ -42,11 +42,11 @@
             <materialDesign:Card Grid.Column="0" Padding="15" UniformCornerRadius="15" Margin="0,0,20,0" Background="White">
                 <DataGrid ItemsSource="{Binding Vendors}" AutoGenerateColumns="False" CanUserAddRows="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Nom" Binding="{Binding VendorName}" Width="*" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Contact" Binding="{Binding ContactPerson}" Width="150" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Téléphone" Binding="{Binding Phone}" Width="120" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Nom_d470}" Binding="{Binding VendorName}" Width="*" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Contact_bbaf}" Binding="{Binding ContactPerson}" Width="150" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Tlphone_301d}" Binding="{Binding Phone}" Width="120" IsReadOnly="True" />
                         
-                        <DataGridTemplateColumn Header="Action" Width="120">
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Action_004b}" Width="120">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Visibility="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}">
@@ -69,25 +69,25 @@
             <materialDesign:Card Grid.Column="1" Padding="20" UniformCornerRadius="15" Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}" Background="White">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <TextBlock Text="Détails du Fournisseur" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
+                        <TextBlock Text="{DynamicResource Str_DtailsduFournis_bc95}" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Nom du Fournisseur" Text="{Binding SelectedVendor.VendorName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_NomduFournisseu_9802}" Text="{Binding SelectedVendor.VendorName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Personne à Contacter" Text="{Binding SelectedVendor.ContactPerson}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_PersonneContact_9111}" Text="{Binding SelectedVendor.ContactPerson}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Téléphone" Text="{Binding SelectedVendor.Phone}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_Tlphone_301d}" Text="{Binding SelectedVendor.Phone}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Email" Text="{Binding SelectedVendor.Email}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_Email_ce8a}" Text="{Binding SelectedVendor.Email}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" FontSize="18" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Adresse" Text="{Binding SelectedVendor.Address}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_Adresse_50d4}" Text="{Binding SelectedVendor.Address}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" FontSize="18" />
 
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
-                            <Button Grid.Column="1" Content="VALIDER" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
+                            <Button Grid.Column="0" Content="{DynamicResource Str_ANNULER_1ce3}" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
+                            <Button Grid.Column="1" Content="{DynamicResource Str_VALIDER_aedd}" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>

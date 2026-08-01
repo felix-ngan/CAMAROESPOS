@@ -23,13 +23,13 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="Gestion des Stocks" FontSize="28" FontWeight="Bold" Foreground="#2B3674" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="0" Text="{DynamicResource Str_GestiondesStock_2931}" FontSize="28" FontWeight="Bold" Foreground="#2B3674" VerticalAlignment="Center" />
             
-            <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="Rechercher un produit, marque..." Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="20,0,20,0" FontSize="16" Style="{StaticResource MaterialDesignFloatingHintTextBox}" MaxWidth="400" HorizontalAlignment="Right" />
+            <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="{DynamicResource Str_Rechercherunpro_97e5}" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="20,0,20,0" FontSize="16" Style="{StaticResource MaterialDesignFloatingHintTextBox}" MaxWidth="400" HorizontalAlignment="Right" />
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}">
-                <Button Content="MARQUES / CATÉGORIES" Command="{Binding ManageCatalogCommand}" Margin="0,0,10,0" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#3F51B5" BorderBrush="#3F51B5" />
-                <Button Content="AJOUTER PRODUIT" Command="{Binding AddCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#4318FF" Foreground="White" />
+                <Button Content="{DynamicResource Str_MARQUESCATGORIE_7ed4}" Command="{Binding ManageCatalogCommand}" Margin="0,0,10,0" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#3F51B5" BorderBrush="#3F51B5" />
+                <Button Content="{DynamicResource Str_AJOUTERPRODUIT_d603}" Command="{Binding AddCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#4318FF" Foreground="White" />
             </StackPanel>
         </Grid>
 
@@ -43,13 +43,13 @@
             <materialDesign:Card Grid.Column="0" Padding="15" UniformCornerRadius="15" Margin="0,0,20,0" Background="White">
                 <DataGrid ItemsSource="{Binding InventoryList}" AutoGenerateColumns="False" CanUserAddRows="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Code" Binding="{Binding ProductCode}" Width="100" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Prix" Binding="{Binding Price, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Stock" Binding="{Binding Qty}" Width="80" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Fournisseur" Binding="{Binding VendorName}" Width="*" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Code_ca0d}" Binding="{Binding ProductCode}" Width="100" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Description_b5a7}" Binding="{Binding Description}" Width="*" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Prix_bc13}" Binding="{Binding Price, StringFormat={}{0:N0} FCFA}" Width="120" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Stock_27ce}" Binding="{Binding Qty}" Width="80" IsReadOnly="True" />
+                        <DataGridTextColumn Header="{DynamicResource Str_Fournisseur_73d1}" Binding="{Binding VendorName}" Width="*" IsReadOnly="True" />
                         
-                        <DataGridTemplateColumn Header="Actions" Width="130">
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Actions_06df}" Width="130">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" Visibility="{Binding DataContext.IsAdmin, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}">
@@ -74,26 +74,26 @@
             <materialDesign:Card Grid.Column="1" Padding="20" UniformCornerRadius="15" Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}" Background="White">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <TextBlock Text="Fiche Produit" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
+                        <TextBlock Text="{DynamicResource Str_FicheProduit_7823}" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="#2B3674" />
                         
-                        <TextBox materialDesign:HintAssist.Hint="Code Produit" Text="{Binding SelectedProduct.ProductCode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                        <TextBox materialDesign:HintAssist.Hint="Description" Text="{Binding SelectedProduct.Description}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                        <TextBox materialDesign:HintAssist.Hint="Prix" Text="{Binding SelectedProduct.Price}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                        <TextBox materialDesign:HintAssist.Hint="Quantité" Text="{Binding SelectedProduct.Qty}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                        <TextBox materialDesign:HintAssist.Hint="Niveau d'Alerte Stock" Text="{Binding SelectedProduct.Reorder}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
-                        <TextBox materialDesign:HintAssist.Hint="Code Barre" Text="{Binding SelectedProduct.Barcode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_CodeProduit_ba21}" Text="{Binding SelectedProduct.ProductCode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_Description_b5a7}" Text="{Binding SelectedProduct.Description}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_Prix_bc13}" Text="{Binding SelectedProduct.Price}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_Quantit_1b27}" Text="{Binding SelectedProduct.Qty}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_NiveaudAlerteSt_feda}" Text="{Binding SelectedProduct.Reorder}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                        <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_CodeBarre_840b}" Text="{Binding SelectedProduct.Barcode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
                         
-                        <ComboBox materialDesign:HintAssist.Hint="Marque" ItemsSource="{Binding Brands}" DisplayMemberPath="BrandName" SelectedValuePath="BrandName" SelectedValue="{Binding SelectedProduct.BrandName}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,15" />
-                        <ComboBox materialDesign:HintAssist.Hint="Catégorie" ItemsSource="{Binding Categories}" DisplayMemberPath="CategoryName" SelectedValuePath="CategoryName" SelectedValue="{Binding SelectedProduct.CategoryName}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,15" />
-                        <ComboBox materialDesign:HintAssist.Hint="Fournisseur" ItemsSource="{Binding Vendors}" DisplayMemberPath="VendorName" SelectedValuePath="Id" SelectedValue="{Binding SelectedProduct.VendorId}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,30" />
+                        <ComboBox materialDesign:HintAssist.Hint="{DynamicResource Str_Marque_a3e2}" ItemsSource="{Binding Brands}" DisplayMemberPath="BrandName" SelectedValuePath="BrandName" SelectedValue="{Binding SelectedProduct.BrandName}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,15" />
+                        <ComboBox materialDesign:HintAssist.Hint="{DynamicResource Str_Catgorie_8c6b}" ItemsSource="{Binding Categories}" DisplayMemberPath="CategoryName" SelectedValuePath="CategoryName" SelectedValue="{Binding SelectedProduct.CategoryName}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,15" />
+                        <ComboBox materialDesign:HintAssist.Hint="{DynamicResource Str_Fournisseur_73d1}" ItemsSource="{Binding Vendors}" DisplayMemberPath="VendorName" SelectedValuePath="Id" SelectedValue="{Binding SelectedProduct.VendorId}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,30" />
 
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
-                            <Button Grid.Column="1" Content="ENREGISTRER" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" />
+                            <Button Grid.Column="0" Content="{DynamicResource Str_ANNULER_1ce3}" Command="{Binding CancelCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
+                            <Button Grid.Column="1" Content="{DynamicResource Str_ENREGISTRER_6d15}" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>
@@ -101,22 +101,22 @@
             <!-- Right Adjust Stock Panel -->
             <materialDesign:Card Grid.Column="1" Padding="20" UniformCornerRadius="15" Visibility="{Binding IsAdjustingStock, Converter={StaticResource BoolToVis}}" Background="White">
                 <StackPanel>
-                    <TextBlock Text="Ajustement de Stock" FontSize="20" FontWeight="Bold" Margin="0,0,0,5" Foreground="#2B3674" />
+                    <TextBlock Text="{DynamicResource Str_AjustementdeSto_c3ff}" FontSize="20" FontWeight="Bold" Margin="0,0,0,5" Foreground="#2B3674" />
                     <TextBlock Text="{Binding SelectedProduct.Description}" FontSize="16" Foreground="Gray" Margin="0,0,0,20" />
                     
-                    <ComboBox materialDesign:HintAssist.Hint="Type d'Opération" ItemsSource="{Binding AdjustmentTypes}" SelectedItem="{Binding AdjustmentType}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,15" />
+                    <ComboBox materialDesign:HintAssist.Hint="{DynamicResource Str_TypedOpration_e475}" ItemsSource="{Binding AdjustmentTypes}" SelectedItem="{Binding AdjustmentType}" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Margin="0,0,0,15" />
                     
-                    <TextBox materialDesign:HintAssist.Hint="Quantité" Text="{Binding AdjustmentQuantity}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
+                    <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_Quantit_1b27}" Text="{Binding AdjustmentQuantity}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,15" />
                     
-                    <TextBox materialDesign:HintAssist.Hint="Justification / Motif" Text="{Binding AdjustmentJustification}" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Height="80" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" />
+                    <TextBox materialDesign:HintAssist.Hint="{DynamicResource Str_JustificationMo_f5c0}" Text="{Binding AdjustmentJustification}" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Height="80" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,30" />
 
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Content="ANNULER" Command="{Binding CancelAdjustmentCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
-                        <Button Grid.Column="1" Content="VALIDER" Command="{Binding SaveAdjustmentCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
+                        <Button Grid.Column="0" Content="{DynamicResource Str_ANNULER_1ce3}" Command="{Binding CancelAdjustmentCommand}" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,5,0" Foreground="Gray" BorderBrush="Gray" />
+                        <Button Grid.Column="1" Content="{DynamicResource Str_VALIDER_aedd}" Command="{Binding SaveAdjustmentCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="5,0,0,0" Background="#43A047" BorderBrush="#43A047" />
                     </Grid>
                 </StackPanel>
             </materialDesign:Card>

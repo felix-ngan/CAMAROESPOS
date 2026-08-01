@@ -13,7 +13,7 @@
         TextOptions.TextRenderingMode="Auto"
         Background="#F4F7FE"
         FontFamily="{DynamicResource MaterialDesignFont}"
-        Title="CamareosPOS Moderne" Height="700" Width="1200" WindowStartupLocation="CenterScreen">
+        Title="{DynamicResource Str_CamareosPOSMode_bb0b}" Height="700" Width="1200" WindowStartupLocation="CenterScreen">
     
     <materialDesign:DialogHost Identifier="RootDialog" DialogTheme="Inherit">
         <Grid>
@@ -30,75 +30,75 @@
                             <materialDesign:PackIcon Kind="ShoppingOutline" Width="30" Height="30" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Camareos" Foreground="#2B3674" FontSize="24" FontWeight="ExtraBlack" Margin="0,0,0,-5" />
-                            <TextBlock Text="POS SYSTEM" Foreground="#1E88E5" FontSize="12" FontWeight="Bold" />
+                            <TextBlock Text="{DynamicResource Str_Camareos_4799}" Foreground="#2B3674" FontSize="24" FontWeight="ExtraBlack" Margin="0,0,0,-5" />
+                            <TextBlock Text="{DynamicResource Str_POSSYSTEM_d9dc}" Foreground="#1E88E5" FontSize="12" FontWeight="Bold" />
                         </StackPanel>
                     </StackPanel>
 
                     <Button x:Name="BtnDashboard" Click="BtnDashboard_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#8F9BBA" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="15,5" materialDesign:ButtonAssist.CornerRadius="10">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="ViewDashboard" Width="22" Height="22" VerticalAlignment="Center"/>
-                            <TextBlock Text="Tableau de bord" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock Text="{DynamicResource Str_Tableaudebord_4a37}" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
                     
                     <Button x:Name="BtnPOS" Click="BtnPOS_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#8F9BBA" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="15,5" materialDesign:ButtonAssist.CornerRadius="10">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Cart" Width="22" Height="22" VerticalAlignment="Center"/>
-                            <TextBlock Text="Caisse" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock Text="{DynamicResource Str_Caisse_4749}" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
                     
                     <Button x:Name="BtnInventory" Click="BtnInventory_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#8F9BBA" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="15,5" materialDesign:ButtonAssist.CornerRadius="10">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="PackageVariant" Width="22" Height="22" VerticalAlignment="Center"/>
-                            <TextBlock Text="Gestion des Stocks" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock Text="{DynamicResource Str_GestiondesStock_2931}" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
 
                     <Button x:Name="BtnWallet" Click="BtnWallet_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#8F9BBA" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="15,5" materialDesign:ButtonAssist.CornerRadius="10">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="AccountTie" Width="22" Height="22" VerticalAlignment="Center"/>
-                            <TextBlock Text="Clients (CRM)" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock Text="{DynamicResource Str_ClientsCRM_2da8}" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
 
                     <Button x:Name="BtnVendors" Click="BtnVendors_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#8F9BBA" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="15,5" materialDesign:ButtonAssist.CornerRadius="10">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="TruckDelivery" Width="22" Height="22" VerticalAlignment="Center"/>
-                            <TextBlock Text="Fournisseurs" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock Text="{DynamicResource Str_Fournisseurs_20a5}" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
 
                     <Button x:Name="BtnReports" Click="BtnReports_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#8F9BBA" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="15,5" materialDesign:ButtonAssist.CornerRadius="10">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="FileChart" Width="22" Height="22" VerticalAlignment="Center"/>
-                            <TextBlock Text="Rapports" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock Text="{DynamicResource Str_Rapports_5a7b}" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
 
                     <Button x:Name="BtnExpenses" Click="BtnExpenses_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#8F9BBA" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="15,5" materialDesign:ButtonAssist.CornerRadius="10">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="CashMinus" Width="22" Height="22" VerticalAlignment="Center"/>
-                            <TextBlock Text="Dépenses" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock Text="{DynamicResource Str_Dpenses_b189}" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
 
                     <Button x:Name="BtnSettings" Click="BtnSettings_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#8F9BBA" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Height="50" Margin="15,5" materialDesign:ButtonAssist.CornerRadius="10">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Cog" Width="22" Height="22" VerticalAlignment="Center"/>
-                            <TextBlock Text="Paramètres" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock Text="{DynamicResource Str_Paramtres_e778}" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
                     
                     <Border Height="1" Background="#E0E5F2" Margin="20,20" />
                     
-                    <TextBlock x:Name="TxtUsername" Text="Connecté : ..." Foreground="#2B3674" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                    <TextBlock x:Name="TxtUsername" Text="{DynamicResource Str_Connect_c2dd}" Foreground="#2B3674" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" />
 
                     <Button Click="BtnLogout_Click" Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="#E53935" BorderBrush="#E53935" HorizontalAlignment="Stretch" Height="40" Margin="20,10" materialDesign:ButtonAssist.CornerRadius="10">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Logout" Width="20" Height="20" VerticalAlignment="Center"/>
-                            <TextBlock Text="Déconnexion" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="14" FontWeight="Bold"/>
+                            <TextBlock Text="{DynamicResource Str_Dconnexion_a7e7}" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="14" FontWeight="Bold"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -118,8 +118,9 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock x:Name="TxtHeader" Grid.Column="0" Text="" FontSize="26" FontWeight="Bold" Foreground="#2B3674" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button x:Name="BtnLangToggle" Content="EN" Click="BtnLangToggle_Click" Style="{StaticResource MaterialDesignOutlinedButton}" Height="30" Width="40" Padding="0" Margin="0,0,15,0" Foreground="#2B3674" BorderBrush="#2B3674" ToolTip="Changer la langue (FR/EN)"/>
                         <materialDesign:PackIcon Kind="CalendarMonth" Width="20" Height="20" Foreground="#A3AED0" VerticalAlignment="Center" Margin="0,0,5,0" />
-                        <TextBlock Text="Aujourd'hui" Foreground="#A3AED0" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <TextBlock Text="{DynamicResource Str_Aujourdhui_6a66}" Foreground="#A3AED0" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </StackPanel>
                 </Grid>
                 

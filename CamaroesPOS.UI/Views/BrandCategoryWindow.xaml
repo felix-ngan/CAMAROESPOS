@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:viewmodels="clr-namespace:CamaroesPOS.UI.ViewModels"
-        Title="Gestion des Marques et Catégories" Height="500" Width="800" WindowStartupLocation="CenterScreen" Background="#F4F7FE">
+        Title="{DynamicResource Str_GestiondesMarqu_b624}" Height="500" Width="800" WindowStartupLocation="CenterScreen" Background="#F4F7FE">
     
     <Window.DataContext>
         <viewmodels:BrandCategoryViewModel />
@@ -51,7 +51,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 
-                <TextBlock Grid.Row="0" Text="MARQUES" FontSize="18" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,15" />
+                <TextBlock Grid.Row="0" Text="{DynamicResource Str_MARQUES_9617}" FontSize="18" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,15" />
                 
                 <Grid Grid.Row="1" Margin="0,0,0,15">
                     <Grid.ColumnDefinitions>
@@ -59,15 +59,15 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" materialDesign:HintAssist.Hint="Nouvelle Marque" Text="{Binding NewBrandName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
-                    <Button Grid.Column="1" Command="{Binding CancelEditBrandCommand}" Content="ANNULER" Margin="10,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" Visibility="{Binding IsEditingBrand, Converter={StaticResource BoolToVis}}" Foreground="Gray" BorderBrush="Gray" />
+                    <TextBox Grid.Column="0" materialDesign:HintAssist.Hint="{DynamicResource Str_NouvelleMarque_1c40}" Text="{Binding NewBrandName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+                    <Button Grid.Column="1" Command="{Binding CancelEditBrandCommand}" Content="{DynamicResource Str_ANNULER_1ce3}" Margin="10,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" Visibility="{Binding IsEditingBrand, Converter={StaticResource BoolToVis}}" Foreground="Gray" BorderBrush="Gray" />
                     <Button Grid.Column="2" Command="{Binding SaveBrandCommand}" Margin="10,0,0,0" Style="{StaticResource SaveButtonStyle}" />
                 </Grid>
                 
                 <DataGrid Grid.Row="2" ItemsSource="{Binding Brands}" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Nom de la Marque" Binding="{Binding BrandName}" Width="*" IsReadOnly="True" />
-                        <DataGridTemplateColumn Header="Action" Width="90">
+                        <DataGridTextColumn Header="{DynamicResource Str_NomdelaMarque_69f6}" Binding="{Binding BrandName}" Width="*" IsReadOnly="True" />
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Action_004b}" Width="90">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -95,7 +95,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 
-                <TextBlock Grid.Row="0" Text="CATÉGORIES" FontSize="18" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,15" />
+                <TextBlock Grid.Row="0" Text="{DynamicResource Str_CATGORIES_4705}" FontSize="18" FontWeight="Bold" Foreground="#2B3674" Margin="0,0,0,15" />
                 
                 <Grid Grid.Row="1" Margin="0,0,0,15">
                     <Grid.ColumnDefinitions>
@@ -103,15 +103,15 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" materialDesign:HintAssist.Hint="Nouvelle Catégorie" Text="{Binding NewCategoryName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
-                    <Button Grid.Column="1" Command="{Binding CancelEditCategoryCommand}" Content="ANNULER" Margin="10,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" Visibility="{Binding IsEditingCategory, Converter={StaticResource BoolToVis}}" Foreground="Gray" BorderBrush="Gray" />
+                    <TextBox Grid.Column="0" materialDesign:HintAssist.Hint="{DynamicResource Str_NouvelleCatgori_899f}" Text="{Binding NewCategoryName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+                    <Button Grid.Column="1" Command="{Binding CancelEditCategoryCommand}" Content="{DynamicResource Str_ANNULER_1ce3}" Margin="10,0,0,0" Style="{StaticResource MaterialDesignOutlinedButton}" Visibility="{Binding IsEditingCategory, Converter={StaticResource BoolToVis}}" Foreground="Gray" BorderBrush="Gray" />
                     <Button Grid.Column="2" Command="{Binding SaveCategoryCommand}" Margin="10,0,0,0" Style="{StaticResource SaveCategoryButtonStyle}" />
                 </Grid>
                 
                 <DataGrid Grid.Row="2" ItemsSource="{Binding Categories}" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Nom de la Catégorie" Binding="{Binding CategoryName}" Width="*" IsReadOnly="True" />
-                        <DataGridTemplateColumn Header="Action" Width="90">
+                        <DataGridTextColumn Header="{DynamicResource Str_NomdelaCatgorie_cf0f}" Binding="{Binding CategoryName}" Width="*" IsReadOnly="True" />
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Action_004b}" Width="90">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
