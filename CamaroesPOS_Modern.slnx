@@ -2,4 +2,5 @@
   <Project Path="CamaroesPOS.Data/CamaroesPOS.Data.csproj" />
   <Project Path="CamaroesPOS.Domain/CamaroesPOS.Domain.csproj" />
   <Project Path="CamaroesPOS.UI/CamaroesPOS.UI.csproj" />
+  <Project Path="CamaroesPOS.UI.Avalonia/CamaroesPOS.UI.Avalonia.csproj" />
 </Solution>
