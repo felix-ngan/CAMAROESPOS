@@ -13,9 +13,12 @@ namespace CamaroesPOS.UI.Avalonia.Views;
 
 public partial class MainWindow : Window
 {
+    private readonly DashboardView _dashboardView;
+
     public MainWindow()
     {
         InitializeComponent();
+        _dashboardView = new DashboardView();
 
         if (!string.IsNullOrEmpty(SessionService.CurrentUserName))
         {
@@ -62,7 +65,11 @@ public partial class MainWindow : Window
     {
         SetActiveNav(BtnDashboard);
         TxtHeader.Text = "";
-        MainContentControl.Content = MakePlaceholder("Tableau de bord");
+        if (_dashboardView.DataContext is ViewModels.DashboardViewModel vm)
+        {
+            vm.LoadStats();
+        }
+        MainContentControl.Content = _dashboardView;
     }
 
     private void BtnDashboard_Click(object? sender, RoutedEventArgs? e) => ShowDashboard();

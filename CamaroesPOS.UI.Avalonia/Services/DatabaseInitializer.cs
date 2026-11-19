@@ -51,18 +51,18 @@ public static class DatabaseInitializer
 
         if (!context.Products.Any())
         {
-            context.Products.Add(new Product { ProductCode = "P001", Description = "Laptop Gamer", Price = 1500000, Qty = 10, Barcode = "12345", BrandName = "Asus", CategoryName = "Informatique" });
-            context.Products.Add(new Product { ProductCode = "P002", Description = "Souris Sans Fil", Price = 15000, Qty = 50, Barcode = "12346", BrandName = "Logitech", CategoryName = "Accessoires" });
-            context.Products.Add(new Product { ProductCode = "P003", Description = "Clavier Mécanique", Price = 45000, Qty = 15, Barcode = "12347", BrandName = "Corsair", CategoryName = "Accessoires" });
-            context.Products.Add(new Product { ProductCode = "P004", Description = "Écran 27 pouces", Price = 120000, Qty = 5, Barcode = "12348", BrandName = "Samsung", CategoryName = "Informatique" });
-            context.Products.Add(new Product { ProductCode = "P005", Description = "Casque Audio", Price = 35000, Qty = 20, Barcode = "12349", BrandName = "Sony", CategoryName = "Audio" });
+            context.Products.Add(new Product { ProductCode = "P001", Description = "Laptop Gamer", Price = 1500000, Qty = 10, Barcode = "12345", BrandName = "Asus", CategoryName = "Informatique", VendorName = "" });
+            context.Products.Add(new Product { ProductCode = "P002", Description = "Souris Sans Fil", Price = 15000, Qty = 50, Barcode = "12346", BrandName = "Logitech", CategoryName = "Accessoires", VendorName = "" });
+            context.Products.Add(new Product { ProductCode = "P003", Description = "Clavier Mécanique", Price = 45000, Qty = 15, Barcode = "12347", BrandName = "Corsair", CategoryName = "Accessoires", VendorName = "" });
+            context.Products.Add(new Product { ProductCode = "P004", Description = "Écran 27 pouces", Price = 120000, Qty = 5, Barcode = "12348", BrandName = "Samsung", CategoryName = "Informatique", VendorName = "" });
+            context.Products.Add(new Product { ProductCode = "P005", Description = "Casque Audio", Price = 35000, Qty = 20, Barcode = "12349", BrandName = "Sony", CategoryName = "Audio", VendorName = "" });
             context.SaveChanges();
         }
 
         if (!context.CustomerWallets.Any())
         {
-            context.CustomerWallets.Add(new CustomerWallet { Phone = "0601020304", Balance = 150000 });
-            context.CustomerWallets.Add(new CustomerWallet { Phone = "0611223344", Balance = 50000 });
+            context.CustomerWallets.Add(new CustomerWallet { Phone = "0601020304", CustomerName = "Client Démo 1", Email = "", Balance = 150000 });
+            context.CustomerWallets.Add(new CustomerWallet { Phone = "0611223344", CustomerName = "Client Démo 2", Email = "", Balance = 50000 });
             context.SaveChanges();
         }
 
