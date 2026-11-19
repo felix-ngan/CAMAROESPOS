@@ -1,0 +1,196 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="CamaroesPOS.UI.Avalonia.Views.POSView"
+             x:Name="PosRoot">
+    <Grid>
+        <!-- Main POS Workspace -->
+        <Grid ColumnDefinitions="*,390">
+            <!-- Left: Barcode + Cart -->
+            <Border Grid.Column="0" Classes="Card" Margin="0,0,14,0">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,14">
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding BarcodeSearch, Mode=TwoWay}"
+                                 Watermark="{DynamicResource Str_Scannerousaisir_da72}"
+                                 KeyDown="BarcodeBox_KeyDown"
+                                 Margin="0,0,10,0"/>
+                        <Button Grid.Column="1" Classes="Primary" Command="{Binding SearchBarcodeCommand}" Margin="0,0,10,0">
+                            <materialIcons:MaterialIcon Kind="BarcodeScan" Width="20" Height="20"/>
+                        </Button>
+                        <Button Grid.Column="2" Classes="Outlined" Command="{Binding OpenCatalogCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <materialIcons:MaterialIcon Kind="ViewGrid" Width="18" Height="18"/>
+                                <TextBlock Text="{DynamicResource Str_CATALOGUE_f192}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Cart}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Str_Code_ca0d}" Binding="{Binding ProductCode}" Width="90"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Article_5e2f}" Binding="{Binding ProductDescription}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Prix_bc13}" Binding="{Binding Price, StringFormat='{}{0:N0}'}" Width="100"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Qt_493a}" Binding="{Binding Qty}" Width="65"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Total_96b0}" Binding="{Binding Total, StringFormat='{}{0:N0}'}" Width="110"/>
+                            <DataGridTemplateColumn Header="{DynamicResource Str_Action_004b}" Width="70">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Classes="DangerOutlined" Padding="6,4" HorizontalAlignment="Center"
+                                                Command="{Binding #PosRoot.DataContext.RemoveFromCartCommand}"
+                                                CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="TrashCanOutline" Width="16" Height="16"/>
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                        <Button Classes="DangerOutlined" Command="{Binding ClearCartCommand}" Content="{DynamicResource Str_VIDER_9b69}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Right: Checkout Summary -->
+            <Border Grid.Column="1" Classes="Card">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="{DynamicResource Str_VotrePanier_6ba3}" Classes="CardTitle"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Text="{DynamicResource Str_Soustotal_f804}" Foreground="#4A5568" FontSize="14"/>
+                        <TextBlock Grid.Column="1" Text="{Binding SubTotalAmount, StringFormat='{}{0:N0} FCFA'}" FontWeight="SemiBold" FontSize="15" Foreground="#2B3674"/>
+                    </Grid>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource Str_Rduction_b2fc}" Classes="LabelMuted"/>
+                        <TextBox Text="{Binding DiscountPercentage, Mode=TwoWay}" Watermark="0"/>
+                    </StackPanel>
+
+                    <Border Background="#EBF3FE" CornerRadius="10" Padding="14">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{DynamicResource Str_MONTANTTOTALPAY_0e5f}" FontSize="11" FontWeight="Bold" Foreground="#1E88E5"/>
+                            <TextBlock Text="{Binding TotalAmount, StringFormat='{}{0:N0} FCFA'}" FontSize="26" FontWeight="ExtraBlack" Foreground="#2B3674"/>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource Str_Modedepaiement_994f}" Classes="LabelMuted"/>
+                        <ComboBox SelectedIndex="{Binding PaymentMethodIndex, Mode=TwoWay}" HorizontalAlignment="Stretch">
+                            <ComboBoxItem Content="{DynamicResource Str_Espces_80bd}"/>
+                            <ComboBoxItem Content="{DynamicResource Str_PortefeuilleCli_8884}"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource Str_NumroTlphoneCli_5e08}" Classes="LabelMuted" TextWrapping="Wrap"/>
+                        <TextBox Text="{Binding CustomerPhone, Mode=TwoWay}" Watermark="0601020304"/>
+                    </StackPanel>
+
+                    <Button Classes="Success"
+                            Command="{Binding CheckoutCommand}"
+                            Content="{DynamicResource Str_VALIDERLACHAT_14b2}"
+                            HorizontalAlignment="Stretch"
+                            Height="50"
+                            FontSize="15"
+                            Margin="0,12,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Overlay: Product Catalog -->
+        <Border IsVisible="{Binding IsCatalogDialogOpen}" Background="#80000000" ZIndex="10">
+            <Border Classes="Card" Width="760" Height="520" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <TextBlock Grid.Row="0" Text="{DynamicResource Str_SlectionnerdesP_3125}" Classes="CardTitle" Margin="0,0,0,12"/>
+                    <ScrollViewer Grid.Row="1">
+                        <ItemsControl ItemsSource="{Binding Products}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Classes="Outlined" Width="220" Height="100" Margin="6" Padding="12"
+                                            Command="{Binding #PosRoot.DataContext.AddToCartCommand}"
+                                            CommandParameter="{Binding}">
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Text="{Binding Description}" FontWeight="Bold" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding Price, StringFormat='{}{0:N0} FCFA'}" Foreground="#1E88E5" FontWeight="Bold" FontSize="14"/>
+                                            <TextBlock Text="{Binding Qty, StringFormat='Stock : {0}'}" FontSize="11" Foreground="#8F9BBA"/>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    <Button Grid.Row="2" Classes="Outlined" Content="{DynamicResource Str_FERMER_76c2}" HorizontalAlignment="Right" Margin="0,12,0,0" Command="{Binding CloseCatalogCommand}"/>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- Overlay: Quantity Picker -->
+        <Border IsVisible="{Binding IsQuantityDialogOpen}" Background="#80000000" ZIndex="20">
+            <Border Classes="Card" Width="340" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="{DynamicResource Str_QuelleQuantit_d2d7}" Classes="CardTitle" HorizontalAlignment="Center"/>
+                    <Grid ColumnDefinitions="60,*,60">
+                        <Button Grid.Column="0" Classes="Outlined" Content="-" FontSize="22" Height="48" Command="{Binding DecreaseQtyCommand}"/>
+                        <TextBox Grid.Column="1" Text="{Binding SelectedQuantityToAdd, Mode=TwoWay}" FontSize="22" FontWeight="Bold" TextAlignment="Center" Margin="10,0"/>
+                        <Button Grid.Column="2" Classes="Outlined" Content="+" FontSize="22" Height="48" Command="{Binding IncreaseQtyCommand}"/>
+                    </Grid>
+                    <UniformGrid Columns="2">
+                        <Button Classes="Outlined" Content="{DynamicResource Str_ANNULER_1ce3}" Margin="0,0,6,0" Command="{Binding CancelQuantityCommand}"/>
+                        <Button Classes="Primary" Content="{DynamicResource Str_AJOUTER_c312}" Margin="6,0,0,0" Command="{Binding ConfirmQuantityCommand}"/>
+                    </UniformGrid>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Overlay: Tactile Cash Numpad -->
+        <Border IsVisible="{Binding IsCheckoutDialogOpen}" Background="#80000000" ZIndex="30">
+            <Border Classes="Card" Width="440" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="{DynamicResource Str_RglementEspces_94b9}" Classes="CardTitle" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding TotalAmount, StringFormat='Total : {0:N0} FCFA'}" FontSize="18" FontWeight="Bold" Foreground="#1E88E5" HorizontalAlignment="Center"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBox Grid.Column="0" Text="{Binding ReceivedAmountString, Mode=TwoWay}" Watermark="{DynamicResource Str_Montantdonn_3471}" FontSize="20" FontWeight="Bold" Margin="0,0,8,0"/>
+                        <Button Grid.Column="1" Classes="DangerOutlined" Content="C" Width="52" Command="{Binding ClearNumpadCommand}"/>
+                    </Grid>
+
+                    <TextBlock Text="{Binding ChangeAmount, StringFormat='Monnaie rendue : {0:N0} FCFA'}" FontSize="15" FontWeight="SemiBold" Foreground="#2E7D32" HorizontalAlignment="Center"/>
+
+                    <UniformGrid Columns="4" Margin="0,4">
+                        <Button Classes="Outlined" Content="{DynamicResource Str_Exact_1649}" Margin="2" Command="{Binding ExactAmountCommand}"/>
+                        <Button Classes="Outlined" Content="5 000" Margin="2" Command="{Binding QuickCashCommand}" CommandParameter="5000"/>
+                        <Button Classes="Outlined" Content="10 000" Margin="2" Command="{Binding QuickCashCommand}" CommandParameter="10000"/>
+                        <Button Classes="Outlined" Content="20 000" Margin="2" Command="{Binding QuickCashCommand}" CommandParameter="20000"/>
+                    </UniformGrid>
+
+                    <UniformGrid Columns="3">
+                        <Button Classes="Outlined" Content="7" Height="44" Margin="3" Command="{Binding NumpadCommand}" CommandParameter="7"/>
+                        <Button Classes="Outlined" Content="8" Height="44" Margin="3" Command="{Binding NumpadCommand}" CommandParameter="8"/>
+                        <Button Classes="Outlined" Content="9" Height="44" Margin="3" Command="{Binding NumpadCommand}" CommandParameter="9"/>
+                        <Button Classes="Outlined" Content="4" Height="44" Margin="3" Command="{Binding NumpadCommand}" CommandParameter="4"/>
+                        <Button Classes="Outlined" Content="5" Height="44" Margin="3" Command="{Binding NumpadCommand}" CommandParameter="5"/>
+                        <Button Classes="Outlined" Content="6" Height="44" Margin="3" Command="{Binding NumpadCommand}" CommandParameter="6"/>
+                        <Button Classes="Outlined" Content="1" Height="44" Margin="3" Command="{Binding NumpadCommand}" CommandParameter="1"/>
+                        <Button Classes="Outlined" Content="2" Height="44" Margin="3" Command="{Binding NumpadCommand}" CommandParameter="2"/>
+                        <Button Classes="Outlined" Content="3" Height="44" Margin="3" Command="{Binding NumpadCommand}" CommandParameter="3"/>
+                        <Button Classes="Outlined" Content="0" Height="44" Margin="3" Command="{Binding NumpadCommand}" CommandParameter="0"/>
+                        <Button Classes="Outlined" Content="00" Height="44" Margin="3" Command="{Binding NumpadCommand}" CommandParameter="00"/>
+                        <Button Classes="Outlined" Content="000" Height="44" Margin="3" Command="{Binding NumpadCommand}" CommandParameter="000"/>
+                    </UniformGrid>
+
+                    <UniformGrid Columns="2" Margin="0,6,0,0">
+                        <Button Classes="Outlined" Content="{DynamicResource Str_ANNULER_1ce3}" Margin="0,0,6,0" Command="{Binding CancelCheckoutCommand}"/>
+                        <Button Classes="Success" Content="{DynamicResource Str_VALIDER_aedd}" Margin="6,0,0,0" Command="{Binding ConfirmCashPaymentCommand}"/>
+                    </UniformGrid>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

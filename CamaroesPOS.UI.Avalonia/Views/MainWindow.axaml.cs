@@ -14,11 +14,13 @@ namespace CamaroesPOS.UI.Avalonia.Views;
 public partial class MainWindow : Window
 {
     private readonly DashboardView _dashboardView;
+    private readonly POSView _posView;
 
     public MainWindow()
     {
         InitializeComponent();
         _dashboardView = new DashboardView();
+        _posView = new POSView();
 
         if (!string.IsNullOrEmpty(SessionService.CurrentUserName))
         {
@@ -78,7 +80,11 @@ public partial class MainWindow : Window
     {
         SetActiveNav(BtnPOS);
         TxtHeader.Text = "Point de Vente";
-        MainContentControl.Content = MakePlaceholder("Point de Vente");
+        if (_posView.DataContext is ViewModels.POSViewModel vm)
+        {
+            vm.LoadDataFromDatabase();
+        }
+        MainContentControl.Content = _posView;
     }
 
     private void BtnInventory_Click(object? sender, RoutedEventArgs? e)
