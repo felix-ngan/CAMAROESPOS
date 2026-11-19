@@ -1,0 +1,130 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        x:Class="CamaroesPOS.UI.Avalonia.Views.MainWindow"
+        Title="{DynamicResource Str_CamareosPOSMode_bb0b}"
+        Width="1280" Height="760"
+        MinWidth="1024" MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F7FE">
+
+    <Grid ColumnDefinitions="250,*">
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="White" BorderBrush="#E0E5F2" BorderThickness="0,0,1,0">
+            <DockPanel LastChildFill="False">
+                <ScrollViewer DockPanel.Dock="Top" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,24,0,16">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,28">
+                            <Border Background="#1E88E5" CornerRadius="10" Width="44" Height="44" Margin="0,0,10,0">
+                                <materialIcons:MaterialIcon Kind="ShoppingOutline" Width="28" Height="28" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="{DynamicResource Str_Camareos_4799}" Foreground="#2B3674" FontSize="22" FontWeight="ExtraBlack" Margin="0,0,0,-4" />
+                                <TextBlock Text="{DynamicResource Str_POSSYSTEM_d9dc}" Foreground="#1E88E5" FontSize="11" FontWeight="Bold" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Button x:Name="BtnDashboard" Classes="NavButton" Click="BtnDashboard_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <materialIcons:MaterialIcon Kind="ViewDashboard" Width="22" Height="22" VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource Str_Tableaudebord_4a37}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="BtnPOS" Classes="NavButton" Click="BtnPOS_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <materialIcons:MaterialIcon Kind="Cart" Width="22" Height="22" VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource Str_Caisse_4749}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="BtnInventory" Classes="NavButton" Click="BtnInventory_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <materialIcons:MaterialIcon Kind="PackageVariant" Width="22" Height="22" VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource Str_GestiondesStock_2931}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="BtnWallet" Classes="NavButton" Click="BtnWallet_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <materialIcons:MaterialIcon Kind="AccountTie" Width="22" Height="22" VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource Str_ClientsCRM_2da8}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="BtnVendors" Classes="NavButton" Click="BtnVendors_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <materialIcons:MaterialIcon Kind="TruckDelivery" Width="22" Height="22" VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource Str_Fournisseurs_20a5}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="BtnReports" Classes="NavButton" Click="BtnReports_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <materialIcons:MaterialIcon Kind="FileChart" Width="22" Height="22" VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource Str_Rapports_5a7b}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="BtnExpenses" Classes="NavButton" Click="BtnExpenses_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <materialIcons:MaterialIcon Kind="CashMinus" Width="22" Height="22" VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource Str_Dpenses_b189}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="BtnSettings" Classes="NavButton" Click="BtnSettings_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <materialIcons:MaterialIcon Kind="Cog" Width="22" Height="22" VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource Str_Paramtres_e778}" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Border Height="1" Background="#E0E5F2" Margin="20,16" />
+
+                        <TextBlock x:Name="TxtUsername"
+                                   Text="{DynamicResource Str_Connect_c2dd}"
+                                   Foreground="#2B3674"
+                                   FontWeight="Bold"
+                                   FontSize="13"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   Margin="12,0,12,10" />
+
+                        <Button Click="BtnLogout_Click"
+                                Classes="DangerOutlined"
+                                HorizontalAlignment="Stretch"
+                                Height="40"
+                                Margin="20,4">
+                            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                <materialIcons:MaterialIcon Kind="Logout" Width="18" Height="18" VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource Str_Dconnexion_a7e7}" VerticalAlignment="Center" FontSize="13" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Grid Grid.Column="1" RowDefinitions="Auto,*" Margin="20">
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="6,4,6,16">
+                <TextBlock x:Name="TxtHeader" Grid.Column="0" Text="" FontSize="24" FontWeight="Bold" Foreground="#2B3674" VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                    <Button x:Name="BtnLangToggle"
+                            Content="EN"
+                            Click="BtnLangToggle_Click"
+                            Classes="Outlined"
+                            Height="32" Width="46" Padding="0"
+                            ToolTip.Tip="Changer la langue (FR/EN)"/>
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <materialIcons:MaterialIcon Kind="CalendarMonth" Width="20" Height="20" Foreground="#A3AED0" VerticalAlignment="Center" />
+                        <TextBlock Text="{DynamicResource Str_Aujourdhui_6a66}" Foreground="#A3AED0" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <ContentControl x:Name="MainContentControl" Grid.Row="1" />
+        </Grid>
+    </Grid>
+</Window>

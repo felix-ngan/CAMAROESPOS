@@ -1,8 +1,8 @@
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using CamaroesPOS.UI.Avalonia.Services;
+using CamaroesPOS.UI.Avalonia.Views;
 
 namespace CamaroesPOS.UI.Avalonia;
 
@@ -20,12 +20,7 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new Window
-            {
-                Title = "CAMAROES POS - Avalonia",
-                Width = 900,
-                Height = 600
-            };
+            desktop.MainWindow = new LoginWindow();
         }
 
         base.OnFrameworkInitializationCompleted();

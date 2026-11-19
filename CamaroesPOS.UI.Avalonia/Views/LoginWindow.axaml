@@ -1,0 +1,59 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        x:Class="CamaroesPOS.UI.Avalonia.Views.LoginWindow"
+        Title="{DynamicResource Str_ConnexionCamare_3745}"
+        Width="420" Height="510"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F7FE">
+    <Border Classes="Card" Margin="20" Padding="30" VerticalAlignment="Center">
+        <StackPanel Spacing="18">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,6">
+                <Border Background="#1E88E5" CornerRadius="12" Width="58" Height="58" Margin="0,0,14,0">
+                    <materialIcons:MaterialIcon Kind="ShoppingOutline" Width="36" Height="36" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{DynamicResource Str_Camareos_4799}" Foreground="#2B3674" FontSize="30" FontWeight="ExtraBlack" Margin="0,0,0,-4" />
+                    <TextBlock Text="{DynamicResource Str_POSSYSTEM_d9dc}" Foreground="#1E88E5" FontSize="13" FontWeight="Bold" />
+                </StackPanel>
+            </StackPanel>
+
+            <TextBlock Text="{DynamicResource Str_Veuillezvouside_05db}" FontSize="14" HorizontalAlignment="Center" Foreground="#8F9BBA" Margin="0,0,0,14" />
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="{DynamicResource Str_Nomdutilisateur_299a}" Classes="LabelMuted" />
+                <TextBox x:Name="TxtUsername"
+                         Text="{Binding Username, Mode=TwoWay}"
+                         Watermark="admin"
+                         FontSize="15"
+                         KeyDown="Input_KeyDown" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="{DynamicResource Str_Motdepasse_b8f6}" Classes="LabelMuted" />
+                <TextBox x:Name="TxtPassword"
+                         Text="{Binding Password, Mode=TwoWay}"
+                         PasswordChar="•"
+                         Watermark="••••••"
+                         FontSize="15"
+                         KeyDown="Input_KeyDown" />
+            </StackPanel>
+
+            <Button Content="{DynamicResource Str_SECONNECTER_11f9}"
+                    Command="{Binding LoginCommand}"
+                    Classes="Primary"
+                    HorizontalAlignment="Stretch"
+                    Height="46"
+                    FontSize="15"
+                    Margin="0,12,0,0" />
+
+            <Button Content="{DynamicResource Str_QUITTER_4eae}"
+                    Command="{Binding CloseCommand}"
+                    Classes="Outlined"
+                    HorizontalAlignment="Stretch"
+                    Height="44"
+                    FontSize="15" />
+        </StackPanel>
+    </Border>
+</Window>
