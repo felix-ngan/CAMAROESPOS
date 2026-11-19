@@ -15,12 +15,14 @@ public partial class MainWindow : Window
 {
     private readonly DashboardView _dashboardView;
     private readonly POSView _posView;
+    private readonly InventoryView _inventoryView;
 
     public MainWindow()
     {
         InitializeComponent();
         _dashboardView = new DashboardView();
         _posView = new POSView();
+        _inventoryView = new InventoryView();
 
         if (!string.IsNullOrEmpty(SessionService.CurrentUserName))
         {
@@ -91,7 +93,11 @@ public partial class MainWindow : Window
     {
         SetActiveNav(BtnInventory);
         TxtHeader.Text = "Gestion des Stocks";
-        MainContentControl.Content = MakePlaceholder("Gestion des Stocks");
+        if (_inventoryView.DataContext is ViewModels.InventoryViewModel vm)
+        {
+            vm.LoadDataFromDatabase();
+        }
+        MainContentControl.Content = _inventoryView;
     }
 
     private void BtnWallet_Click(object? sender, RoutedEventArgs? e)

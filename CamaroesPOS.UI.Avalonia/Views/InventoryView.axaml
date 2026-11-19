@@ -1,0 +1,116 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="CamaroesPOS.UI.Avalonia.Views.InventoryView"
+             x:Name="InvRoot">
+    <Grid ColumnDefinitions="*,Auto">
+        <!-- Main Table -->
+        <Border Grid.Column="0" Classes="Card">
+            <Grid RowDefinitions="Auto,*">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,14">
+                    <TextBox Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}" Watermark="{DynamicResource Str_Rechercherunpro_97e5}" Margin="0,0,10,0"/>
+                    <Button Grid.Column="1" Classes="Outlined" Content="{DynamicResource Str_MARQUESCATGORIE_7ed4}" Command="{Binding ManageCatalogCommand}" Margin="0,0,10,0" IsVisible="{Binding IsAdmin}"/>
+                    <Button Grid.Column="2" Classes="Primary" Content="{DynamicResource Str_AJOUTERPRODUIT_d603}" Command="{Binding AddCommand}" IsVisible="{Binding IsAdmin}"/>
+                </Grid>
+
+                <DataGrid Grid.Row="1" ItemsSource="{Binding InventoryList}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{DynamicResource Str_Code_ca0d}" Binding="{Binding ProductCode}" Width="90"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_CodeBarre_840b}" Binding="{Binding Barcode}" Width="110"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Description_b5a7}" Binding="{Binding Description}" Width="*"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Marque_a3e2}" Binding="{Binding BrandName}" Width="100"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Catgorie_8c6b}" Binding="{Binding CategoryName}" Width="110"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_PrixVente_5076}" Binding="{Binding Price, StringFormat='{}{0:N0}'}" Width="100"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Stock_27ce}" Binding="{Binding Qty}" Width="70"/>
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Actions_06df}" Width="145">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+                                        <Button Classes="Outlined" Padding="6,4" ToolTip.Tip="Ajuster le stock"
+                                                Command="{Binding #InvRoot.DataContext.AdjustStockCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="SwapVertical" Width="15" Height="15"/>
+                                        </Button>
+                                        <Button Classes="Outlined" Padding="6,4" ToolTip.Tip="Modifier"
+                                                Command="{Binding #InvRoot.DataContext.EditCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="PencilOutline" Width="15" Height="15"/>
+                                        </Button>
+                                        <Button Classes="DangerOutlined" Padding="6,4" ToolTip.Tip="Supprimer"
+                                                Command="{Binding #InvRoot.DataContext.DeleteCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="TrashCanOutline" Width="15" Height="15"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- Side Panel: Add/Edit Product -->
+        <Border Grid.Column="1" Classes="Card" Width="340" Margin="14,0,0,0" IsVisible="{Binding IsEditing}">
+            <ScrollViewer>
+                <StackPanel Spacing="10">
+                    <TextBlock Text="{DynamicResource Str_FicheProduit_7823}" Classes="CardTitle"/>
+                    <TextBlock Text="{DynamicResource Str_CodeProduit_ba21}" Classes="LabelMuted"/>
+                    <TextBox Text="{Binding SelectedProduct.ProductCode, Mode=TwoWay}"/>
+                    <TextBlock Text="{DynamicResource Str_CodeBarre_840b}" Classes="LabelMuted"/>
+                    <TextBox Text="{Binding SelectedProduct.Barcode, Mode=TwoWay}"/>
+                    <TextBlock Text="{DynamicResource Str_DescriptiondelA_2b9a}" Classes="LabelMuted"/>
+                    <TextBox Text="{Binding SelectedProduct.Description, Mode=TwoWay}"/>
+                    <TextBlock Text="{DynamicResource Str_Marque_a3e2}" Classes="LabelMuted"/>
+                    <TextBox Text="{Binding SelectedProduct.BrandName, Mode=TwoWay}"/>
+                    <TextBlock Text="{DynamicResource Str_Catgorie_8c6b}" Classes="LabelMuted"/>
+                    <TextBox Text="{Binding SelectedProduct.CategoryName, Mode=TwoWay}"/>
+                    <Grid ColumnDefinitions="*,*">
+                        <StackPanel Grid.Column="0" Margin="0,0,6,0" Spacing="4">
+                            <TextBlock Text="{DynamicResource Str_PrixVente_5076}" Classes="LabelMuted"/>
+                            <TextBox Text="{Binding SelectedProduct.Price, Mode=TwoWay}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="6,0,0,0" Spacing="4">
+                            <TextBlock Text="Prix d'achat" Classes="LabelMuted"/>
+                            <TextBox Text="{Binding SelectedProduct.CostPrice, Mode=TwoWay}"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*">
+                        <StackPanel Grid.Column="0" Margin="0,0,6,0" Spacing="4">
+                            <TextBlock Text="{DynamicResource Str_StockActuel_aa7a}" Classes="LabelMuted"/>
+                            <TextBox Text="{Binding SelectedProduct.Qty, Mode=TwoWay}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="6,0,0,0" Spacing="4">
+                            <TextBlock Text="{DynamicResource Str_NiveaudAlerteSt_feda}" Classes="LabelMuted"/>
+                            <TextBox Text="{Binding SelectedProduct.Reorder, Mode=TwoWay}"/>
+                        </StackPanel>
+                    </Grid>
+                    <UniformGrid Columns="2" Margin="0,12,0,0">
+                        <Button Classes="Outlined" Content="{DynamicResource Str_ANNULER_1ce3}" Margin="0,0,6,0" Command="{Binding CancelCommand}"/>
+                        <Button Classes="Primary" Content="{DynamicResource Str_ENREGISTRER_6d15}" Margin="6,0,0,0" Command="{Binding SaveCommand}"/>
+                    </UniformGrid>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Side Panel: Stock Adjustment -->
+        <Border Grid.Column="1" Classes="Card" Width="340" Margin="14,0,0,0" IsVisible="{Binding IsAdjustingStock}">
+            <StackPanel Spacing="12">
+                <TextBlock Text="{DynamicResource Str_AjustementdeSto_c3ff}" Classes="CardTitle"/>
+                <TextBlock Text="{Binding SelectedProduct.Description}" FontWeight="Bold" Foreground="#1E88E5"/>
+                <TextBlock Text="{Binding SelectedProduct.Qty, StringFormat='Stock actuel : {0}'}" Foreground="#8F9BBA"/>
+
+                <TextBlock Text="{DynamicResource Str_TypedOpration_e475}" Classes="LabelMuted"/>
+                <ComboBox ItemsSource="{Binding AdjustmentTypes}" SelectedItem="{Binding AdjustmentType, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+
+                <TextBlock Text="{DynamicResource Str_Quantit_1b27}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding AdjustmentQuantity, Mode=TwoWay}"/>
+
+                <TextBlock Text="{DynamicResource Str_JustificationMo_f5c0}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding AdjustmentJustification, Mode=TwoWay}" AcceptsReturn="True" Height="70"/>
+
+                <UniformGrid Columns="2" Margin="0,10,0,0">
+                    <Button Classes="Outlined" Content="{DynamicResource Str_ANNULER_1ce3}" Margin="0,0,6,0" Command="{Binding CancelAdjustmentCommand}"/>
+                    <Button Classes="Success" Content="{DynamicResource Str_VALIDER_aedd}" Margin="6,0,0,0" Command="{Binding SaveAdjustmentCommand}"/>
+                </UniformGrid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
