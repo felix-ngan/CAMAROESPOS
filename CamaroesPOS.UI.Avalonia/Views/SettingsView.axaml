@@ -1,0 +1,90 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CamaroesPOS.UI.Avalonia.Views.SettingsView">
+    <Border Classes="Card" Padding="14">
+        <TabControl>
+            <!-- Tab 1: Users -->
+            <TabItem Header="{DynamicResource Str_GestiondesUtili_97ce}">
+                <Grid ColumnDefinitions="*,340" Margin="0,12,0,0">
+                    <DataGrid Grid.Column="0" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}"
+                              AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal" Margin="0,0,16,0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Str_Identifiant_c943}" Binding="{Binding Username}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_NomComplet_088b}" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Rle_1977}" Binding="{Binding Role}" Width="100"/>
+                            <DataGridCheckBoxColumn Header="{DynamicResource Str_Actif_a9f3}" Binding="{Binding IsActive}" Width="75"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Border Grid.Column="1" Classes="Card">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="{DynamicResource Str_DtailsUtilisate_74be}" Classes="CardTitle"/>
+
+                            <TextBlock Text="{DynamicResource Str_Nomdutilisateur_299a}" Classes="LabelMuted"/>
+                            <TextBox Text="{Binding NewUsername, Mode=TwoWay}"/>
+
+                            <TextBlock Text="{DynamicResource Str_NomComplet_088b}" Classes="LabelMuted"/>
+                            <TextBox Text="{Binding NewName, Mode=TwoWay}"/>
+
+                            <TextBlock Text="{DynamicResource Str_MotdePasse_6224}" Classes="LabelMuted"/>
+                            <TextBox Text="{Binding NewPassword, Mode=TwoWay}" PasswordChar="•"/>
+
+                            <TextBlock Text="{DynamicResource Str_Rledelutilisate_bb27}" Classes="LabelMuted"/>
+                            <ComboBox ItemsSource="{Binding Roles}" SelectedItem="{Binding NewRole, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+
+                            <CheckBox Content="{DynamicResource Str_CompteActif_e821}" IsChecked="{Binding IsActiveUser, Mode=TwoWay}"/>
+
+                            <UniformGrid Columns="2" Margin="0,10,0,0">
+                                <Button Classes="Outlined" Content="{DynamicResource Str_NOUVEAU_dcef}" Margin="0,0,6,0" Command="{Binding ClearUserCommand}"/>
+                                <Button Classes="Primary" Content="{DynamicResource Str_ENREGISTRER_6d15}" Margin="6,0,0,0" Command="{Binding SaveUserCommand}"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- Tab 2: Store & Mobile Money -->
+            <TabItem Header="{DynamicResource Str_ParamtresSystme_ee31}">
+                <ScrollViewer Margin="0,12,0,0">
+                    <StackPanel MaxWidth="520" HorizontalAlignment="Left" Spacing="12">
+                        <TextBlock Text="{DynamicResource Str_Informationsdel_2e55}" Classes="CardTitle"/>
+
+                        <TextBlock Text="{DynamicResource Str_NomdelaBoutique_af7e}" Classes="LabelMuted"/>
+                        <TextBox Text="{Binding StoreName, Mode=TwoWay}"/>
+
+                        <TextBlock Text="{DynamicResource Str_AdresseCompltea_c08a}" Classes="LabelMuted"/>
+                        <TextBox Text="{Binding StoreAddress, Mode=TwoWay}"/>
+
+                        <TextBlock Text="{DynamicResource Str_PaiementsMobile_7eff}" Classes="CardTitle" Margin="0,10,0,0"/>
+
+                        <TextBlock Text="{DynamicResource Str_CodeMarchandMTN_6e81}" Classes="LabelMuted"/>
+                        <TextBox Text="{Binding MomoCode, Mode=TwoWay}"/>
+
+                        <TextBlock Text="{DynamicResource Str_CodeMarchandOra_11ba}" Classes="LabelMuted"/>
+                        <TextBox Text="{Binding OrangeCode, Mode=TwoWay}"/>
+
+                        <Button Classes="Primary" Content="{DynamicResource Str_ENREGISTRERLESP_e12e}" Command="{Binding SaveStoreCommand}" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Tab 3: Security -->
+            <TabItem Header="{DynamicResource Str_Scurit_f020}">
+                <StackPanel MaxWidth="420" HorizontalAlignment="Left" Spacing="12" Margin="0,12,0,0">
+                    <TextBlock Text="{DynamicResource Str_ChangermonMotde_0861}" Classes="CardTitle"/>
+
+                    <TextBlock Text="{DynamicResource Str_Ancienmotdepass_6082}" Classes="LabelMuted"/>
+                    <TextBox Text="{Binding OldPassword, Mode=TwoWay}" PasswordChar="•"/>
+
+                    <TextBlock Text="{DynamicResource Str_Nouveaumotdepas_d383}" Classes="LabelMuted"/>
+                    <TextBox Text="{Binding ProfileNewPassword, Mode=TwoWay}" PasswordChar="•"/>
+
+                    <TextBlock Text="{DynamicResource Str_Confirmerlenouv_1c8c}" Classes="LabelMuted"/>
+                    <TextBox Text="{Binding ProfileConfirmPassword, Mode=TwoWay}" PasswordChar="•"/>
+
+                    <Button Classes="Primary" Content="{DynamicResource Str_METTREJOURLEMOT_435f}" Command="{Binding ChangePasswordCommand}" Margin="0,8,0,0"/>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </Border>
+</UserControl>

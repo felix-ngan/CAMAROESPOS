@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="CamaroesPOS.UI.Avalonia.Views.VendorView"
+             x:Name="VendorRoot">
+    <Grid ColumnDefinitions="*,Auto">
+        <Border Grid.Column="0" Classes="Card">
+            <Grid RowDefinitions="Auto,*">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,14">
+                    <TextBox Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}" Watermark="{DynamicResource Str_RechercherNomCo_1d25}" Margin="0,0,10,0"/>
+                    <Button Grid.Column="1" Classes="Primary" Content="{DynamicResource Str_AJOUTERUNFOURNI_781e}" Command="{Binding CreateVendorCommand}" IsVisible="{Binding IsAdmin}"/>
+                </Grid>
+
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Vendors}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{DynamicResource Str_Fournisseur_73d1}" Binding="{Binding VendorName}" Width="*"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Contact_bbaf}" Binding="{Binding ContactPerson}" Width="140"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Tlphone_301d}" Binding="{Binding Phone}" Width="130"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Email_ce8a}" Binding="{Binding Email}" Width="*"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Adresse_50d4}" Binding="{Binding Address}" Width="*"/>
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Actions_06df}" Width="110">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center"
+                                                IsVisible="{Binding #VendorRoot.DataContext.IsAdmin}">
+                                        <Button Classes="Outlined" Padding="6,4" Command="{Binding #VendorRoot.DataContext.EditVendorCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button Classes="DangerOutlined" Padding="6,4" Command="{Binding #VendorRoot.DataContext.DeleteVendorCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="TrashCanOutline" Width="16" Height="16"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="1" Classes="Card" Width="340" Margin="14,0,0,0" IsVisible="{Binding IsEditing}">
+            <StackPanel Spacing="10">
+                <TextBlock Text="{DynamicResource Str_DtailsduFournis_bc95}" Classes="CardTitle"/>
+
+                <TextBlock Text="{DynamicResource Str_NomduFournisseu_9802}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding SelectedVendor.VendorName, Mode=TwoWay}"/>
+
+                <TextBlock Text="{DynamicResource Str_PersonneContact_9111}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding SelectedVendor.ContactPerson, Mode=TwoWay}"/>
+
+                <TextBlock Text="{DynamicResource Str_Tlphone_301d}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding SelectedVendor.Phone, Mode=TwoWay}"/>
+
+                <TextBlock Text="{DynamicResource Str_Email_ce8a}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding SelectedVendor.Email, Mode=TwoWay}"/>
+
+                <TextBlock Text="{DynamicResource Str_Adresse_50d4}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding SelectedVendor.Address, Mode=TwoWay}" AcceptsReturn="True" Height="64"/>
+
+                <UniformGrid Columns="2" Margin="0,12,0,0">
+                    <Button Classes="Outlined" Content="{DynamicResource Str_ANNULER_1ce3}" Margin="0,0,6,0" Command="{Binding CancelCommand}"/>
+                    <Button Classes="Primary" Content="{DynamicResource Str_ENREGISTRER_6d15}" Margin="6,0,0,0" Command="{Binding SaveCommand}"/>
+                </UniformGrid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

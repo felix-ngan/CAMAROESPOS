@@ -1,0 +1,73 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        x:Class="CamaroesPOS.UI.Avalonia.Views.BrandCategoryWindow"
+        x:Name="BrandCatWin"
+        Title="{DynamicResource Str_GestiondesMarqu_b624}"
+        Width="860" Height="560"
+        WindowStartupLocation="CenterOwner"
+        Background="#F4F7FE">
+    <Grid ColumnDefinitions="*,*" Margin="18">
+        <!-- Brands -->
+        <Border Grid.Column="0" Classes="Card" Margin="0,0,10,0">
+            <Grid RowDefinitions="Auto,Auto,*">
+                <TextBlock Grid.Row="0" Text="{DynamicResource Str_MARQUES_9617}" Classes="CardTitle" Margin="0,0,0,12"/>
+                <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,12">
+                    <TextBox Grid.Column="0" Text="{Binding NewBrandName, Mode=TwoWay}" Watermark="{DynamicResource Str_NouvelleMarque_1c40}" Margin="0,0,8,0"/>
+                    <Button Grid.Column="1" Classes="Primary" Content="{DynamicResource Str_ENREGISTRER_6d15}" Command="{Binding SaveBrandCommand}" Margin="0,0,6,0"/>
+                    <Button Grid.Column="2" Classes="Outlined" Content="{DynamicResource Str_ANNULER_1ce3}" IsVisible="{Binding IsEditingBrand}" Command="{Binding CancelEditBrandCommand}"/>
+                </Grid>
+                <DataGrid Grid.Row="2" ItemsSource="{Binding Brands}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{DynamicResource Str_NomdelaMarque_69f6}" Binding="{Binding BrandName}" Width="*"/>
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Action_004b}" Width="110">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                        <Button Classes="Outlined" Padding="6,4" Command="{Binding #BrandCatWin.DataContext.EditBrandCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button Classes="DangerOutlined" Padding="6,4" Command="{Binding #BrandCatWin.DataContext.DeleteBrandCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="TrashCanOutline" Width="16" Height="16"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- Categories -->
+        <Border Grid.Column="1" Classes="Card" Margin="10,0,0,0">
+            <Grid RowDefinitions="Auto,Auto,*">
+                <TextBlock Grid.Row="0" Text="{DynamicResource Str_CATGORIES_4705}" Classes="CardTitle" Margin="0,0,0,12"/>
+                <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,12">
+                    <TextBox Grid.Column="0" Text="{Binding NewCategoryName, Mode=TwoWay}" Watermark="{DynamicResource Str_NouvelleCatgori_899f}" Margin="0,0,8,0"/>
+                    <Button Grid.Column="1" Classes="Primary" Content="{DynamicResource Str_ENREGISTRER_6d15}" Command="{Binding SaveCategoryCommand}" Margin="0,0,6,0"/>
+                    <Button Grid.Column="2" Classes="Outlined" Content="{DynamicResource Str_ANNULER_1ce3}" IsVisible="{Binding IsEditingCategory}" Command="{Binding CancelEditCategoryCommand}"/>
+                </Grid>
+                <DataGrid Grid.Row="2" ItemsSource="{Binding Categories}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{DynamicResource Str_NomdelaCatgorie_cf0f}" Binding="{Binding CategoryName}" Width="*"/>
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Action_004b}" Width="110">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                        <Button Classes="Outlined" Padding="6,4" Command="{Binding #BrandCatWin.DataContext.EditCategoryCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button Classes="DangerOutlined" Padding="6,4" Command="{Binding #BrandCatWin.DataContext.DeleteCategoryCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="TrashCanOutline" Width="16" Height="16"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

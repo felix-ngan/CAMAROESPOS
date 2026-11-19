@@ -1,0 +1,66 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="CamaroesPOS.UI.Avalonia.Views.WalletView"
+             x:Name="WalletRoot">
+    <Grid ColumnDefinitions="*,Auto">
+        <Border Grid.Column="0" Classes="Card">
+            <Grid RowDefinitions="Auto,*">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,14">
+                    <TextBlock Grid.Column="0" Text="{DynamicResource Str_CRMampPortefeui_cf84}" Classes="CardTitle" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1" Classes="Primary" Content="{DynamicResource Str_CRERUNPORTEFEUI_003d}" Command="{Binding CreateWalletCommand}"/>
+                </Grid>
+
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Wallets}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{DynamicResource Str_Tlphone_301d}" Binding="{Binding Phone}" Width="130"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_NomClient_0e66}" Binding="{Binding CustomerName}" Width="*"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Email_ce8a}" Binding="{Binding Email}" Width="*"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_SoldeWallet_32ee}" Binding="{Binding Balance, StringFormat='{}{0:N0} FCFA'}" Width="130"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Points_75dd}" Binding="{Binding LoyaltyPoints}" Width="80"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_TotalAchat_54cb}" Binding="{Binding TotalSpent, StringFormat='{}{0:N0}'}" Width="110"/>
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Actions_06df}" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                        <Button Classes="Outlined" Padding="6,4" ToolTip.Tip="Modifier / Recharger"
+                                                Command="{Binding #WalletRoot.DataContext.RechargeCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="WalletPlusOutline" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button Classes="DangerOutlined" Padding="6,4" ToolTip.Tip="Supprimer"
+                                                Command="{Binding #WalletRoot.DataContext.DeleteWalletCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="TrashCanOutline" Width="16" Height="16"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="1" Classes="Card" Width="340" Margin="14,0,0,0" IsVisible="{Binding IsRecharging}">
+            <StackPanel Spacing="12">
+                <TextBlock Text="{DynamicResource Str_OprationPortefe_dc9c}" Classes="CardTitle"/>
+
+                <TextBlock Text="{DynamicResource Str_NumrodeTlphone_3b7b}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding SelectedWallet.Phone, Mode=TwoWay}" IsEnabled="{Binding IsNewWallet}"/>
+
+                <TextBlock Text="{DynamicResource Str_NomduClient_b154}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding SelectedWallet.CustomerName, Mode=TwoWay}"/>
+
+                <TextBlock Text="{DynamicResource Str_EmailOptionnel_18ea}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding SelectedWallet.Email, Mode=TwoWay}"/>
+
+                <TextBlock Text="{DynamicResource Str_MontantRecharge_a8d5}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding RechargeAmount, Mode=TwoWay}"/>
+
+                <UniformGrid Columns="2" Margin="0,12,0,0">
+                    <Button Classes="Outlined" Content="{DynamicResource Str_ANNULER_1ce3}" Margin="0,0,6,0" Command="{Binding CancelCommand}"/>
+                    <Button Classes="Success" Content="{DynamicResource Str_VALIDER_aedd}" Margin="6,0,0,0" Command="{Binding SaveCommand}"/>
+                </UniformGrid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

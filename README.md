@@ -55,13 +55,27 @@ Grâce à SQLite, l'installation est d'une simplicité déconcertante. Aucun ser
 *   [SDK .NET 8.0](https://dotnet.microsoft.com/download/dotnet/8.0) ou Visual Studio 2022.
 
 ### Compilation et Lancement
+
+#### Version Multiplateforme — macOS, Windows et Linux (Avalonia UI)
+1. Assurez-vous d'avoir le **SDK .NET 8.0** installé (`dotnet --version`).
+2. Compilez et lancez l'application directement :
+   ```bash
+   dotnet build CamaroesPOS_Avalonia.sln
+   dotnet run --project CamaroesPOS.UI.Avalonia
+   ```
+3. Pour exécuter la suite de tests automatisés :
+   ```bash
+   dotnet test CamaroesPOS_Avalonia.sln
+   ```
+
+#### Version Windows Classique (WPF)
 1. Clonez ce dépôt :
    ```bash
    git clone https://github.com/felix-ngan/CAMAROESPOS.git
    ```
 2. Placez-vous dans le répertoire du projet :
    ```bash
-   cd "CAMAROESPOS - ASP/CamaroesPOS.UI"
+   cd CamaroesPOS.UI
    ```
 3. Compilez et exécutez le projet :
    ```bash

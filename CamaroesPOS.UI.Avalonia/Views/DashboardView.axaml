@@ -1,0 +1,241 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+             x:Class="CamaroesPOS.UI.Avalonia.Views.DashboardView">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="18" Margin="0,0,8,20">
+            <!-- Header + Refresh + Critical Stock Alert Badge -->
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBlock Grid.Column="0" Text="{DynamicResource Str_Tableaudebord_4a37}" Classes="PageTitle" VerticalAlignment="Center"/>
+                <Border Grid.Column="1" IsVisible="{Binding HasCriticalStock}" Background="#FFEBEE" BorderBrush="#E53935" BorderThickness="1" CornerRadius="10" Padding="10,6" Margin="0,0,10,0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <materialIcons:MaterialIcon Kind="AlertOutline" Width="16" Height="16" Foreground="#E53935"/>
+                        <TextBlock Text="{Binding LowStockItems, StringFormat='{}{0} stock(s) critique(s)'}" FontSize="12" FontWeight="Bold" Foreground="#E53935"/>
+                    </StackPanel>
+                </Border>
+                <Button Grid.Column="2" Classes="Outlined" Command="{Binding RefreshCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <materialIcons:MaterialIcon Kind="Refresh" Width="16" Height="16"/>
+                        <TextBlock Text="{DynamicResource Str_Rafrachir_baa6}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <!-- KPI Row 1 -->
+            <UniformGrid Columns="4" Rows="1">
+                <Border Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <materialIcons:MaterialIcon Kind="CashMultiple" Width="22" Height="22" Foreground="#1E88E5"/>
+                            <TextBlock Text="{DynamicResource Str_VentesAujourdhu_1f90}" Classes="LabelMuted"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding TodaySales, StringFormat='{}{0:N0} FCFA'}" FontSize="22" FontWeight="Bold" Foreground="#2B3674"/>
+                        <TextBlock Text="{Binding TotalSalesAllTime, StringFormat='Total : {0:N0} FCFA'}" FontSize="12" Foreground="#8F9BBA"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <materialIcons:MaterialIcon Kind="TrendingUp" Width="22" Height="22" Foreground="#2E7D32"/>
+                            <TextBlock Text="{DynamicResource Str_BnficeNet_91ee}" Classes="LabelMuted"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding NetProfit, StringFormat='{}{0:N0} FCFA'}" FontSize="22" FontWeight="Bold" Foreground="#2E7D32"/>
+                        <TextBlock Text="{Binding TotalExpensesDashboard, StringFormat='Dépenses : {0:N0} FCFA'}" FontSize="12" Foreground="#8F9BBA"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <materialIcons:MaterialIcon Kind="PackageVariantClosed" Width="22" Height="22" Foreground="#7E57C2"/>
+                            <TextBlock Text="{DynamicResource Str_VolumeduStock_ddd4}" Classes="LabelMuted"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding TotalStockQuantity, StringFormat='{}{0:N0} unités'}" FontSize="22" FontWeight="Bold" Foreground="#2B3674"/>
+                        <TextBlock Text="{Binding TotalProducts, StringFormat='{}{0} références'}" FontSize="12" Foreground="#8F9BBA"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Classes="Card">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <materialIcons:MaterialIcon Kind="AlertOutline" Width="22" Height="22" Foreground="#E53935"/>
+                            <TextBlock Text="{DynamicResource Str_AlertesdeStockC_c36f}" Classes="LabelMuted"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding LowStockItems}" FontSize="22" FontWeight="Bold" Foreground="#E53935"/>
+                        <TextBlock Text="{Binding TotalCustomers, StringFormat='Clients CRM : {0}'}" FontSize="12" Foreground="#8F9BBA"/>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <!-- KPI Row 2 -->
+            <UniformGrid Columns="4" Rows="1">
+                <Border Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource Str_ArticlesVendus_a9a2}" Classes="LabelMuted"/>
+                        <TextBlock Text="{Binding TotalItemsSoldToday, StringFormat='{}{0:N0} auj.'}" FontSize="20" FontWeight="Bold" Foreground="#2B3674"/>
+                        <TextBlock Text="{Binding TotalItemsSoldAllTime, StringFormat='Cumul : {0:N0}'}" FontSize="12" Foreground="#8F9BBA"/>
+                    </StackPanel>
+                </Border>
+                <Border Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource Str_ClientsFidlit_744c}" Classes="LabelMuted"/>
+                        <TextBlock Text="{Binding TotalWalletsBalance, StringFormat='{}{0:N0} FCFA'}" FontSize="20" FontWeight="Bold" Foreground="#00897B"/>
+                        <TextBlock Text="{Binding TotalLoyaltyPoints, StringFormat='Points : {0:N0}'}" FontSize="12" Foreground="#8F9BBA"/>
+                    </StackPanel>
+                </Border>
+                <Border Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource Str_RductionsAccord_e6e2}" Classes="LabelMuted"/>
+                        <TextBlock Text="{Binding TotalDiscountAmount, StringFormat='{}{0:N0} FCFA'}" FontSize="20" FontWeight="Bold" Foreground="#FB8C00"/>
+                        <TextBlock Text="{Binding TotalCancelledAmount, StringFormat='Annulations : {0:N0} FCFA'}" FontSize="12" Foreground="#8F9BBA"/>
+                    </StackPanel>
+                </Border>
+                <Border Classes="Card">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource Str_UtilisateursSys_b30e}" Classes="LabelMuted"/>
+                        <TextBlock Text="{Binding TotalUsers}" FontSize="20" FontWeight="Bold" Foreground="#2B3674"/>
+                        <TextBlock FontSize="12" Foreground="#8F9BBA">
+                            <Run Text="Admin : "/>
+                            <Run Text="{Binding AdminCount}"/>
+                            <Run Text=" | Caissiers : "/>
+                            <Run Text="{Binding CashierCount}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <!-- Charts Row 1 -->
+            <Grid ColumnDefinitions="2*,*">
+                <Border Grid.Column="0" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_volutionChiffre_805f}" Classes="CardTitle"/>
+                        <lvc:CartesianChart Series="{Binding SalesChart}" XAxes="{Binding DaysXAxes}" Height="250"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="Card">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_RpartitiondesMo_99c1}" Classes="CardTitle"/>
+                        <lvc:PieChart Series="{Binding PaymentModesChart}" Height="250"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Charts Row 2 -->
+            <Grid ColumnDefinitions="*,*">
+                <Border Grid.Column="0" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_MouvementsdeSto_a312}" Classes="CardTitle"/>
+                        <lvc:CartesianChart Series="{Binding StockMovementsChart}" XAxes="{Binding DaysXAxes}" Height="230"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="Card">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_RentabilitampBn_aba1}" Classes="CardTitle"/>
+                        <lvc:CartesianChart Series="{Binding ProfitChart}" XAxes="{Binding ProfitXAxes}" Height="230"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Charts Row 3 -->
+            <Grid ColumnDefinitions="*,*,*">
+                <Border Grid.Column="0" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_Top5ArticlesenS_221d}" Classes="CardTitle"/>
+                        <lvc:CartesianChart Series="{Binding TotalProductsChart}" XAxes="{Binding ProductsXAxes}" Height="210"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_Top5MeilleursCl_45b6}" Classes="CardTitle"/>
+                        <lvc:CartesianChart Series="{Binding WalletsChart}" YAxes="{Binding WalletsYAxes}" Height="210"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Classes="Card">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_RpartitionVente_11e5}" Classes="CardTitle"/>
+                        <lvc:PieChart Series="{Binding TodaySalesChart}" Height="210"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Charts Row 4 (Remaining 5 Charts for full 12-chart parity) -->
+            <Grid ColumnDefinitions="*,*,*">
+                <Border Grid.Column="0" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_Top5ArticlesVen_4eda}" Classes="CardTitle"/>
+                        <lvc:CartesianChart Series="{Binding ItemsSoldTodayChart}" XAxes="{Binding ItemsSoldXAxes}" Height="210"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_AnnulationsRcen_0058}" Classes="CardTitle"/>
+                        <lvc:CartesianChart Series="{Binding CancelledChart}" XAxes="{Binding DaysXAxes}" Height="210"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Classes="Card">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_volutiondesRduc_6291}" Classes="CardTitle"/>
+                        <lvc:CartesianChart Series="{Binding DiscountChart}" XAxes="{Binding DaysXAxes}" Height="210"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Charts Row 5 -->
+            <Grid ColumnDefinitions="*,*,*">
+                <Border Grid.Column="0" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_RpartitiondesRl_778e}" Classes="CardTitle"/>
+                        <lvc:PieChart Series="{Binding UsersChart}" Height="210"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_TopFournisseurs_7ca3}" Classes="CardTitle"/>
+                        <lvc:PieChart Series="{Binding VendorsChart}" Height="210"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Classes="Card">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_RupturedeStock_0306}" Classes="CardTitle"/>
+                        <lvc:PieChart Series="{Binding LowStockChart}" Height="210"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Critical Stock + Users Table -->
+            <Grid ColumnDefinitions="*,*">
+                <Border Grid.Column="0" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_AlertesdeStockC_c36f}" Classes="CardTitle"/>
+                        <DataGrid ItemsSource="{Binding CriticalStockList}" AutoGenerateColumns="False" IsReadOnly="True" Height="200" GridLinesVisibility="Horizontal">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{DynamicResource Str_Code_ca0d}" Binding="{Binding ProductCode}" Width="90"/>
+                                <DataGridTextColumn Header="{DynamicResource Str_Produit_e30e}" Binding="{Binding Description}" Width="*"/>
+                                <DataGridTextColumn Header="{DynamicResource Str_Stock_27ce}" Binding="{Binding Qty}" Width="75"/>
+                                <DataGridTextColumn Header="{DynamicResource Str_Seuil_3e8e}" Binding="{Binding Reorder}" Width="75"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="Card">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*,200">
+                            <TextBlock Grid.Column="0" Text="{DynamicResource Str_ListedesUtilisa_a168}" Classes="CardTitle" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="1" Text="{Binding SearchText, Mode=TwoWay}" Watermark="{DynamicResource Str_Rechercherunuti_d5c1}"/>
+                        </Grid>
+                        <DataGrid ItemsSource="{Binding UsersList}" AutoGenerateColumns="False" IsReadOnly="True" Height="200" GridLinesVisibility="Horizontal">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{DynamicResource Str_Identifiant_c943}" Binding="{Binding Username}" Width="*"/>
+                                <DataGridTextColumn Header="{DynamicResource Str_Nom_d470}" Binding="{Binding Name}" Width="*"/>
+                                <DataGridTextColumn Header="{DynamicResource Str_Rle_1977}" Binding="{Binding Role}" Width="90"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
