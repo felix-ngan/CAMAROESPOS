@@ -16,6 +16,8 @@ public partial class MainWindow : Window
     private readonly DashboardView _dashboardView;
     private readonly POSView _posView;
     private readonly InventoryView _inventoryView;
+    private readonly WalletView _walletView;
+    private readonly VendorView _vendorView;
 
     public MainWindow()
     {
@@ -23,6 +25,8 @@ public partial class MainWindow : Window
         _dashboardView = new DashboardView();
         _posView = new POSView();
         _inventoryView = new InventoryView();
+        _walletView = new WalletView();
+        _vendorView = new VendorView();
 
         if (!string.IsNullOrEmpty(SessionService.CurrentUserName))
         {
@@ -104,14 +108,16 @@ public partial class MainWindow : Window
     {
         SetActiveNav(BtnWallet);
         TxtHeader.Text = "Gestion des Clients (CRM)";
-        MainContentControl.Content = MakePlaceholder("Clients CRM");
+        if (_walletView.DataContext is ViewModels.WalletViewModel vm) vm.LoadDataFromDatabase();
+        MainContentControl.Content = _walletView;
     }
 
     private void BtnVendors_Click(object? sender, RoutedEventArgs? e)
     {
         SetActiveNav(BtnVendors);
         TxtHeader.Text = "Gestion des Fournisseurs";
-        MainContentControl.Content = MakePlaceholder("Fournisseurs");
+        if (_vendorView.DataContext is ViewModels.VendorViewModel vm) vm.LoadVendors();
+        MainContentControl.Content = _vendorView;
     }
 
     private void BtnReports_Click(object? sender, RoutedEventArgs? e)
