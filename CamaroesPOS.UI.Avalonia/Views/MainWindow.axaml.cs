@@ -18,6 +18,8 @@ public partial class MainWindow : Window
     private readonly InventoryView _inventoryView;
     private readonly WalletView _walletView;
     private readonly VendorView _vendorView;
+    private readonly ReportsView _reportsView;
+    private readonly ExpenseView _expenseView;
 
     public MainWindow()
     {
@@ -27,6 +29,8 @@ public partial class MainWindow : Window
         _inventoryView = new InventoryView();
         _walletView = new WalletView();
         _vendorView = new VendorView();
+        _reportsView = new ReportsView();
+        _expenseView = new ExpenseView();
 
         if (!string.IsNullOrEmpty(SessionService.CurrentUserName))
         {
@@ -124,14 +128,16 @@ public partial class MainWindow : Window
     {
         SetActiveNav(BtnReports);
         TxtHeader.Text = "Rapports & Ventes";
-        MainContentControl.Content = MakePlaceholder("Rapports & Ventes");
+        if (_reportsView.DataContext is ViewModels.ReportsViewModel vm) vm.LoadTransactions();
+        MainContentControl.Content = _reportsView;
     }
 
     private void BtnExpenses_Click(object? sender, RoutedEventArgs? e)
     {
         SetActiveNav(BtnExpenses);
         TxtHeader.Text = "Dépenses & Charges";
-        MainContentControl.Content = MakePlaceholder("Dépenses & Charges");
+        if (_expenseView.DataContext is ViewModels.ExpenseViewModel vm) vm.LoadExpenses();
+        MainContentControl.Content = _expenseView;
     }
 
     private void BtnSettings_Click(object? sender, RoutedEventArgs? e)

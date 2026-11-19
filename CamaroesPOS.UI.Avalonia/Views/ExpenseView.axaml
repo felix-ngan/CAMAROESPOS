@@ -1,0 +1,71 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="CamaroesPOS.UI.Avalonia.Views.ExpenseView"
+             x:Name="ExpenseRoot">
+    <Grid ColumnDefinitions="*,Auto">
+        <Border Grid.Column="0" Classes="Card">
+            <Grid RowDefinitions="Auto,Auto,*">
+                <WrapPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                    <CalendarDatePicker SelectedDate="{Binding StartDate, Mode=TwoWay}" Watermark="{DynamicResource Str_Datededbut_b9af}" Width="150" Margin="0,0,8,4"/>
+                    <CalendarDatePicker SelectedDate="{Binding EndDate, Mode=TwoWay}" Watermark="{DynamicResource Str_Datedefin_806e}" Width="150" Margin="0,0,8,4"/>
+                    <Button Classes="Primary" Content="{DynamicResource Str_FILTRER_d94c}" Command="{Binding FilterCommand}" Margin="0,0,8,4"/>
+                    <Button Classes="Outlined" Content="{DynamicResource Str_RINITIALISER_6f47}" Command="{Binding ResetFilterCommand}" Margin="0,0,8,4"/>
+                    <Button Classes="Success" Content="{DynamicResource Str_NOUVELLEDPENSE_6ea0}" Command="{Binding CreateCommand}" IsVisible="{Binding IsAdmin}" Margin="0,0,0,4"/>
+                </WrapPanel>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
+                    <TextBlock Text="{DynamicResource Str_TotalDpenses_bc82}" FontSize="15" FontWeight="SemiBold" Foreground="#2B3674"/>
+                    <TextBlock Text="{Binding TotalExpenses, StringFormat='{}{0:N0} FCFA'}" FontSize="16" FontWeight="Bold" Foreground="#E53935"/>
+                </StackPanel>
+
+                <DataGrid Grid.Row="2" ItemsSource="{Binding Expenses}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{DynamicResource Str_Date_4474}" Binding="{Binding Date, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="140"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Catgorie_8c6b}" Binding="{Binding Category}" Width="130"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Description_b5a7}" Binding="{Binding Description}" Width="*"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Montant_4dd4}" Binding="{Binding Amount, StringFormat='{}{0:N0} FCFA'}" Width="120"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Ajoutpar_cd9c}" Binding="{Binding AddedBy}" Width="110"/>
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Actions_06df}" Width="110">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                        <Button Classes="Outlined" Padding="6,4" Command="{Binding #ExpenseRoot.DataContext.EditCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="PencilOutline" Width="15" Height="15"/>
+                                        </Button>
+                                        <Button Classes="DangerOutlined" Padding="6,4" Command="{Binding #ExpenseRoot.DataContext.DeleteCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="TrashCanOutline" Width="15" Height="15"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="1" Classes="Card" Width="340" Margin="14,0,0,0" IsVisible="{Binding IsEditing}">
+            <StackPanel Spacing="12">
+                <TextBlock Text="{DynamicResource Str_DtailsdelaDpens_6c0d}" Classes="CardTitle"/>
+
+                <TextBlock Text="{DynamicResource Str_Datedeladpense_ae5c}" Classes="LabelMuted"/>
+                <CalendarDatePicker SelectedDate="{Binding SelectedExpense.Date, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+
+                <TextBlock Text="{DynamicResource Str_Catgorie_8c6b}" Classes="LabelMuted"/>
+                <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedExpense.Category, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+
+                <TextBlock Text="{DynamicResource Str_Description_b5a7}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding SelectedExpense.Description, Mode=TwoWay}" AcceptsReturn="True" Height="70"/>
+
+                <TextBlock Text="{DynamicResource Str_Montant_4dd4}" Classes="LabelMuted"/>
+                <TextBox Text="{Binding SelectedExpense.Amount, Mode=TwoWay}"/>
+
+                <UniformGrid Columns="2" Margin="0,10,0,0">
+                    <Button Classes="Outlined" Content="{DynamicResource Str_ANNULER_1ce3}" Margin="0,0,6,0" Command="{Binding CancelCommand}"/>
+                    <Button Classes="Primary" Content="{DynamicResource Str_ENREGISTRER_6d15}" Margin="6,0,0,0" Command="{Binding SaveCommand}"/>
+                </UniformGrid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

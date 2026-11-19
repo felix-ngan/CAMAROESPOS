@@ -1,0 +1,101 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="CamaroesPOS.UI.Avalonia.Views.ReportsView"
+             x:Name="ReportsRoot">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <!-- Filters -->
+        <Border Grid.Row="0" Classes="Card" Margin="0,0,0,14">
+            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <CalendarDatePicker SelectedDate="{Binding StartDate, Mode=TwoWay}" Watermark="{DynamicResource Str_Datededbut_b9af}" Width="160" Margin="0,0,10,4"/>
+                <CalendarDatePicker SelectedDate="{Binding EndDate, Mode=TwoWay}" Watermark="{DynamicResource Str_Datedefin_806e}" Width="160" Margin="0,0,10,4"/>
+                <TextBox Text="{Binding SearchText, Mode=TwoWay}" Watermark="{DynamicResource Str_Rechercheglobal_1043}" Width="220" Margin="0,0,10,4"/>
+                <Button Classes="Primary" Content="{DynamicResource Str_FILTRER_d94c}" Command="{Binding FilterCommand}" Margin="0,0,8,4"/>
+                <Button Classes="Outlined" Content="{DynamicResource Str_RINITIALISER_6f47}" Command="{Binding ResetFilterCommand}" Margin="0,0,8,4"/>
+                <Button Classes="Success" Content="{DynamicResource Str_EXPORTERPDF_8383}" Command="{Binding ExportPdfCommand}" Margin="0,0,0,4"/>
+            </WrapPanel>
+        </Border>
+
+        <!-- Summary KPIs -->
+        <UniformGrid Grid.Row="1" Columns="2" Margin="0,0,0,14">
+            <Border Classes="Card" Margin="0,0,8,0">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="{DynamicResource Str_ChiffredAffaire_90ea}" Classes="LabelMuted"/>
+                    <TextBlock Text="{Binding TotalSalesAmount, StringFormat='{}{0:N0} FCFA'}" FontSize="22" FontWeight="Bold" Foreground="#1E88E5"/>
+                </StackPanel>
+            </Border>
+            <Border Classes="Card" Margin="8,0,0,0">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="{DynamicResource Str_ArticlesVendus_a9a2}" Classes="LabelMuted"/>
+                    <TextBlock Text="{Binding TotalItemsSold}" FontSize="22" FontWeight="Bold" Foreground="#2B3674"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Tabs -->
+        <Border Grid.Row="2" Classes="Card" Padding="12">
+            <TabControl>
+                <TabItem Header="{DynamicResource Str_RapportdesVente_f50d}">
+                    <DataGrid ItemsSource="{Binding Transactions}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal" Margin="0,8,0,0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Str_DateampHeure_f673}" Binding="{Binding SoldDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="140"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_NTrans_5ce4}" Binding="{Binding TransNo}" Width="130"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Produit_e30e}" Binding="{Binding Description}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Qt_493a}" Binding="{Binding Qty}" Width="60"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Total_96b0}" Binding="{Binding Total, StringFormat='{}{0:N0}'}" Width="100"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Caissier_4c93}" Binding="{Binding Cashier}" Width="110"/>
+                            <DataGridTemplateColumn Header="{DynamicResource Str_Action_004b}" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Classes="DangerOutlined" Padding="6,4" HorizontalAlignment="Center"
+                                                Command="{Binding #ReportsRoot.DataContext.CancelTransactionCommand}" CommandParameter="{Binding}">
+                                            <materialIcons:MaterialIcon Kind="Cancel" Width="15" Height="15"/>
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+
+                <TabItem Header="{DynamicResource Str_HistoriquedesSt_6c30}">
+                    <DataGrid ItemsSource="{Binding StockHistoryList}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal" Margin="0,8,0,0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Str_DateAjout_d98d}" Binding="{Binding StockInDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="140"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Rf_2a02}" Binding="{Binding RefNo}" Width="130"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Produit_e30e}" Binding="{Binding Description}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_QtAjoute_c10f}" Binding="{Binding Qty}" Width="80"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_AjoutPar_39b8}" Binding="{Binding StockInBy}" Width="110"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Raison_7f06}" Binding="{Binding Status}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+
+                <TabItem Header="{DynamicResource Str_OrdresAnnuls_9bcd}">
+                    <DataGrid ItemsSource="{Binding CancelledOrdersList}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal" Margin="0,8,0,0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Str_DateVente_bce3}" Binding="{Binding SoldDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="140"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_NTrans_5ce4}" Binding="{Binding TransNo}" Width="130"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Produit_e30e}" Binding="{Binding Description}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Total_96b0}" Binding="{Binding Total, StringFormat='{}{0:N0}'}" Width="100"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_AnnulPar_2760}" Binding="{Binding CancelledBy}" Width="110"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Raison_7f06}" Binding="{Binding Reason}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+
+                <TabItem Header="{DynamicResource Str_OprationsPortef_45a1}">
+                    <DataGrid ItemsSource="{Binding WalletTransactionsList}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal" Margin="0,8,0,0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Str_Date_4474}" Binding="{Binding CreatedAt, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="150"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_NTransaction_aaf6}" Binding="{Binding TransNo}" Width="140"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Tlphone_301d}" Binding="{Binding Phone}" Width="130"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Type_a1fa}" Binding="{Binding Type}" Width="90"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Montant_4dd4}" Binding="{Binding Amount, StringFormat='{}{0:N0} FCFA'}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+            </TabControl>
+        </Border>
+    </Grid>
+</UserControl>
