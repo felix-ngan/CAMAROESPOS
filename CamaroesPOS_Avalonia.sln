@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CamaroesPOS.Data", "Camaroe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CamaroesPOS.UI.Avalonia", "CamaroesPOS.UI.Avalonia\CamaroesPOS.UI.Avalonia.csproj", "{AF016496-E840-4B6E-83A1-7F7E1B8DD26D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CamaroesPOS.Tests", "CamaroesPOS.Tests\CamaroesPOS.Tests.csproj", "{8CFD63BD-443C-4915-995E-5DE5D304D479}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{AF016496-E840-4B6E-83A1-7F7E1B8DD26D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF016496-E840-4B6E-83A1-7F7E1B8DD26D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF016496-E840-4B6E-83A1-7F7E1B8DD26D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CFD63BD-443C-4915-995E-5DE5D304D479}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CFD63BD-443C-4915-995E-5DE5D304D479}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CFD63BD-443C-4915-995E-5DE5D304D479}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CFD63BD-443C-4915-995E-5DE5D304D479}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

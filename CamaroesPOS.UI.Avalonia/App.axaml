@@ -1,11 +1,22 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:conv="clr-namespace:CamaroesPOS.UI.Avalonia.Converters"
              x:Class="CamaroesPOS.UI.Avalonia.App"
              RequestedThemeVariant="Light">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://CamaroesPOS.UI.Avalonia/Resources/Langs/Strings.fr.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <conv:BoolToInverseConverter x:Key="BoolToInverseConverter" />
+            <conv:IntGreaterThanZeroConverter x:Key="IntGreaterThanZeroConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <materialIcons:MaterialIconStyles />
+        <StyleInclude Source="avares://CamaroesPOS.UI.Avalonia/Styles/MaterialStyles.axaml" />
     </Application.Styles>
 </Application>
