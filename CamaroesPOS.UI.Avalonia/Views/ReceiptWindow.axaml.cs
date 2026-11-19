@@ -42,11 +42,20 @@ public partial class ReceiptWindow : Window
         ItemsList.ItemsSource = items;
 
         double subTotal = total + discount;
+        bool hasDiscount = discount > 0;
+        LblSubTotal.IsVisible = hasDiscount;
+        TxtSubTotal.IsVisible = hasDiscount;
         TxtSubTotal.Text = $"{subTotal:N0} FCFA";
-        LblDiscount.IsVisible = discount > 0;
-        TxtDiscount.IsVisible = discount > 0;
+        LblDiscount.IsVisible = hasDiscount;
+        TxtDiscount.IsVisible = hasDiscount;
         TxtDiscount.Text = $"-{discount:N0} FCFA";
         TxtTotal.Text = $"{total:N0} FCFA";
+
+        bool isCash = string.Equals(paymentMode, "Espèces", StringComparison.OrdinalIgnoreCase);
+        LblReceived.IsVisible = isCash;
+        TxtReceived.IsVisible = isCash;
+        LblChange.IsVisible = isCash;
+        TxtChange.IsVisible = isCash;
         TxtReceived.Text = $"{received:N0} FCFA";
         TxtChange.Text = $"{change:N0} FCFA";
     }

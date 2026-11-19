@@ -148,6 +148,7 @@
     <x:String x:Key="Str_PersonneContact_9111">Personne à Contacter</x:String>
     <x:String x:Key="Str_Points_75dd">Points</x:String>
     <x:String x:Key="Str_PortefeuilleCli_8884">Portefeuille Client</x:String>
+    <x:String x:Key="Str_PrixAchat_av01">Prix d'achat</x:String>
     <x:String x:Key="Str_PrixTotal_8294">Prix Total</x:String>
     <x:String x:Key="Str_PrixVente_5076">Prix Vente</x:String>
     <x:String x:Key="Str_Prix_bc13">Prix</x:String>

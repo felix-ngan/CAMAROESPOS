@@ -40,6 +40,8 @@ public partial class MainWindow : Window
             TxtUsername.Text = $"Connecté : {SessionService.CurrentUserName} ({role})";
         }
 
+        SyncLanguageButton();
+
         if (string.Equals(SessionService.CurrentUserRole, "Cashier", StringComparison.OrdinalIgnoreCase))
         {
             BtnDashboard.IsVisible = false;
@@ -147,6 +149,17 @@ public partial class MainWindow : Window
         }
         loginWin.Show();
         Close();
+    }
+
+    private void SyncLanguageButton()
+    {
+        if (Application.Current == null) return;
+        var current = Application.Current.Resources.MergedDictionaries
+            .OfType<ResourceInclude>()
+            .FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("/Resources/Langs/Strings."));
+
+        bool isEnglish = current?.Source?.OriginalString.EndsWith("Strings.en.axaml", StringComparison.OrdinalIgnoreCase) == true;
+        BtnLangToggle.Content = isEnglish ? "FR" : "EN";
     }
 
     private void BtnLangToggle_Click(object? sender, RoutedEventArgs e)

@@ -262,9 +262,9 @@ public class InventoryViewModel : INotifyPropertyChanged
     {
         if (SelectedProduct == null) return;
 
-        if (AdjustmentQuantity <= 0 && AdjustmentType != "Ajustement (Inventaire)")
+        if (AdjustmentQuantity < 0 || (AdjustmentQuantity == 0 && AdjustmentType != "Ajustement (Inventaire)"))
         {
-            await DialogService.ShowErrorAsync("La quantité doit être supérieure à zéro.", "Erreur");
+            await DialogService.ShowErrorAsync("La quantité doit être valide et non négative.", "Erreur");
             return;
         }
         if (string.IsNullOrWhiteSpace(AdjustmentJustification))

@@ -53,7 +53,15 @@ public class WalletViewModel : INotifyPropertyChanged
     private void OpenRechargeForm(CustomerWallet? wallet)
     {
         if (wallet == null) return;
-        SelectedWallet = wallet;
+        SelectedWallet = new CustomerWallet
+        {
+            Phone = wallet.Phone,
+            CustomerName = wallet.CustomerName,
+            Email = wallet.Email,
+            Balance = wallet.Balance,
+            LoyaltyPoints = wallet.LoyaltyPoints,
+            TotalSpent = wallet.TotalSpent
+        };
         RechargeAmount = 0;
         IsNewWallet = false;
         IsRecharging = true;

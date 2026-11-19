@@ -84,7 +84,7 @@
                             <TextBox Text="{Binding SelectedProduct.Price, Mode=TwoWay}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Margin="6,0,0,0" Spacing="4">
-                            <TextBlock Text="Prix d'achat" Classes="LabelMuted"/>
+                            <TextBlock Text="{DynamicResource Str_PrixAchat_av01}" Classes="LabelMuted"/>
                             <TextBox Text="{Binding SelectedProduct.CostPrice, Mode=TwoWay}"/>
                         </StackPanel>
                     </Grid>

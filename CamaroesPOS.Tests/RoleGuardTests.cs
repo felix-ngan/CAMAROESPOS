@@ -5,6 +5,7 @@ using Xunit;
 
 namespace CamaroesPOS.Tests;
 
+[Collection("SharedState")]
 public class RoleGuardTests
 {
     [Fact]

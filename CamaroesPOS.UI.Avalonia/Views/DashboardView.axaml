@@ -224,7 +224,7 @@
                     <StackPanel Spacing="10">
                         <Grid ColumnDefinitions="*,200">
                             <TextBlock Grid.Column="0" Text="{DynamicResource Str_ListedesUtilisa_a168}" Classes="CardTitle" VerticalAlignment="Center"/>
-                            <TextBox Grid.Column="1" Text="{Binding SearchText, Mode=TwoWay}" Watermark="Rechercher un utilisateur..."/>
+                            <TextBox Grid.Column="1" Text="{Binding SearchText, Mode=TwoWay}" Watermark="{DynamicResource Str_Rechercherunuti_d5c1}"/>
                         </Grid>
                         <DataGrid ItemsSource="{Binding UsersList}" AutoGenerateColumns="False" IsReadOnly="True" Height="200" GridLinesVisibility="Horizontal">
                             <DataGrid.Columns>

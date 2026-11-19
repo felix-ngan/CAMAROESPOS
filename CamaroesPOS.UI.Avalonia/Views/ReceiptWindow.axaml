@@ -51,7 +51,7 @@
                     <Border Height="1" Background="#E0E5F2" Margin="0,8"/>
 
                     <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource Str_Soustotal_f804}" FontSize="13" Foreground="#4A5568" Margin="0,2"/>
+                        <TextBlock x:Name="LblSubTotal" Grid.Row="0" Grid.Column="0" Text="{DynamicResource Str_Soustotal_f804}" FontSize="13" Foreground="#4A5568" Margin="0,2"/>
                         <TextBlock x:Name="TxtSubTotal" Grid.Row="0" Grid.Column="1" FontSize="13" HorizontalAlignment="Right" Margin="0,2"/>
 
                         <TextBlock x:Name="LblDiscount" Grid.Row="1" Grid.Column="0" Text="{DynamicResource Str_Rduction_1fbd}" FontSize="13" Foreground="#FB8C00" Margin="0,2"/>
@@ -60,10 +60,10 @@
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource Str_TOTALPAYER_6722}" FontSize="15" FontWeight="Bold" Foreground="#2B3674" Margin="0,6,0,4"/>
                         <TextBlock x:Name="TxtTotal" Grid.Row="2" Grid.Column="1" FontSize="15" FontWeight="Bold" Foreground="#1E88E5" HorizontalAlignment="Right" Margin="0,6,0,4"/>
 
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{DynamicResource Str_MontantReu_2e3b}" FontSize="13" Foreground="#4A5568" Margin="0,2"/>
+                        <TextBlock x:Name="LblReceived" Grid.Row="3" Grid.Column="0" Text="{DynamicResource Str_MontantReu_2e3b}" FontSize="13" Foreground="#4A5568" Margin="0,2"/>
                         <TextBlock x:Name="TxtReceived" Grid.Row="3" Grid.Column="1" FontSize="13" HorizontalAlignment="Right" Margin="0,2"/>
 
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="{DynamicResource Str_MonnaieRendue_8852}" FontSize="13" Foreground="#2E7D32" FontWeight="SemiBold" Margin="0,2"/>
+                        <TextBlock x:Name="LblChange" Grid.Row="4" Grid.Column="0" Text="{DynamicResource Str_MonnaieRendue_8852}" FontSize="13" Foreground="#2E7D32" FontWeight="SemiBold" Margin="0,2"/>
                         <TextBlock x:Name="TxtChange" Grid.Row="4" Grid.Column="1" FontSize="13" Foreground="#2E7D32" FontWeight="SemiBold" HorizontalAlignment="Right" Margin="0,2"/>
                     </Grid>
 

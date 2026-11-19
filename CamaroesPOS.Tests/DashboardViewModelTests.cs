@@ -6,6 +6,7 @@ using Xunit;
 
 namespace CamaroesPOS.Tests;
 
+[Collection("SharedState")]
 public class DashboardViewModelTests
 {
     [Fact]
