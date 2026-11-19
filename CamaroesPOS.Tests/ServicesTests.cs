@@ -70,4 +70,34 @@ public class ServicesTests
             if (File.Exists(tempPath)) File.Delete(tempPath);
         }
     }
+
+    [Fact]
+    public void PdfServiceGeneratesNonEmptySalesReportPdf()
+    {
+        QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+        var pdfService = new PdfService();
+        var tempPath = Path.Combine(Path.GetTempPath(), $"camaroes_report_{Guid.NewGuid():N}.pdf");
+
+        try
+        {
+            var sold = new List<SoldItem>
+            {
+                new() { TransNo = "T001", ProductCode = "P001", Description = "Laptop Gamer", Qty = 1, Price = 1500000, Total = 1500000, SoldDate = DateTime.Now, Cashier = "Admin", PaymentMode = "Espèces" }
+            };
+
+            pdfService.GenerateSalesReportPdf(DateTime.Today.AddDays(-7), DateTime.Today, 1500000, 0, 1, sold, tempPath);
+
+            Assert.True(File.Exists(tempPath));
+            var bytes = File.ReadAllBytes(tempPath);
+            Assert.True(bytes.Length > 100);
+            Assert.Equal((byte)'%', bytes[0]);
+            Assert.Equal((byte)'P', bytes[1]);
+            Assert.Equal((byte)'D', bytes[2]);
+            Assert.Equal((byte)'F', bytes[3]);
+        }
+        finally
+        {
+            if (File.Exists(tempPath)) File.Delete(tempPath);
+        }
+    }
 }

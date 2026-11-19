@@ -46,6 +46,7 @@ public class ExpenseViewModel : INotifyPropertyChanged
     {
         CreateCommand = new RelayCommand<object?>(_ =>
         {
+            if (!IsAdmin) return;
             SelectedExpense = new Expense { Date = DateTime.Now, Category = "Autre", Description = string.Empty, AddedBy = SessionService.CurrentUserName ?? "Admin" };
             IsEditing = true;
             IsNewExpense = true;
@@ -53,7 +54,7 @@ public class ExpenseViewModel : INotifyPropertyChanged
 
         EditCommand = new RelayCommand<Expense>(e =>
         {
-            if (e == null) return;
+            if (!IsAdmin || e == null) return;
             SelectedExpense = new Expense
             {
                 Id = e.Id,

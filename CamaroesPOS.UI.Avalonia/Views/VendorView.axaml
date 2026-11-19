@@ -21,7 +21,8 @@
                         <DataGridTemplateColumn Header="{DynamicResource Str_Actions_06df}" Width="110">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center"
+                                                IsVisible="{Binding #VendorRoot.DataContext.IsAdmin}">
                                         <Button Classes="Outlined" Padding="6,4" Command="{Binding #VendorRoot.DataContext.EditVendorCommand}" CommandParameter="{Binding}">
                                             <materialIcons:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
                                         </Button>

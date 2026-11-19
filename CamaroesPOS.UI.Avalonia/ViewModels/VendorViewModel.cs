@@ -41,6 +41,7 @@ public class VendorViewModel : INotifyPropertyChanged
     {
         CreateVendorCommand = new RelayCommand<object?>(_ =>
         {
+            if (!IsAdmin) return;
             SelectedVendor = new Vendor { VendorName = string.Empty, ContactPerson = string.Empty, Phone = string.Empty, Email = string.Empty, Address = string.Empty };
             IsEditing = true;
             IsNewVendor = true;
@@ -48,7 +49,7 @@ public class VendorViewModel : INotifyPropertyChanged
 
         EditVendorCommand = new RelayCommand<Vendor>(v =>
         {
-            if (v == null) return;
+            if (!IsAdmin || v == null) return;
             SelectedVendor = new Vendor
             {
                 Id = v.Id,

@@ -20,12 +20,14 @@
                         <DataGridTextColumn Header="{DynamicResource Str_Description_b5a7}" Binding="{Binding Description}" Width="*"/>
                         <DataGridTextColumn Header="{DynamicResource Str_Marque_a3e2}" Binding="{Binding BrandName}" Width="100"/>
                         <DataGridTextColumn Header="{DynamicResource Str_Catgorie_8c6b}" Binding="{Binding CategoryName}" Width="110"/>
+                        <DataGridTextColumn Header="{DynamicResource Str_Fournisseur_73d1}" Binding="{Binding VendorName}" Width="110"/>
                         <DataGridTextColumn Header="{DynamicResource Str_PrixVente_5076}" Binding="{Binding Price, StringFormat='{}{0:N0}'}" Width="100"/>
                         <DataGridTextColumn Header="{DynamicResource Str_Stock_27ce}" Binding="{Binding Qty}" Width="70"/>
                         <DataGridTemplateColumn Header="{DynamicResource Str_Actions_06df}" Width="145">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center"
+                                                IsVisible="{Binding #InvRoot.DataContext.IsAdmin}">
                                         <Button Classes="Outlined" Padding="6,4" ToolTip.Tip="Ajuster le stock"
                                                 Command="{Binding #InvRoot.DataContext.AdjustStockCommand}" CommandParameter="{Binding}">
                                             <materialIcons:MaterialIcon Kind="SwapVertical" Width="15" Height="15"/>
@@ -59,9 +61,23 @@
                     <TextBlock Text="{DynamicResource Str_DescriptiondelA_2b9a}" Classes="LabelMuted"/>
                     <TextBox Text="{Binding SelectedProduct.Description, Mode=TwoWay}"/>
                     <TextBlock Text="{DynamicResource Str_Marque_a3e2}" Classes="LabelMuted"/>
-                    <TextBox Text="{Binding SelectedProduct.BrandName, Mode=TwoWay}"/>
+                    <ComboBox ItemsSource="{Binding Brands}"
+                              DisplayMemberBinding="{Binding BrandName}"
+                              SelectedValueBinding="{Binding BrandName}"
+                              SelectedValue="{Binding SelectedProduct.BrandName, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch"/>
                     <TextBlock Text="{DynamicResource Str_Catgorie_8c6b}" Classes="LabelMuted"/>
-                    <TextBox Text="{Binding SelectedProduct.CategoryName, Mode=TwoWay}"/>
+                    <ComboBox ItemsSource="{Binding Categories}"
+                              DisplayMemberBinding="{Binding CategoryName}"
+                              SelectedValueBinding="{Binding CategoryName}"
+                              SelectedValue="{Binding SelectedProduct.CategoryName, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch"/>
+                    <TextBlock Text="{DynamicResource Str_Fournisseur_73d1}" Classes="LabelMuted"/>
+                    <ComboBox ItemsSource="{Binding Vendors}"
+                              DisplayMemberBinding="{Binding VendorName}"
+                              SelectedValueBinding="{Binding Id}"
+                              SelectedValue="{Binding SelectedProduct.VendorId, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch"/>
                     <Grid ColumnDefinitions="*,*">
                         <StackPanel Grid.Column="0" Margin="0,0,6,0" Spacing="4">
                             <TextBlock Text="{DynamicResource Str_PrixVente_5076}" Classes="LabelMuted"/>

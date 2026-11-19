@@ -5,6 +5,23 @@
              x:Class="CamaroesPOS.UI.Avalonia.Views.DashboardView">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Spacing="18" Margin="0,0,8,20">
+            <!-- Header + Refresh + Critical Stock Alert Badge -->
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBlock Grid.Column="0" Text="{DynamicResource Str_Tableaudebord_4a37}" Classes="PageTitle" VerticalAlignment="Center"/>
+                <Border Grid.Column="1" IsVisible="{Binding HasCriticalStock}" Background="#FFEBEE" BorderBrush="#E53935" BorderThickness="1" CornerRadius="10" Padding="10,6" Margin="0,0,10,0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <materialIcons:MaterialIcon Kind="AlertOutline" Width="16" Height="16" Foreground="#E53935"/>
+                        <TextBlock Text="{Binding LowStockItems, StringFormat='{}{0} stock(s) critique(s)'}" FontSize="12" FontWeight="Bold" Foreground="#E53935"/>
+                    </StackPanel>
+                </Border>
+                <Button Grid.Column="2" Classes="Outlined" Command="{Binding RefreshCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <materialIcons:MaterialIcon Kind="Refresh" Width="16" Height="16"/>
+                        <TextBlock Text="{DynamicResource Str_Rafrachir_baa6}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+
             <!-- KPI Row 1 -->
             <UniformGrid Columns="4" Rows="1">
                 <Border Classes="Card" Margin="0,0,12,0">
@@ -139,6 +156,50 @@
                     <StackPanel Spacing="10">
                         <TextBlock Text="{DynamicResource Str_RpartitionVente_11e5}" Classes="CardTitle"/>
                         <lvc:PieChart Series="{Binding TodaySalesChart}" Height="210"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Charts Row 4 (Remaining 5 Charts for full 12-chart parity) -->
+            <Grid ColumnDefinitions="*,*,*">
+                <Border Grid.Column="0" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_Top5ArticlesVen_4eda}" Classes="CardTitle"/>
+                        <lvc:CartesianChart Series="{Binding ItemsSoldTodayChart}" XAxes="{Binding ItemsSoldXAxes}" Height="210"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_AnnulationsRcen_0058}" Classes="CardTitle"/>
+                        <lvc:CartesianChart Series="{Binding CancelledChart}" XAxes="{Binding DaysXAxes}" Height="210"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Classes="Card">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_volutiondesRduc_6291}" Classes="CardTitle"/>
+                        <lvc:CartesianChart Series="{Binding DiscountChart}" XAxes="{Binding DaysXAxes}" Height="210"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Charts Row 5 -->
+            <Grid ColumnDefinitions="*,*,*">
+                <Border Grid.Column="0" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_RpartitiondesRl_778e}" Classes="CardTitle"/>
+                        <lvc:PieChart Series="{Binding UsersChart}" Height="210"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="Card" Margin="0,0,12,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_TopFournisseurs_7ca3}" Classes="CardTitle"/>
+                        <lvc:PieChart Series="{Binding VendorsChart}" Height="210"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Classes="Card">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{DynamicResource Str_RupturedeStock_0306}" Classes="CardTitle"/>
+                        <lvc:PieChart Series="{Binding LowStockChart}" Height="210"/>
                     </StackPanel>
                 </Border>
             </Grid>

@@ -45,11 +45,31 @@ public class POSViewModel : INotifyPropertyChanged
         get => _discountPercentage;
         set
         {
-            if (value < 0) value = 0;
+            if (double.IsNaN(value) || double.IsInfinity(value) || value < 0) value = 0;
             if (value > 100) value = 100;
             _discountPercentage = value;
             OnPropertyChanged();
             UpdateTotalAmount();
+            RaiseCommandsChanged();
+        }
+    }
+
+    private string _discountPercentageString = string.Empty;
+    public string DiscountPercentageString
+    {
+        get => _discountPercentageString;
+        set
+        {
+            _discountPercentageString = value ?? string.Empty;
+            OnPropertyChanged();
+            if (string.IsNullOrWhiteSpace(_discountPercentageString))
+            {
+                DiscountPercentage = 0;
+            }
+            else if (double.TryParse(_discountPercentageString, out double parsed) && !double.IsNaN(parsed) && !double.IsInfinity(parsed))
+            {
+                DiscountPercentage = parsed;
+            }
         }
     }
 
@@ -129,12 +149,12 @@ public class POSViewModel : INotifyPropertyChanged
     public POSViewModel()
     {
         AddToCartCommand = new RelayCommand<Product>(AddToCart);
-        CheckoutCommand = new RelayCommand<object?>(_ => CheckoutAsync(), _ => Cart.Count > 0);
+        CheckoutCommand = new RelayCommand<object?>(_ => CheckoutAsync(), _ => Cart.Count > 0 && TotalAmount > 0);
         NumpadCommand = new RelayCommand<string>(NumpadPress);
         ClearNumpadCommand = new RelayCommand<object?>(_ => ReceivedAmountString = string.Empty);
         CancelCheckoutCommand = new RelayCommand<object?>(_ => IsCheckoutDialogOpen = false);
         ConfirmCashPaymentCommand = new RelayCommand<object?>(_ => ConfirmCashPaymentAsync(), _ => ReceivedAmount >= TotalAmount && TotalAmount > 0);
-        ExactAmountCommand = new RelayCommand<object?>(_ => ReceivedAmountString = TotalAmount.ToString("0"));
+        ExactAmountCommand = new RelayCommand<object?>(_ => ReceivedAmountString = Math.Ceiling(TotalAmount).ToString("0"));
         QuickCashCommand = new RelayCommand<string>(amount => ReceivedAmountString = amount);
         ClearCartCommand = new RelayCommand<object?>(_ => ClearCart(), _ => Cart.Count > 0);
         RemoveFromCartCommand = new RelayCommand<CartItem>(RemoveFromCart);
@@ -227,7 +247,7 @@ public class POSViewModel : INotifyPropertyChanged
     private void ClearCart()
     {
         Cart.Clear();
-        DiscountPercentage = 0;
+        DiscountPercentageString = string.Empty;
         UpdateTotalAmount();
         RaiseCommandsChanged();
     }
@@ -242,18 +262,20 @@ public class POSViewModel : INotifyPropertyChanged
 
     private async void CheckoutAsync()
     {
-        if (Cart.Count == 0) return;
+        if (Cart.Count == 0 || TotalAmount <= 0) return;
 
         if (IsWalletPayment)
         {
-            using (var context = new PosDbContext())
+            if (string.IsNullOrWhiteSpace(CustomerPhone))
             {
-                if (string.IsNullOrWhiteSpace(CustomerPhone))
-                {
-                    await DialogService.ShowErrorAsync("Veuillez entrer le numéro de téléphone du client pour payer par portefeuille.", "Erreur");
-                    return;
-                }
+                await DialogService.ShowErrorAsync("Veuillez entrer le numéro de téléphone du client pour payer par portefeuille.", "Erreur");
+                return;
+            }
 
+            string transNo = DateTime.Now.ToString("yyyyMMddHHmmss");
+            using (var context = new PosDbContext())
+            using (var tx = context.Database.BeginTransaction())
+            {
                 var wallet = context.CustomerWallets.FirstOrDefault(w => w.Phone == CustomerPhone);
                 if (wallet == null)
                 {
@@ -271,20 +293,22 @@ public class POSViewModel : INotifyPropertyChanged
                 context.WalletTransactions.Add(new WalletTransaction
                 {
                     Phone = wallet.Phone,
-                    TransNo = DateTime.Now.ToString("yyyyMMddHHmmss"),
+                    TransNo = transNo,
                     Type = "Debit",
                     Amount = TotalAmount,
                     CreatedAt = DateTime.Now
                 });
+
+                SaveTransactionItems(context, transNo, "Portefeuille");
                 context.SaveChanges();
+                tx.Commit();
             }
 
-            string transNo = SaveTransaction("Portefeuille");
             double totalDiscountWallet = SubTotalAmount * (DiscountPercentage / 100.0);
             await ShowReceiptDialogAsync(transNo, TotalAmount, TotalAmount, 0, "Portefeuille (Wallet)", totalDiscountWallet);
 
             Cart.Clear();
-            DiscountPercentage = 0;
+            DiscountPercentageString = string.Empty;
             UpdateTotalAmount();
             CustomerPhone = string.Empty;
             LoadDataFromDatabase();
@@ -301,7 +325,13 @@ public class POSViewModel : INotifyPropertyChanged
     {
         string transNo = DateTime.Now.ToString("yyyyMMddHHmmss");
         using var context = new PosDbContext();
+        SaveTransactionItems(context, transNo, paymentMode);
+        context.SaveChanges();
+        return transNo;
+    }
 
+    private void SaveTransactionItems(PosDbContext context, string transNo, string paymentMode)
+    {
         foreach (var item in Cart)
         {
             double itemDiscount = item.Total * (DiscountPercentage / 100.0);
@@ -339,9 +369,6 @@ public class POSViewModel : INotifyPropertyChanged
                 wallet.LoyaltyPoints += (int)(TotalAmount / 1000);
             }
         }
-
-        context.SaveChanges();
-        return transNo;
     }
 
     private void NumpadPress(string? digit)
@@ -375,7 +402,7 @@ public class POSViewModel : INotifyPropertyChanged
 
         IsCheckoutDialogOpen = false;
         Cart.Clear();
-        DiscountPercentage = 0;
+        DiscountPercentageString = string.Empty;
         UpdateTotalAmount();
         ReceivedAmountString = string.Empty;
         CustomerPhone = string.Empty;

@@ -144,8 +144,11 @@ public class DashboardViewModel : INotifyPropertyChanged
     private Axis[] _profitXAxes = Array.Empty<Axis>();
     public Axis[] ProfitXAxes { get => _profitXAxes; set { _profitXAxes = value; OnPropertyChanged(); } }
 
+    public RelayCommand<object?> RefreshCommand { get; }
+
     public DashboardViewModel()
     {
+        RefreshCommand = new RelayCommand<object?>(_ => LoadStats());
         LoadStats();
     }
 

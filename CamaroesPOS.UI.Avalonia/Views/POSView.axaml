@@ -65,7 +65,7 @@
 
                     <StackPanel Spacing="4">
                         <TextBlock Text="{DynamicResource Str_Rduction_b2fc}" Classes="LabelMuted"/>
-                        <TextBox Text="{Binding DiscountPercentage, Mode=TwoWay}" Watermark="0"/>
+                        <TextBox Text="{Binding DiscountPercentageString, Mode=TwoWay}" Watermark="0"/>
                     </StackPanel>
 
                     <Border Background="#EBF3FE" CornerRadius="10" Padding="14">

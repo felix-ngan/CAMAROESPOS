@@ -48,6 +48,7 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Classes="DangerOutlined" Padding="6,4" HorizontalAlignment="Center"
+                                                IsVisible="{Binding #ReportsRoot.DataContext.IsAdmin}"
                                                 Command="{Binding #ReportsRoot.DataContext.CancelTransactionCommand}" CommandParameter="{Binding}">
                                             <materialIcons:MaterialIcon Kind="Cancel" Width="15" Height="15"/>
                                         </Button>
@@ -58,12 +59,27 @@
                     </DataGrid>
                 </TabItem>
 
+                <TabItem Header="{DynamicResource Str_StockActuel_aa7a}">
+                    <DataGrid ItemsSource="{Binding ProductsList}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal" Margin="0,8,0,0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Str_Code_ca0d}" Binding="{Binding ProductCode}" Width="90"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Description_b5a7}" Binding="{Binding Description}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Marque_a3e2}" Binding="{Binding BrandName}" Width="110"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Catgorie_8c6b}" Binding="{Binding CategoryName}" Width="110"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Fournisseur_73d1}" Binding="{Binding VendorName}" Width="120"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Prix_bc13}" Binding="{Binding Price, StringFormat='{}{0:N0}'}" Width="100"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_EnStock_d898}" Binding="{Binding Qty}" Width="80"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+
                 <TabItem Header="{DynamicResource Str_HistoriquedesSt_6c30}">
                     <DataGrid ItemsSource="{Binding StockHistoryList}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal" Margin="0,8,0,0">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="{DynamicResource Str_DateAjout_d98d}" Binding="{Binding StockInDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="140"/>
-                            <DataGridTextColumn Header="{DynamicResource Str_Rf_2a02}" Binding="{Binding RefNo}" Width="130"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Rf_2a02}" Binding="{Binding RefNo}" Width="120"/>
                             <DataGridTextColumn Header="{DynamicResource Str_Produit_e30e}" Binding="{Binding Description}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource Str_Fournisseur_73d1}" Binding="{Binding VendorName}" Width="120"/>
                             <DataGridTextColumn Header="{DynamicResource Str_QtAjoute_c10f}" Binding="{Binding Qty}" Width="80"/>
                             <DataGridTextColumn Header="{DynamicResource Str_AjoutPar_39b8}" Binding="{Binding StockInBy}" Width="110"/>
                             <DataGridTextColumn Header="{DynamicResource Str_Raison_7f06}" Binding="{Binding Status}" Width="*"/>

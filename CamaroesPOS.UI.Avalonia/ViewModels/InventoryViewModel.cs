@@ -125,6 +125,7 @@ public class InventoryViewModel : INotifyPropertyChanged
 
     private void OpenAddForm()
     {
+        if (!IsAdmin) return;
         SelectedProduct = new Product
         {
             ProductCode = string.Empty,
@@ -142,7 +143,7 @@ public class InventoryViewModel : INotifyPropertyChanged
 
     private void OpenEditForm(Product? product)
     {
-        if (product == null) return;
+        if (!IsAdmin || product == null) return;
         SelectedProduct = new Product
         {
             ProductCode = product.ProductCode,
