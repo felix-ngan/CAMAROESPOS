@@ -20,6 +20,7 @@ public partial class MainWindow : Window
     private readonly VendorView _vendorView;
     private readonly ReportsView _reportsView;
     private readonly ExpenseView _expenseView;
+    private readonly SettingsView _settingsView;
 
     public MainWindow()
     {
@@ -31,6 +32,7 @@ public partial class MainWindow : Window
         _vendorView = new VendorView();
         _reportsView = new ReportsView();
         _expenseView = new ExpenseView();
+        _settingsView = new SettingsView();
 
         if (!string.IsNullOrEmpty(SessionService.CurrentUserName))
         {
@@ -59,19 +61,6 @@ public partial class MainWindow : Window
             b.Classes.Set("Active", b == active);
         }
     }
-
-    private static Control MakePlaceholder(string title) => new Border
-    {
-        Classes = { "Card" },
-        Child = new TextBlock
-        {
-            Text = $"{title} — en cours de chargement...",
-            FontSize = 16,
-            Foreground = SolidColorBrush.Parse("#8F9BBA"),
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center
-        }
-    };
 
     private void ShowDashboard()
     {
@@ -144,7 +133,8 @@ public partial class MainWindow : Window
     {
         SetActiveNav(BtnSettings);
         TxtHeader.Text = "Paramètres Généraux";
-        MainContentControl.Content = MakePlaceholder("Paramètres Généraux");
+        if (_settingsView.DataContext is ViewModels.SettingsViewModel vm) vm.LoadData();
+        MainContentControl.Content = _settingsView;
     }
 
     private void BtnLogout_Click(object? sender, RoutedEventArgs e)
