@@ -1,0 +1,228 @@
+@page "/settings"
+@implements IDisposable
+@inject PosStoreState Store
+@inject BrowserStorageService Storage
+@inject SessionState Session
+@inject LocalizationService Loc
+
+<PageTitle>@Loc.T("Nav_Settings") — CAMAROES POS</PageTitle>
+
+<RoleGuard RequireAdmin="true">
+    @if (!string.IsNullOrEmpty(_msg))
+    {
+        <div class="alert @(_err ? "alert-error" : "alert-success")">
+            <span>@_msg</span>
+            <button class="btn btn-sm" @onclick="() => _msg = string.Empty">×</button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="tabs">
+            <button class="tab-btn @(_tab == 0 ? "active" : "")" @onclick="() => _tab = 0">@Loc.T("Set_TabUsers")</button>
+            <button class="tab-btn @(_tab == 1 ? "active" : "")" @onclick="() => _tab = 1">@Loc.T("Set_TabStore")</button>
+            <button class="tab-btn @(_tab == 2 ? "active" : "")" @onclick="() => _tab = 2">@Loc.T("Set_TabSecurity")</button>
+        </div>
+
+        @if (_tab == 0)
+        {
+            <div class="grid-split">
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>@Loc.T("Login_Username")</th>
+                                <th>@Loc.T("Col_Name")</th>
+                                <th>@Loc.T("Col_Role")</th>
+                                <th>@Loc.T("Col_Active")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var u in Store.Users)
+                            {
+                                <tr style="cursor:pointer;" @onclick="() => SelectUser(u)">
+                                    <td><strong>@u.Username</strong></td>
+                                    <td>@u.Name</td>
+                                    <td><span class="badge @(u.Role == "Admin" ? "badge-info" : "badge-success")">@u.Role</span></td>
+                                    <td>@(u.IsActive ? "✓" : "✕")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card stack" style="box-shadow:none;">
+                    <div>
+                        <label class="label-muted">@Loc.T("Login_Username")</label>
+                        <input class="input" @bind="_uUsername" />
+                    </div>
+                    <div>
+                        <label class="label-muted">@Loc.T("Col_Name")</label>
+                        <input class="input" @bind="_uName" />
+                    </div>
+                    <div>
+                        <label class="label-muted">@Loc.T("Login_Password")</label>
+                        <input class="input" type="password" @bind="_uPassword" />
+                    </div>
+                    <div>
+                        <label class="label-muted">@Loc.T("Col_Role")</label>
+                        <select class="input" @bind="_uRole">
+                            <option value="Admin">Admin</option>
+                            <option value="Cashier">Cashier</option>
+                        </select>
+                    </div>
+                    <label class="row" style="cursor:pointer;">
+                        <input type="checkbox" @bind="_uActive" />
+                        <span>@Loc.T("Col_Active")</span>
+                    </label>
+                    <div class="grid-2">
+                        <button class="btn btn-outlined" @onclick="ClearUserForm">@Loc.T("Btn_New")</button>
+                        <button class="btn btn-primary" @onclick="SaveUserAsync">@Loc.T("Btn_Save")</button>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (_tab == 1)
+        {
+            <div class="stack" style="max-width:520px;">
+                <div>
+                    <label class="label-muted">@Loc.T("Set_StoreName")</label>
+                    <input class="input" @bind="_storeName" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Vendor_Address")</label>
+                    <input class="input" @bind="_storeAddress" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Set_Momo")</label>
+                    <input class="input" @bind="_momoCode" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Set_Orange")</label>
+                    <input class="input" @bind="_orangeCode" />
+                </div>
+                <button class="btn btn-primary" @onclick="SaveStoreAsync">@Loc.T("Set_SaveSettings")</button>
+            </div>
+        }
+        else
+        {
+            <div class="stack" style="max-width:440px;">
+                <div class="card-title" style="margin:0;">@Loc.T("Set_ChangePassword")</div>
+                <div>
+                    <label class="label-muted">@Loc.T("Set_OldPass")</label>
+                    <input class="input" type="password" @bind="_oldPass" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Set_NewPass")</label>
+                    <input class="input" type="password" @bind="_newPass" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Set_ConfirmPass")</label>
+                    <input class="input" type="password" @bind="_confirmPass" />
+                </div>
+                <button class="btn btn-primary" @onclick="ChangePasswordAsync">@Loc.T("Set_UpdatePass")</button>
+
+                <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px;">
+                    <button class="btn btn-danger" @onclick="ResetDemoAsync">↺ @Loc.T("Nav_ResetDemo")</button>
+                </div>
+            </div>
+        }
+    </div>
+</RoleGuard>
+
+@code {
+    private int _tab;
+    private string _msg = string.Empty;
+    private bool _err;
+
+    private string _uUsername = string.Empty;
+    private string _uName = string.Empty;
+    private string _uPassword = string.Empty;
+    private string _uRole = "Cashier";
+    private bool _uActive = true;
+
+    private string _storeName = string.Empty;
+    private string _storeAddress = string.Empty;
+    private string _momoCode = string.Empty;
+    private string _orangeCode = string.Empty;
+
+    private string _oldPass = string.Empty;
+    private string _newPass = string.Empty;
+    private string _confirmPass = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        LoadStoreFields();
+        Store.OnChanged += OnStoreChanged;
+        Loc.OnChange += StateHasChanged;
+    }
+
+    private void OnStoreChanged()
+    {
+        LoadStoreFields();
+        StateHasChanged();
+    }
+
+    private void LoadStoreFields()
+    {
+        _storeName = Store.Store.StoreName;
+        _storeAddress = Store.Store.Address;
+        _momoCode = Store.Store.MomoCode;
+        _orangeCode = Store.Store.OrangeCode;
+    }
+
+    private void SelectUser(User u)
+    {
+        _uUsername = u.Username;
+        _uName = u.Name;
+        _uPassword = u.Password;
+        _uRole = u.Role;
+        _uActive = u.IsActive;
+    }
+
+    private void ClearUserForm()
+    {
+        _uUsername = string.Empty;
+        _uName = string.Empty;
+        _uPassword = string.Empty;
+        _uRole = "Cashier";
+        _uActive = true;
+    }
+
+    private async Task SaveUserAsync()
+    {
+        var res = Store.SaveUser(new User { Username = _uUsername.Trim(), Name = _uName.Trim(), Password = _uPassword, Role = _uRole, IsActive = _uActive }, Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) { ClearUserForm(); await Storage.PersistAsync(Store); }
+    }
+
+    private async Task SaveStoreAsync()
+    {
+        var res = Store.SaveStore(_storeName.Trim(), _storeAddress.Trim(), _momoCode.Trim(), _orangeCode.Trim(), Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) await Storage.PersistAsync(Store);
+    }
+
+    private async Task ChangePasswordAsync()
+    {
+        var res = Store.ChangePassword(Session.CurrentUser?.Username ?? "", _oldPass, _newPass, _confirmPass);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success)
+        {
+            _oldPass = _newPass = _confirmPass = string.Empty;
+            await Storage.PersistAsync(Store);
+        }
+    }
+
+    private async Task ResetDemoAsync()
+    {
+        await Storage.ResetAsync(Store);
+        _msg = "Données de démonstration réinitialisées.";
+        _err = false;
+    }
+
+    public void Dispose()
+    {
+        Store.OnChanged -= OnStoreChanged;
+        Loc.OnChange -= StateHasChanged;
+    }
+}

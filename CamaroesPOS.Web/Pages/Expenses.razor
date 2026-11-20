@@ -1,0 +1,162 @@
+@page "/expenses"
+@implements IDisposable
+@inject PosStoreState Store
+@inject BrowserStorageService Storage
+@inject SessionState Session
+@inject LocalizationService Loc
+
+<PageTitle>@Loc.T("Nav_Expenses") — CAMAROES POS</PageTitle>
+
+<RoleGuard RequireAdmin="true">
+    @if (!string.IsNullOrEmpty(_msg))
+    {
+        <div class="alert @(_err ? "alert-error" : "alert-success")">
+            <span>@_msg</span>
+            <button class="btn btn-sm" @onclick="() => _msg = string.Empty">×</button>
+        </div>
+    }
+
+    <div class="@(_isEditing ? "grid-split" : "")">
+        <div class="card stack">
+            <div class="row-between">
+                <div class="row">
+                    <input class="input input-inline" type="date" @bind="_startDate" />
+                    <input class="input input-inline" type="date" @bind="_endDate" />
+                    <button class="btn btn-outlined btn-sm" @onclick="ResetFilters">@Loc.T("Rep_Reset")</button>
+                </div>
+                <button class="btn btn-success btn-sm" @onclick="OpenAdd">+ @Loc.T("Exp_New")</button>
+            </div>
+
+            <div class="row">
+                <span style="font-weight:700;color:var(--navy);">@Loc.T("Exp_Total")</span>
+                <strong class="text-danger" style="font-size:18px;">@FilteredExpenses.Sum(e => e.Amount).ToString("N0") FCFA</strong>
+            </div>
+
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>@Loc.T("Col_Date")</th>
+                            <th>@Loc.T("Col_Category")</th>
+                            <th>@Loc.T("Col_Description")</th>
+                            <th class="text-right">@Loc.T("Col_Amount")</th>
+                            <th>Par</th>
+                            <th>@Loc.T("Col_Actions")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in FilteredExpenses)
+                        {
+                            <tr>
+                                <td>@e.Date.ToString("dd/MM/yyyy")</td>
+                                <td><span class="badge badge-warning">@e.Category</span></td>
+                                <td>@e.Description</td>
+                                <td class="text-right"><strong class="text-danger">@e.Amount.ToString("N0") FCFA</strong></td>
+                                <td>@e.AddedBy</td>
+                                <td>
+                                    <div class="row" style="gap:4px;">
+                                        <button class="btn btn-outlined btn-sm" @onclick="() => OpenEdit(e)">✏️</button>
+                                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteExpenseAsync(e)">🗑</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (_isEditing && _model != null)
+        {
+            <div class="card stack">
+                <div class="card-title" style="margin:0;">@Loc.T("Exp_Details")</div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Date")</label>
+                    <input class="input" type="date" @bind="_model.Date" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Category")</label>
+                    <select class="input" @bind="_model.Category">
+                        @foreach (var c in _categories)
+                        {
+                            <option value="@c">@c</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Description")</label>
+                    <textarea class="input" rows="3" @bind="_model.Description"></textarea>
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Amount")</label>
+                    <input class="input" type="number" min="0" @bind="_model.Amount" />
+                </div>
+                <div class="grid-2">
+                    <button class="btn btn-outlined" @onclick="() => _isEditing = false">@Loc.T("Btn_Cancel")</button>
+                    <button class="btn btn-primary" @onclick="SaveExpenseAsync">@Loc.T("Btn_Save")</button>
+                </div>
+            </div>
+        }
+    </div>
+</RoleGuard>
+
+@code {
+    private readonly string[] _categories = { "Électricité", "Loyer", "Salaires", "Transport", "Marketing", "Équipement", "Autre" };
+    private DateTime? _startDate = DateTime.Today.AddDays(-30);
+    private DateTime? _endDate = DateTime.Today;
+    private bool _isEditing;
+    private bool _isNew;
+    private Expense? _model;
+    private string _msg = string.Empty;
+    private bool _err;
+
+    private IEnumerable<Expense> FilteredExpenses => Store.Expenses
+        .Where(e => (!_startDate.HasValue || e.Date >= _startDate.Value.Date) &&
+                    (!_endDate.HasValue || e.Date < _endDate.Value.Date.AddDays(1)))
+        .OrderByDescending(e => e.Date);
+
+    protected override void OnInitialized()
+    {
+        Store.OnChanged += StateHasChanged;
+        Loc.OnChange += StateHasChanged;
+    }
+
+    private void ResetFilters()
+    {
+        _startDate = DateTime.Today.AddDays(-30);
+        _endDate = DateTime.Today;
+    }
+
+    private void OpenAdd()
+    {
+        _model = new Expense { Date = DateTime.Today, Category = "Autre", Description = "", Amount = 0 };
+        _isNew = true; _isEditing = true;
+    }
+
+    private void OpenEdit(Expense e)
+    {
+        _model = new Expense { Id = e.Id, Date = e.Date, Category = e.Category, Description = e.Description, Amount = e.Amount, AddedBy = e.AddedBy };
+        _isNew = false; _isEditing = true;
+    }
+
+    private async Task SaveExpenseAsync()
+    {
+        if (_model == null) return;
+        var res = Store.SaveExpense(_model, _isNew, Session.DisplayName, Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) { _isEditing = false; await Storage.PersistAsync(Store); }
+    }
+
+    private async Task DeleteExpenseAsync(Expense e)
+    {
+        var res = Store.DeleteExpense(e.Id, Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) await Storage.PersistAsync(Store);
+    }
+
+    public void Dispose()
+    {
+        Store.OnChanged -= StateHasChanged;
+        Loc.OnChange -= StateHasChanged;
+    }
+}
