@@ -1,0 +1,46 @@
+@using System.Globalization
+
+<div class="chart-box">
+    @if (Items.Count == 0)
+    {
+        <div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;">Aucune donnée</div>
+    }
+    else
+    {
+        <svg viewBox="0 0 460 200" style="width:100%;height:auto;display:block;">
+            <line x1="20" y1="162" x2="444" y2="162" stroke="#E2E8F0" stroke-width="1.5" />
+            @{
+                double max = Items.Max(i => Math.Abs(i.Value));
+                if (max <= 0) max = 1;
+                double slot = 410.0 / Items.Count;
+                double barW = Math.Min(48, slot * 0.58);
+            }
+            @for (int i = 0; i < Items.Count; i++)
+            {
+                var item = Items[i];
+                double ratio = Math.Clamp(Math.Max(0, item.Value) / max, 0, 1);
+                double h = Math.Max(4, ratio * 130);
+                double x = 25 + i * slot + (slot - barW) / 2;
+                double y = 162 - h;
+                string color = Colors[i % Colors.Length];
+
+                <rect x="@F(x)" y="@F(y)" width="@F(barW)" height="@F(h)" rx="6" fill="@color">
+                    <title>@item.Label : @item.Value.ToString("N0")</title>
+                </rect>
+                @((MarkupString)$"<text x=\"{F(x + barW / 2)}\" y=\"{F(y - 5)}\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"700\" fill=\"#2B3674\">{System.Net.WebUtility.HtmlEncode(FormatShort(item.Value))}</text>")
+                @((MarkupString)$"<text x=\"{F(x + barW / 2)}\" y=\"182\" text-anchor=\"middle\" font-size=\"10\" fill=\"#8F9BBA\">{System.Net.WebUtility.HtmlEncode(Truncate(item.Label, 11))}</text>")
+            }
+        </svg>
+    }
+</div>
+
+@code {
+    [Parameter] public List<(string Label, double Value)> Items { get; set; } = new();
+    [Parameter] public string[] Colors { get; set; } = new[] { "#1E88E5", "#7E57C2", "#26A69A", "#FB8C00", "#2E7D32" };
+
+    private static string F(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
+
+    private static string Truncate(string s, int max) => s.Length <= max ? s : s[..(max - 1)] + "…";
+
+    private static string FormatShort(double v) => v >= 1_000_000 ? $"{v / 1_000_000:0.#}M" : v >= 1_000 ? $"{v / 1_000:0.#}k" : v.ToString("N0");
+}

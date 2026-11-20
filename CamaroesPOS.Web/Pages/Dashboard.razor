@@ -1,0 +1,217 @@
+@page "/"
+@implements IDisposable
+@inject PosStoreState Store
+@inject LocalizationService Loc
+
+<PageTitle>@Loc.T("Nav_Dashboard") — CAMAROES POS</PageTitle>
+
+<RoleGuard RequireAdmin="true">
+    <div class="stack">
+        <!-- Top Actions -->
+        <div class="row-between">
+            <div class="row">
+                @if (_m.LowStockItems > 0)
+                {
+                    <span class="badge badge-danger">⚠ @_m.LowStockItems stock(s) critique(s)</span>
+                }
+            </div>
+            <button class="btn btn-outlined btn-sm" @onclick="Refresh">↻ @Loc.T("Refresh")</button>
+        </div>
+
+        <!-- KPI Row 1 -->
+        <div class="grid-4">
+            <div class="card">
+                <span class="label-muted">@Loc.T("Dash_TodaySales")</span>
+                <div class="kpi-value text-primary">@_m.TodaySales.ToString("N0") FCFA</div>
+                <div class="kpi-sub">Total : @_m.TotalSalesAllTime.ToString("N0") FCFA</div>
+            </div>
+            <div class="card">
+                <span class="label-muted">@Loc.T("Dash_NetProfit")</span>
+                <div class="kpi-value text-success">@_m.NetProfit.ToString("N0") FCFA</div>
+                <div class="kpi-sub">Dépenses : @_m.TotalExpenses.ToString("N0") FCFA</div>
+            </div>
+            <div class="card">
+                <span class="label-muted">@Loc.T("Dash_StockVolume")</span>
+                <div class="kpi-value">@_m.TotalStockQuantity.ToString("N0") unités</div>
+                <div class="kpi-sub">@_m.TotalProducts références</div>
+            </div>
+            <div class="card">
+                <span class="label-muted">@Loc.T("Dash_CriticalAlerts")</span>
+                <div class="kpi-value text-danger">@_m.LowStockItems</div>
+                <div class="kpi-sub">Clients CRM : @_m.TotalCustomers</div>
+            </div>
+        </div>
+
+        <!-- KPI Row 2 -->
+        <div class="grid-4">
+            <div class="card">
+                <span class="label-muted">@Loc.T("Dash_ItemsSold")</span>
+                <div class="kpi-value">@_m.TotalItemsSoldToday auj.</div>
+                <div class="kpi-sub">Cumul : @_m.TotalItemsSoldAllTime</div>
+            </div>
+            <div class="card">
+                <span class="label-muted">@Loc.T("Dash_Wallets")</span>
+                <div class="kpi-value" style="color:#00897B;">@_m.TotalWalletsBalance.ToString("N0") FCFA</div>
+                <div class="kpi-sub">Points : @_m.TotalLoyaltyPoints.ToString("N0")</div>
+            </div>
+            <div class="card">
+                <span class="label-muted">@Loc.T("Dash_Discounts")</span>
+                <div class="kpi-value text-warning">@_m.TotalDiscountAmount.ToString("N0") FCFA</div>
+                <div class="kpi-sub">Annulations : @_m.TotalCancelledAmount.ToString("N0") FCFA</div>
+            </div>
+            <div class="card">
+                <span class="label-muted">@Loc.T("Dash_Users")</span>
+                <div class="kpi-value">@_m.TotalUsers</div>
+                <div class="kpi-sub">Admin : @_m.AdminCount | Caissiers : @_m.CashierCount</div>
+            </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="grid-2-1">
+            <div class="card">
+                <div class="card-title">@Loc.T("Dash_ChartRevenue7d")</div>
+                <LineChartSvg Labels="@_m.Last7DaysLabels" Values="@_m.Last7DaysSales" PrimaryLabel="Ventes (FCFA)" />
+            </div>
+            <div class="card">
+                <div class="card-title">@Loc.T("Dash_ChartPayments")</div>
+                <PieChartSvg Items="@_m.PaymentModes" />
+            </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">@Loc.T("Dash_ChartStock7d")</div>
+                <LineChartSvg Labels="@_m.Last7DaysLabels"
+                              Values="@_m.Last7DaysStockIn"
+                              SecondaryValues="@_m.Last7DaysStockOut"
+                              StrokeColor="#2E7D32"
+                              FillColor="rgba(46, 125, 50, 0.1)"
+                              SecondaryStrokeColor="#E53935"
+                              PrimaryLabel="Entrées"
+                              SecondaryLabel="Sorties" />
+            </div>
+            <div class="card">
+                <div class="card-title">@Loc.T("Dash_ChartProfit")</div>
+                <BarChartSvg Items="@ProfitItems" Colors="@(new[] { "#1E88E5", "#FB8C00", "#E53935", "#2E7D32" })" />
+            </div>
+        </div>
+
+        <!-- Charts Row 3 -->
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-title">@Loc.T("Dash_ChartTopStock")</div>
+                <BarChartSvg Items="@_m.TopProductsStock" />
+            </div>
+            <div class="card">
+                <div class="card-title">@Loc.T("Dash_ChartTopCustomers")</div>
+                <BarChartSvg Items="@_m.TopCustomers" Colors="@(new[] { "#00897B", "#1E88E5", "#7E57C2", "#FB8C00", "#2E7D32" })" />
+            </div>
+            <div class="card">
+                <div class="card-title">@Loc.T("Dash_ChartTopSold")</div>
+                <BarChartSvg Items="@_m.TopSoldItems" />
+            </div>
+        </div>
+
+        <!-- Tables Row -->
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">@Loc.T("Dash_CriticalAlerts")</div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>@Loc.T("Col_Code")</th>
+                                <th>@Loc.T("Col_Description")</th>
+                                <th class="text-right">Stock</th>
+                                <th class="text-right">@Loc.T("Inv_Reorder")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in _m.CriticalStockList)
+                            {
+                                <tr>
+                                    <td><strong>@p.ProductCode</strong></td>
+                                    <td>@p.Description</td>
+                                    <td class="text-right"><span class="badge badge-danger">@p.Qty</span></td>
+                                    <td class="text-right">@p.Reorder</td>
+                                </tr>
+                            }
+                            @if (_m.CriticalStockList.Count == 0)
+                            {
+                                <tr><td colspan="4" style="text-align:center;color:var(--muted);">Aucune alerte critique</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="row-between" style="margin-bottom:10px;">
+                    <div class="card-title" style="margin-bottom:0;">@Loc.T("Dash_UsersList")</div>
+                    <input class="input input-inline" @bind="_userSearch" @bind:event="oninput" placeholder="@Loc.T("Dash_SearchUser")" />
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>@Loc.T("Login_Username")</th>
+                                <th>@Loc.T("Col_Name")</th>
+                                <th>@Loc.T("Col_Role")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var u in FilteredUsers)
+                            {
+                                <tr>
+                                    <td><strong>@u.Username</strong></td>
+                                    <td>@u.Name</td>
+                                    <td><span class="badge @(u.Role == "Admin" ? "badge-info" : "badge-success")">@u.Role</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</RoleGuard>
+
+@code {
+    private DashboardMetrics _m = new();
+    private string _userSearch = string.Empty;
+
+    private List<(string Label, double Value)> ProfitItems => new()
+    {
+        ("Revenus", _m.TotalSalesAllTime),
+        ("Coûts", _m.TotalCOGS),
+        ("Dépenses", _m.TotalExpenses),
+        ("Bénéfice", Math.Max(0, _m.NetProfit))
+    };
+
+    private IEnumerable<User> FilteredUsers => string.IsNullOrWhiteSpace(_userSearch)
+        ? Store.Users
+        : Store.Users.Where(u =>
+            (u.Username?.Contains(_userSearch, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (u.Name?.Contains(_userSearch, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (u.Role?.Contains(_userSearch, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    protected override void OnInitialized()
+    {
+        Refresh();
+        Store.OnChanged += Refresh;
+        Loc.OnChange += StateHasChanged;
+    }
+
+    private void Refresh()
+    {
+        _m = Store.GetDashboardMetrics();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        Store.OnChanged -= Refresh;
+        Loc.OnChange -= StateHasChanged;
+    }
+}
