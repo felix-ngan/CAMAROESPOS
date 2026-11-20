@@ -1,0 +1,114 @@
+@page "/login"
+@layout EmptyLayout
+@implements IDisposable
+@inject PosStoreState Store
+@inject BrowserStorageService Storage
+@inject SessionState Session
+@inject LocalizationService Loc
+@inject NavigationManager Nav
+
+<PageTitle>@Loc.T("App_Title")</PageTitle>
+
+<div class="login-wrapper">
+    <div class="card login-card">
+        <div class="row-between" style="margin-bottom:14px;">
+            <span class="badge badge-info">.NET 8 · Blazor WASM</span>
+            <button class="btn btn-outlined btn-sm" @onclick="Loc.Toggle">
+                @(Loc.CurrentLang == "fr" ? "EN" : "FR")
+            </button>
+        </div>
+
+        <div class="boot-logo" style="margin-bottom:12px;">
+            <span class="boot-badge">C</span>
+            <div>
+                <div class="boot-title">CAMAROES</div>
+                <div class="boot-sub">POS SYSTEM · WEB EDITION</div>
+            </div>
+        </div>
+
+        <p style="text-align:center;color:var(--muted);margin-bottom:20px;font-size:13px;">
+            @Loc.T("Login_Subtitle")
+        </p>
+
+        @if (!string.IsNullOrEmpty(_error))
+        {
+            <div class="alert alert-error">@_error</div>
+        }
+
+        <div class="stack" style="gap:12px;">
+            <div>
+                <label class="label-muted">@Loc.T("Login_Username")</label>
+                <input class="input" @bind="_username" @bind:event="oninput" @onkeydown="OnKeyDown" placeholder="admin" />
+            </div>
+
+            <div>
+                <label class="label-muted">@Loc.T("Login_Password")</label>
+                <input class="input" type="password" @bind="_password" @bind:event="oninput" @onkeydown="OnKeyDown" placeholder="••••••" />
+            </div>
+
+            <button class="btn btn-primary btn-lg btn-block" @onclick="HandleLogin">
+                @Loc.T("Login_Submit")
+            </button>
+        </div>
+
+        <div class="demo-box">
+            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;text-align:center;">
+                ✨ @Loc.T("Login_QuickDemo")
+            </div>
+            <div class="grid-2" style="gap:8px;">
+                <button class="btn btn-outlined btn-sm" @onclick="() => QuickLogin(true)">
+                    🔑 @Loc.T("Login_DemoAdmin")
+                </button>
+                <button class="btn btn-outlined btn-sm" @onclick="() => QuickLogin(false)">
+                    🧾 @Loc.T("Login_DemoCashier")
+                </button>
+            </div>
+            <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px;">
+                @Loc.T("Login_LocalHint")
+            </p>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _username = "admin";
+    private string _password = "123";
+    private string _error = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Storage.LoadIntoAsync(Store);
+        Loc.OnChange += StateHasChanged;
+        if (Session.IsAuthenticated)
+        {
+            Nav.NavigateTo(Session.IsAdmin ? "/" : "/pos", replace: true);
+        }
+    }
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") HandleLogin();
+    }
+
+    private void QuickLogin(bool asAdmin)
+    {
+        _username = asAdmin ? "admin" : "caissier1";
+        _password = "123";
+        HandleLogin();
+    }
+
+    private void HandleLogin()
+    {
+        _error = string.Empty;
+        var user = Store.Authenticate(_username.Trim(), _password);
+        if (user == null)
+        {
+            _error = Loc.T("Login_Error");
+            return;
+        }
+        Session.Login(user);
+        Nav.NavigateTo(Session.IsAdmin ? "/" : "/pos", replace: true);
+    }
+
+    public void Dispose() => Loc.OnChange -= StateHasChanged;
+}

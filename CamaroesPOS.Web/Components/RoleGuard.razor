@@ -1,0 +1,33 @@
+@inject SessionState Session
+@inject PosStoreState Store
+@inject BrowserStorageService Storage
+@inject NavigationManager Nav
+
+@if (_ready && IsAllowed)
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter] public bool RequireAdmin { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool _ready;
+    private bool IsAllowed => Session.IsAuthenticated && (!RequireAdmin || Session.IsAdmin);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Storage.LoadIntoAsync(Store);
+        if (!Session.IsAuthenticated)
+        {
+            Nav.NavigateTo("/login", replace: true);
+            return;
+        }
+        if (RequireAdmin && !Session.IsAdmin)
+        {
+            Nav.NavigateTo("/pos", replace: true);
+            return;
+        }
+        _ready = true;
+    }
+}
