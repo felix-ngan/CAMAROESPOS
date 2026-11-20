@@ -1,0 +1,18 @@
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>CAMAROES POS</PageTitle>
+        <LayoutView Layout="@typeof(EmptyLayout)">
+            <div class="login-wrapper">
+                <div class="card" style="max-width:420px;text-align:center;">
+                    <h2 style="color:#2B3674;margin-bottom:8px;">Page introuvable</h2>
+                    <p style="color:#8F9BBA;margin-bottom:16px;">La route demandée n'existe pas.</p>
+                    <a href="/login" class="btn btn-primary">Connexion</a>
+                </div>
+            </div>
+        </LayoutView>
+    </NotFound>
+</Router>

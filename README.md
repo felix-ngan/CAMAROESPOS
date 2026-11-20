@@ -56,7 +56,19 @@ Grâce à SQLite, l'installation est d'une simplicité déconcertante. Aucun ser
 
 ### Compilation et Lancement
 
-#### Version Multiplateforme — macOS, Windows et Linux (Avalonia UI)
+#### Version Web — Blazor WebAssembly (.NET 8, déployable gratuitement sur Vercel)
+Partage directement `CamaroesPOS.Domain` (100 % C# / .NET 8), persiste les données par visiteur dans `localStorage`, inclut un accès démo 1-clic (Admin / Caissier) et des reçus/rapports imprimables en PDF.
+1. Lancer localement :
+   ```bash
+   dotnet run --project CamaroesPOS.Web
+   ```
+2. Publier en Release statique (`dist/wwwroot`) :
+   ```bash
+   bash vercel-build.sh
+   ```
+3. **Déploiement automatique gratuit sur Vercel** : importez ce dépôt GitHub dans votre tableau de bord [Vercel](https://vercel.com/new) — `vercel.json` et `vercel-build.sh` installent .NET 8, publient Blazor WebAssembly et configurent le routage SPA automatiquement.
+
+#### Version Multiplateforme Desktop — macOS, Windows et Linux (Avalonia UI)
 1. Assurez-vous d'avoir le **SDK .NET 8.0** installé (`dotnet --version`).
 2. Compilez et lancez l'application directement :
    ```bash

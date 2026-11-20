@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CamaroesPOS.UI.Avalonia\CamaroesPOS.UI.Avalonia.csproj" />
+    <ProjectReference Include="..\CamaroesPOS.Web\CamaroesPOS.Web.csproj" />
     <ProjectReference Include="..\CamaroesPOS.Data\CamaroesPOS.Data.csproj" />
     <ProjectReference Include="..\CamaroesPOS.Domain\CamaroesPOS.Domain.csproj" />
   </ItemGroup>

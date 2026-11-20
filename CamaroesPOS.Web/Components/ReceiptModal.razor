@@ -1,0 +1,91 @@
+@inject BrowserStorageService Storage
+@inject LocalizationService Loc
+@inject PosStoreState Store
+
+@if (Result != null)
+{
+    <div class="modal-backdrop">
+        <div class="modal-box">
+            <div class="receipt-paper">
+                <div style="text-align:center;">
+                    <div style="font-size:22px;font-weight:900;color:#2B3674;">@Store.Store.StoreName</div>
+                    <div style="font-size:12px;color:#64748B;">@Store.Store.Address</div>
+                    <div style="font-size:13px;font-weight:700;margin-top:4px;color:#1E88E5;">@Loc.T("Receipt_Title")</div>
+                </div>
+
+                <div class="receipt-divider"></div>
+
+                <div style="font-size:12px;" class="stack">
+                    <div class="row-between"><span>N° Trans :</span><strong>@Result.TransNo</strong></div>
+                    <div class="row-between"><span>Date :</span><span>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span></div>
+                    <div class="row-between"><span>@Loc.T("Col_Cashier") :</span><span>@Cashier</span></div>
+                    <div class="row-between"><span>@Loc.T("POS_PaymentMode")</span><strong>@Result.PaymentMode</strong></div>
+                    @if (!string.IsNullOrWhiteSpace(CustomerPhone))
+                    {
+                        <div class="row-between"><span>@Loc.T("Col_Phone") :</span><span>@CustomerPhone</span></div>
+                    }
+                </div>
+
+                <div class="receipt-divider"></div>
+
+                <table class="data-table" style="font-size:12px;">
+                    <thead>
+                        <tr>
+                            <th>@Loc.T("Lbl_Item")</th>
+                            <th class="text-right">@Loc.T("Col_Qty")</th>
+                            <th class="text-right">@Loc.T("Col_Total")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Items)
+                        {
+                            <tr>
+                                <td>@item.ProductDescription</td>
+                                <td class="text-right">@item.Qty</td>
+                                <td class="text-right">@item.Total.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="receipt-divider"></div>
+
+                <div class="stack" style="gap:4px;font-size:13px;">
+                    @if (Result.DiscountAmount > 0)
+                    {
+                        <div class="row-between"><span>@Loc.T("POS_Subtotal")</span><span>@Result.SubTotal.ToString("N0") FCFA</span></div>
+                        <div class="row-between text-warning"><span>@Loc.T("Lbl_Discount")</span><span>-@Result.DiscountAmount.ToString("N0") FCFA</span></div>
+                    }
+                    <div class="row-between" style="font-size:16px;font-weight:800;color:#2B3674;margin-top:4px;">
+                        <span>TOTAL :</span>
+                        <span class="text-primary">@Result.TotalAmount.ToString("N0") FCFA</span>
+                    </div>
+                    @if (Result.PaymentMode == "Espèces")
+                    {
+                        <div class="row-between"><span>@Loc.T("Lbl_Received")</span><span>@Result.ReceivedAmount.ToString("N0") FCFA</span></div>
+                        <div class="row-between text-success"><strong>@Loc.T("POS_ChangeDue")</strong><strong>@Result.ChangeAmount.ToString("N0") FCFA</strong></div>
+                    }
+                </div>
+
+                <div class="receipt-divider"></div>
+                <div style="text-align:center;font-size:12px;font-style:italic;color:#2B3674;">@Loc.T("Receipt_Thanks")</div>
+                <div style="text-align:center;font-size:11px;color:#8F9BBA;margin-top:4px;">@Loc.T("Receipt_NoReturn")</div>
+            </div>
+
+            <div class="grid-2 no-print" style="margin-top:14px;">
+                <button class="btn btn-primary" @onclick="PrintAsync">🖨️ @Loc.T("Receipt_PrintPdf")</button>
+                <button class="btn btn-danger" @onclick="OnClose">@Loc.T("Btn_Close")</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public CheckoutResult? Result { get; set; }
+    [Parameter] public List<CartItem> Items { get; set; } = new();
+    [Parameter] public string Cashier { get; set; } = "";
+    [Parameter] public string CustomerPhone { get; set; } = "";
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private Task PrintAsync() => Storage.PrintAsync();
+}

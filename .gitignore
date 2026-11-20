@@ -71,6 +71,7 @@ Thumbs.db
 # Agent files
 .antigravitycli/
 .superpowers/
+dist/
 *.db
 *.db-shm
 *.db-wal

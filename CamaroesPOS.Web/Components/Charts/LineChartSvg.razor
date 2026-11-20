@@ -1,0 +1,102 @@
+@using System.Globalization
+
+<div class="chart-box">
+    <svg viewBox="0 0 520 200" style="width:100%;height:auto;display:block;">
+        @for (int g = 0; g <= 4; g++)
+        {
+            double y = 16 + g * 36;
+            <line x1="42" y1="@F(y)" x2="504" y2="@F(y)" stroke="#E2E8F0" stroke-width="1" />
+        }
+
+        @if (Values.Length > 0)
+        {
+            <polygon points="@BuildAreaPoints(Values)" fill="@FillColor" />
+            <polyline points="@BuildLinePoints(Values)" fill="none" stroke="@StrokeColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+            @for (int i = 0; i < Values.Length; i++)
+            {
+                var (x, y) = PointAt(i, Values[i]);
+                <circle cx="@F(x)" cy="@F(y)" r="4.5" fill="@StrokeColor" stroke="#fff" stroke-width="1.5">
+                    <title>@((i < Labels.Length ? Labels[i] : "") + ": " + Values[i].ToString("N0"))</title>
+                </circle>
+            }
+        }
+
+        @if (SecondaryValues != null && SecondaryValues.Length > 0)
+        {
+            <polyline points="@BuildLinePoints(SecondaryValues)" fill="none" stroke="@SecondaryStrokeColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+            @for (int i = 0; i < SecondaryValues.Length; i++)
+            {
+                var (x, y) = PointAt(i, SecondaryValues[i]);
+                <circle cx="@F(x)" cy="@F(y)" r="4" fill="@SecondaryStrokeColor" stroke="#fff" stroke-width="1.5">
+                    <title>@((i < Labels.Length ? Labels[i] : "") + ": " + SecondaryValues[i].ToString("N0"))</title>
+                </circle>
+            }
+        }
+
+        @for (int i = 0; i < Labels.Length; i++)
+        {
+            double x = XAt(i, Labels.Length);
+            @((MarkupString)$"<text x=\"{F(x)}\" y=\"186\" text-anchor=\"middle\" font-size=\"11\" fill=\"#8F9BBA\">{System.Net.WebUtility.HtmlEncode(Labels[i])}</text>")
+        }
+    </svg>
+
+    @if (!string.IsNullOrEmpty(PrimaryLabel) || !string.IsNullOrEmpty(SecondaryLabel))
+    {
+        <div class="chart-legend">
+            @if (!string.IsNullOrEmpty(PrimaryLabel))
+            {
+                <span class="legend-item"><span class="legend-dot" style="background:@StrokeColor"></span>@PrimaryLabel</span>
+            }
+            @if (!string.IsNullOrEmpty(SecondaryLabel))
+            {
+                <span class="legend-item"><span class="legend-dot" style="background:@SecondaryStrokeColor"></span>@SecondaryLabel</span>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string[] Labels { get; set; } = Array.Empty<string>();
+    [Parameter] public double[] Values { get; set; } = Array.Empty<double>();
+    [Parameter] public double[]? SecondaryValues { get; set; }
+    [Parameter] public string StrokeColor { get; set; } = "#1E88E5";
+    [Parameter] public string FillColor { get; set; } = "rgba(30, 136, 229, 0.14)";
+    [Parameter] public string SecondaryStrokeColor { get; set; } = "#E53935";
+    [Parameter] public string? PrimaryLabel { get; set; }
+    [Parameter] public string? SecondaryLabel { get; set; }
+
+    private double MaxVal
+    {
+        get
+        {
+            double m = Values.Length > 0 ? Values.Max() : 0;
+            if (SecondaryValues != null && SecondaryValues.Length > 0) m = Math.Max(m, SecondaryValues.Max());
+            return m <= 0 ? 1 : m * 1.1;
+        }
+    }
+
+    private static double XAt(int idx, int count) => count <= 1 ? 273 : 48 + idx * (450.0 / (count - 1));
+
+    private (double X, double Y) PointAt(int idx, double val)
+    {
+        double x = XAt(idx, Math.Max(Values.Length, SecondaryValues?.Length ?? 0));
+        double ratio = Math.Clamp(val / MaxVal, 0, 1);
+        double y = 160 - ratio * 144;
+        return (x, y);
+    }
+
+    private string BuildLinePoints(double[] vals)
+        => string.Join(" ", vals.Select((v, i) => { var (x, y) = PointAt(i, v); return $"{F(x)},{F(y)}"; }));
+
+    private string BuildAreaPoints(double[] vals)
+    {
+        if (vals.Length == 0) return "";
+        var line = BuildLinePoints(vals);
+        double lastX = XAt(vals.Length - 1, vals.Length);
+        double firstX = XAt(0, vals.Length);
+        return $"{firstX.ToString("0.##", CultureInfo.InvariantCulture)},160 {line} {lastX.ToString("0.##", CultureInfo.InvariantCulture)},160";
+    }
+
+    private static string F(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
+}

@@ -1,0 +1,157 @@
+@page "/vendors"
+@implements IDisposable
+@inject PosStoreState Store
+@inject BrowserStorageService Storage
+@inject SessionState Session
+@inject LocalizationService Loc
+
+<PageTitle>@Loc.T("Nav_Vendors") — CAMAROES POS</PageTitle>
+
+<RoleGuard>
+    @if (!string.IsNullOrEmpty(_msg))
+    {
+        <div class="alert @(_err ? "alert-error" : "alert-success")">
+            <span>@_msg</span>
+            <button class="btn btn-sm" @onclick="() => _msg = string.Empty">×</button>
+        </div>
+    }
+
+    <div class="@(_isEditing ? "grid-split" : "")">
+        <div class="card stack">
+            <div class="row-between">
+                <input class="input" style="flex:1;min-width:220px;" @bind="_search" @bind:event="oninput" placeholder="@Loc.T("Vendor_Search")" />
+                @if (Session.IsAdmin)
+                {
+                    <button class="btn btn-primary btn-sm" @onclick="OpenAdd">+ @Loc.T("Vendor_Add")</button>
+                }
+            </div>
+
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>@Loc.T("Col_Vendor")</th>
+                            <th>@Loc.T("Vendor_Contact")</th>
+                            <th>@Loc.T("Col_Phone")</th>
+                            <th>@Loc.T("Col_Email")</th>
+                            <th>@Loc.T("Vendor_Address")</th>
+                            @if (Session.IsAdmin)
+                            {
+                                <th>@Loc.T("Col_Actions")</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in FilteredVendors)
+                        {
+                            <tr>
+                                <td><strong>@v.VendorName</strong></td>
+                                <td>@v.ContactPerson</td>
+                                <td>@v.Phone</td>
+                                <td>@v.Email</td>
+                                <td>@v.Address</td>
+                                @if (Session.IsAdmin)
+                                {
+                                    <td>
+                                        <div class="row" style="gap:4px;">
+                                            <button class="btn btn-outlined btn-sm" @onclick="() => OpenEdit(v)">✏️</button>
+                                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteVendorAsync(v)">🗑</button>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (_isEditing && _model != null && Session.IsAdmin)
+        {
+            <div class="card stack">
+                <div class="card-title" style="margin:0;">@Loc.T("Vendor_Details")</div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Vendor")</label>
+                    <input class="input" @bind="_model.VendorName" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Vendor_Contact")</label>
+                    <input class="input" @bind="_model.ContactPerson" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Phone")</label>
+                    <input class="input" @bind="_model.Phone" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Email")</label>
+                    <input class="input" @bind="_model.Email" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Vendor_Address")</label>
+                    <textarea class="input" rows="2" @bind="_model.Address"></textarea>
+                </div>
+                <div class="grid-2">
+                    <button class="btn btn-outlined" @onclick="() => _isEditing = false">@Loc.T("Btn_Cancel")</button>
+                    <button class="btn btn-primary" @onclick="SaveVendorAsync">@Loc.T("Btn_Save")</button>
+                </div>
+            </div>
+        }
+    </div>
+</RoleGuard>
+
+@code {
+    private string _search = string.Empty;
+    private bool _isEditing;
+    private bool _isNew;
+    private Vendor? _model;
+    private string _msg = string.Empty;
+    private bool _err;
+
+    private IEnumerable<Vendor> FilteredVendors => string.IsNullOrWhiteSpace(_search)
+        ? Store.Vendors
+        : Store.Vendors.Where(v =>
+            (v.VendorName?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (v.ContactPerson?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (v.Email?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    protected override void OnInitialized()
+    {
+        Store.OnChanged += StateHasChanged;
+        Loc.OnChange += StateHasChanged;
+    }
+
+    private void OpenAdd()
+    {
+        if (!Session.IsAdmin) return;
+        _model = new Vendor { VendorName = "", ContactPerson = "", Phone = "", Email = "", Address = "" };
+        _isNew = true; _isEditing = true;
+    }
+
+    private void OpenEdit(Vendor v)
+    {
+        if (!Session.IsAdmin) return;
+        _model = new Vendor { Id = v.Id, VendorName = v.VendorName, ContactPerson = v.ContactPerson, Phone = v.Phone, Email = v.Email, Address = v.Address };
+        _isNew = false; _isEditing = true;
+    }
+
+    private async Task SaveVendorAsync()
+    {
+        if (_model == null) return;
+        var res = Store.SaveVendor(_model, _isNew, Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) { _isEditing = false; await Storage.PersistAsync(Store); }
+    }
+
+    private async Task DeleteVendorAsync(Vendor v)
+    {
+        var res = Store.DeleteVendor(v.Id, Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) await Storage.PersistAsync(Store);
+    }
+
+    public void Dispose()
+    {
+        Store.OnChanged -= StateHasChanged;
+        Loc.OnChange -= StateHasChanged;
+    }
+}

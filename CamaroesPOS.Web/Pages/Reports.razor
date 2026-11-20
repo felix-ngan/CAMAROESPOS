@@ -1,0 +1,297 @@
+@page "/reports"
+@implements IDisposable
+@inject PosStoreState Store
+@inject BrowserStorageService Storage
+@inject SessionState Session
+@inject LocalizationService Loc
+
+<PageTitle>@Loc.T("Nav_Reports") — CAMAROES POS</PageTitle>
+
+<RoleGuard>
+    <div class="stack">
+        @if (!string.IsNullOrEmpty(_msg))
+        {
+            <div class="alert @(_err ? "alert-error" : "alert-success") no-print">
+                <span>@_msg</span>
+                <button class="btn btn-sm" @onclick="() => _msg = string.Empty">×</button>
+            </div>
+        }
+
+        <!-- Filters -->
+        <div class="card no-print">
+            <div class="row">
+                <div>
+                    <label class="label-muted">@Loc.T("Rep_StartDate")</label>
+                    <input class="input input-inline" type="date" @bind="_startDate" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Rep_EndDate")</label>
+                    <input class="input input-inline" type="date" @bind="_endDate" />
+                </div>
+                <div style="flex:1;min-width:190px;">
+                    <label class="label-muted">@Loc.T("Rep_Search")</label>
+                    <input class="input" @bind="_search" @bind:event="oninput" placeholder="@Loc.T("Rep_Search")" />
+                </div>
+                <div class="row" style="align-self:flex-end;">
+                    <button class="btn btn-outlined btn-sm" @onclick="ResetFilters">@Loc.T("Rep_Reset")</button>
+                    <button class="btn btn-success btn-sm" @onclick="PrintReportAsync">🖨️ @Loc.T("Rep_ExportPdf")</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary KPIs -->
+        <div class="grid-2">
+            <div class="card">
+                <span class="label-muted">@Loc.T("Lbl_Revenue")</span>
+                <div class="kpi-value text-primary">@FilteredSales.Sum(s => s.Total).ToString("N0") FCFA</div>
+                <div class="kpi-sub">@FilteredSales.Count() @Loc.T("Lbl_SalesLines")</div>
+            </div>
+            <div class="card">
+                <span class="label-muted">@Loc.T("Dash_ItemsSold")</span>
+                <div class="kpi-value">@FilteredSales.Sum(s => s.Qty)</div>
+                <div class="kpi-sub">@Loc.T("Lbl_Discounts") : @FilteredSales.Sum(s => s.Discount).ToString("N0") FCFA</div>
+            </div>
+        </div>
+
+        <!-- 5 Tabs -->
+        <div class="card">
+            <div class="tabs no-print">
+                <button class="tab-btn @(_tab == 0 ? "active" : "")" @onclick="() => _tab = 0">@Loc.T("Rep_TabSales")</button>
+                <button class="tab-btn @(_tab == 1 ? "active" : "")" @onclick="() => _tab = 1">@Loc.T("Rep_TabStock")</button>
+                <button class="tab-btn @(_tab == 2 ? "active" : "")" @onclick="() => _tab = 2">@Loc.T("Rep_TabHistory")</button>
+                <button class="tab-btn @(_tab == 3 ? "active" : "")" @onclick="() => _tab = 3">@Loc.T("Rep_TabCancelled")</button>
+                <button class="tab-btn @(_tab == 4 ? "active" : "")" @onclick="() => _tab = 4">@Loc.T("Rep_TabWallets")</button>
+            </div>
+
+            @if (_tab == 0)
+            {
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>@Loc.T("Col_Date")</th>
+                                <th>@Loc.T("Lbl_TransNo")</th>
+                                <th>@Loc.T("Col_Description")</th>
+                                <th class="text-right">@Loc.T("Col_Qty")</th>
+                                <th class="text-right">@Loc.T("Col_Total")</th>
+                                <th>@Loc.T("Col_Cashier")</th>
+                                <th>Mode</th>
+                                @if (Session.IsAdmin)
+                                {
+                                    <th class="no-print">@Loc.T("Col_Actions")</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in FilteredSales)
+                            {
+                                <tr>
+                                    <td>@s.SoldDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td><strong>@s.TransNo</strong></td>
+                                    <td>@s.Description</td>
+                                    <td class="text-right">@s.Qty</td>
+                                    <td class="text-right"><strong>@s.Total.ToString("N0")</strong></td>
+                                    <td>@s.Cashier</td>
+                                    <td><span class="badge badge-info">@s.PaymentMode</span></td>
+                                    @if (Session.IsAdmin)
+                                    {
+                                        <td class="no-print">
+                                            <button class="btn btn-danger btn-sm" title="Annuler la vente" @onclick="() => CancelSaleAsync(s)">⊘</button>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else if (_tab == 1)
+            {
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>@Loc.T("Col_Code")</th>
+                                <th>@Loc.T("Col_Description")</th>
+                                <th>@Loc.T("Col_Brand")</th>
+                                <th>@Loc.T("Col_Category")</th>
+                                <th>@Loc.T("Col_Vendor")</th>
+                                <th class="text-right">@Loc.T("Col_Price")</th>
+                                <th class="text-right">Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in FilteredProducts)
+                            {
+                                <tr>
+                                    <td><strong>@p.ProductCode</strong></td>
+                                    <td>@p.Description</td>
+                                    <td>@p.BrandName</td>
+                                    <td>@p.CategoryName</td>
+                                    <td>@p.VendorName</td>
+                                    <td class="text-right">@p.Price.ToString("N0")</td>
+                                    <td class="text-right"><span class="badge @(p.Qty <= p.Reorder ? "badge-danger" : "badge-success")">@p.Qty</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else if (_tab == 2)
+            {
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>@Loc.T("Col_Date")</th>
+                                <th>@Loc.T("Lbl_Ref")</th>
+                                <th>@Loc.T("Col_Description")</th>
+                                <th>@Loc.T("Col_Vendor")</th>
+                                <th class="text-right">@Loc.T("Col_Qty")</th>
+                                <th>@Loc.T("Lbl_By")</th>
+                                <th>@Loc.T("Lbl_Reason")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var st in FilteredStocks)
+                            {
+                                <tr>
+                                    <td>@st.StockInDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@st.RefNo</td>
+                                    <td>@st.Description</td>
+                                    <td>@st.VendorName</td>
+                                    <td class="text-right"><strong>@st.Qty</strong></td>
+                                    <td>@st.StockInBy</td>
+                                    <td>@st.Status</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else if (_tab == 3)
+            {
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>@Loc.T("Col_Date")</th>
+                                <th>@Loc.T("Lbl_TransNo")</th>
+                                <th>@Loc.T("Col_Description")</th>
+                                <th class="text-right">@Loc.T("Col_Total")</th>
+                                <th>@Loc.T("Lbl_CancelledBy")</th>
+                                <th>@Loc.T("Lbl_Reason")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in FilteredCancelled)
+                            {
+                                <tr>
+                                    <td>@c.SoldDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@c.TransNo</td>
+                                    <td>@c.Description</td>
+                                    <td class="text-right text-danger">@c.Total.ToString("N0")</td>
+                                    <td>@c.CancelledBy</td>
+                                    <td>@c.Reason</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>@Loc.T("Col_Date")</th>
+                                <th>@Loc.T("Lbl_TransNo")</th>
+                                <th>@Loc.T("Col_Phone")</th>
+                                <th>Type</th>
+                                <th class="text-right">@Loc.T("Col_Amount")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var wt in FilteredWallets)
+                            {
+                                <tr>
+                                    <td>@wt.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@wt.TransNo</td>
+                                    <td>@wt.Phone</td>
+                                    <td><span class="badge @(wt.Type == "Credit" ? "badge-success" : "badge-warning")">@wt.Type</span></td>
+                                    <td class="text-right"><strong>@wt.Amount.ToString("N0") FCFA</strong></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</RoleGuard>
+
+@code {
+    private DateTime? _startDate = DateTime.Today.AddDays(-30);
+    private DateTime? _endDate = DateTime.Today;
+    private string _search = string.Empty;
+    private int _tab;
+    private string _msg = string.Empty;
+    private bool _err;
+
+    private bool InRange(DateTime d)
+        => (!_startDate.HasValue || d >= _startDate.Value.Date) &&
+           (!_endDate.HasValue || d < _endDate.Value.Date.AddDays(1));
+
+    private bool Match(params string?[] fields)
+        => string.IsNullOrWhiteSpace(_search) ||
+           fields.Any(f => f != null && f.Contains(_search, StringComparison.OrdinalIgnoreCase));
+
+    private IEnumerable<SoldItem> FilteredSales => Store.SoldItems
+        .Where(s => InRange(s.SoldDate) && Match(s.TransNo, s.ProductCode, s.Description, s.Cashier, s.PaymentMode))
+        .OrderByDescending(s => s.SoldDate);
+
+    private IEnumerable<Product> FilteredProducts => Store.Products
+        .Where(p => Match(p.ProductCode, p.Description, p.BrandName, p.CategoryName, p.VendorName))
+        .OrderBy(p => p.Description);
+
+    private IEnumerable<Stock> FilteredStocks => Store.Stocks
+        .Where(s => InRange(s.StockInDate) && Match(s.RefNo, s.ProductCode, s.Description, s.VendorName, s.Status))
+        .OrderByDescending(s => s.StockInDate);
+
+    private IEnumerable<CancelledOrder> FilteredCancelled => Store.CancelledOrders
+        .Where(c => InRange(c.SoldDate) && Match(c.TransNo, c.ProductCode, c.Description, c.CancelledBy))
+        .OrderByDescending(c => c.SoldDate);
+
+    private IEnumerable<WalletTransaction> FilteredWallets => Store.WalletTransactions
+        .Where(w => InRange(w.CreatedAt) && Match(w.TransNo, w.Phone, w.Type))
+        .OrderByDescending(w => w.CreatedAt);
+
+    protected override void OnInitialized()
+    {
+        Store.OnChanged += StateHasChanged;
+        Loc.OnChange += StateHasChanged;
+    }
+
+    private void ResetFilters()
+    {
+        _startDate = DateTime.Today.AddDays(-30);
+        _endDate = DateTime.Today;
+        _search = string.Empty;
+    }
+
+    private async Task CancelSaleAsync(SoldItem s)
+    {
+        var res = Store.CancelSale(s.Id, Session.DisplayName, Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) await Storage.PersistAsync(Store);
+    }
+
+    private Task PrintReportAsync() => Storage.PrintAsync();
+
+    public void Dispose()
+    {
+        Store.OnChanged -= StateHasChanged;
+        Loc.OnChange -= StateHasChanged;
+    }
+}

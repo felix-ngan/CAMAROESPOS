@@ -1,0 +1,75 @@
+@using System.Globalization
+@inject LocalizationService Loc
+
+<div class="chart-box" style="display:flex;flex-direction:column;align-items:center;">
+    @{
+        double total = Items.Sum(i => Math.Max(0, i.Value));
+    }
+    @if (Items.Count == 0 || total <= 0)
+    {
+        <div style="padding:36px;text-align:center;color:var(--muted);font-size:13px;">@Loc.T("Lbl_NoData")</div>
+    }
+    else
+    {
+        <svg viewBox="0 0 180 180" style="width:165px;height:165px;display:block;">
+            @{
+                double startAngle = -90;
+                int idx = 0;
+            }
+            @foreach (var item in Items.Where(x => x.Value > 0))
+            {
+                double pct = item.Value / total;
+                double sweep = pct * 360.0;
+                string color = Colors[idx++ % Colors.Length];
+                if (sweep >= 359.9)
+                {
+                    <circle cx="90" cy="90" r="64" fill="none" stroke="@color" stroke-width="26">
+                        <title>@item.Label : @item.Value.ToString("N0") (100%)</title>
+                    </circle>
+                }
+                else
+                {
+                    <path d="@DescribeArc(90, 90, 64, startAngle, startAngle + sweep)" fill="none" stroke="@color" stroke-width="26">
+                        <title>@item.Label : @item.Value.ToString("N0") (@((pct * 100).ToString("0.#"))%)</title>
+                    </path>
+                }
+                startAngle += sweep;
+            }
+            <text x="90" y="94" text-anchor="middle" font-size="13" font-weight="800" fill="#2B3674">@FormatShort(total)</text>
+        </svg>
+
+        <div class="chart-legend" style="justify-content:center;">
+            @{ int c = 0; }
+            @foreach (var item in Items)
+            {
+                string color = Colors[c++ % Colors.Length];
+                <span class="legend-item">
+                    <span class="legend-dot" style="background:@color"></span>
+                    @item.Label (@FormatShort(item.Value))
+                </span>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public List<(string Label, double Value)> Items { get; set; } = new();
+    [Parameter] public string[] Colors { get; set; } = new[] { "#1E88E5", "#2E7D32", "#FB8C00", "#7E57C2", "#E53935", "#00897B" };
+
+    private static string DescribeArc(double cx, double cy, double r, double startDeg, double endDeg)
+    {
+        var (sx, sy) = Polar(cx, cy, r, startDeg);
+        var (ex, ey) = Polar(cx, cy, r, endDeg);
+        int largeArc = (endDeg - startDeg) > 180 ? 1 : 0;
+        return $"M {F(sx)} {F(sy)} A {F(r)} {F(r)} 0 {largeArc} 1 {F(ex)} {F(ey)}";
+    }
+
+    private static (double X, double Y) Polar(double cx, double cy, double r, double deg)
+    {
+        double rad = deg * Math.PI / 180.0;
+        return (cx + r * Math.Cos(rad), cy + r * Math.Sin(rad));
+    }
+
+    private static string F(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
+    private static string FormatShort(double v) => v >= 1_000_000 ? $"{v / 1_000_000:0.#}M" : v >= 1_000 ? $"{v / 1_000:0.#}k" : v.ToString("N0");
+}

@@ -1,0 +1,399 @@
+@page "/pos"
+@implements IDisposable
+@inject PosStoreState Store
+@inject BrowserStorageService Storage
+@inject SessionState Session
+@inject LocalizationService Loc
+
+<PageTitle>@Loc.T("Nav_POS") — CAMAROES POS</PageTitle>
+
+<RoleGuard>
+    @if (!string.IsNullOrEmpty(_message))
+    {
+        <div class="alert @(_isError ? "alert-error" : "alert-success") no-print">
+            <span>@_message</span>
+            <button class="btn btn-sm" @onclick="() => _message = string.Empty">×</button>
+        </div>
+    }
+
+    <div class="grid-pos no-print">
+        <!-- Left: Barcode + Cart -->
+        <div class="card stack">
+            <div class="row">
+                <input class="input" style="flex:1;"
+                       @bind="_barcodeSearch" @bind:event="oninput"
+                       @onkeydown="OnBarcodeKeyDown"
+                       placeholder="@Loc.T("POS_BarcodePlaceholder")" />
+                <button class="btn btn-primary" @onclick="SearchBarcode">🔍 Scan</button>
+                <button class="btn btn-outlined" @onclick="() => _showCatalog = true">📦 @Loc.T("POS_Catalog")</button>
+            </div>
+
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>@Loc.T("Col_Code")</th>
+                            <th>@Loc.T("Col_Description")</th>
+                            <th class="text-right">@Loc.T("Col_Price")</th>
+                            <th class="text-right">@Loc.T("Col_Qty")</th>
+                            <th class="text-right">@Loc.T("Col_Total")</th>
+                            <th>@Loc.T("Col_Actions")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in _cart)
+                        {
+                            <tr>
+                                <td><strong>@item.ProductCode</strong></td>
+                                <td>@item.ProductDescription</td>
+                                <td class="text-right">@item.Price.ToString("N0")</td>
+                                <td class="text-right">@item.Qty</td>
+                                <td class="text-right"><strong>@item.Total.ToString("N0")</strong></td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" @onclick="() => RemoveItem(item)">🗑</button>
+                                </td>
+                            </tr>
+                        }
+                        @if (_cart.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="6" style="text-align:center;color:var(--muted);padding:32px;">
+                                    @Loc.T("POS_EmptyCart")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row-between">
+                <span class="label-muted">@_cart.Sum(c => c.Qty) @Loc.T("Lbl_CartItems")</span>
+                <button class="btn btn-danger btn-sm" disabled="@(_cart.Count == 0)" @onclick="ClearCart">
+                    @Loc.T("POS_Clear")
+                </button>
+            </div>
+        </div>
+
+        <!-- Right: Checkout Panel -->
+        <div class="card stack">
+            <div class="card-title" style="margin-bottom:0;">@Loc.T("POS_Cart")</div>
+
+            <div class="row-between">
+                <span class="label-muted" style="margin:0;">@Loc.T("POS_Subtotal")</span>
+                <strong>@SubTotal.ToString("N0") FCFA</strong>
+            </div>
+
+            <div>
+                <label class="label-muted">@Loc.T("POS_DiscountPct")</label>
+                <input class="input" value="@_discountString" @oninput="OnDiscountChanged" placeholder="0" />
+            </div>
+
+            <div class="total-box">
+                <div style="font-size:11px;font-weight:700;color:var(--primary);">@Loc.T("POS_TotalDue")</div>
+                <div style="font-size:26px;font-weight:900;color:var(--navy);">@TotalAmount.ToString("N0") FCFA</div>
+            </div>
+
+            <div>
+                <label class="label-muted">@Loc.T("POS_PaymentMode")</label>
+                <select class="input" @bind="_paymentMode">
+                    <option value="cash">@Loc.T("POS_Cash")</option>
+                    <option value="wallet">@Loc.T("POS_Wallet")</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="label-muted">@Loc.T("POS_CustomerPhone")</label>
+                <input class="input" @bind="_customerPhone" placeholder="0601020304" list="wallet-phones" />
+                <datalist id="wallet-phones">
+                    @foreach (var w in Store.CustomerWallets)
+                    {
+                        <option value="@w.Phone">@w.CustomerName (@w.Balance.ToString("N0") FCFA)</option>
+                    }
+                </datalist>
+            </div>
+
+            <button class="btn btn-success btn-lg btn-block"
+                    disabled="@(_cart.Count == 0 || TotalAmount <= 0)"
+                    @onclick="StartCheckoutAsync">
+                ✓ @Loc.T("POS_CompletePurchase")
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal: Product Catalog -->
+    @if (_showCatalog)
+    {
+        <div class="modal-backdrop no-print">
+            <div class="modal-box modal-lg stack">
+                <div class="row-between">
+                    <div class="card-title" style="margin:0;">@Loc.T("POS_SelectProducts")</div>
+                    <button class="btn btn-outlined btn-sm" @onclick="() => _showCatalog = false">@Loc.T("Btn_Close")</button>
+                </div>
+
+                <div class="catalog-grid">
+                    @foreach (var p in Store.Products)
+                    {
+                        <button class="catalog-item" @onclick="() => PickProduct(p)">
+                            <div style="font-weight:700;color:var(--navy);margin-bottom:4px;">@p.Description</div>
+                            <div style="font-weight:800;color:var(--primary);font-size:15px;">@p.Price.ToString("N0") FCFA</div>
+                            <div style="margin-top:6px;" class="row-between">
+                                <span style="font-size:11px;color:var(--muted);">@p.ProductCode</span>
+                                <span class="badge @(p.Qty <= p.Reorder ? "badge-danger" : "badge-success")">Stock : @p.Qty</span>
+                            </div>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Modal: Quantity Picker -->
+    @if (_pickedProduct != null)
+    {
+        <div class="modal-backdrop no-print">
+            <div class="modal-box stack" style="max-width:340px;">
+                <div class="card-title" style="text-align:center;margin:0;">@Loc.T("POS_WhatQty")</div>
+                <div style="text-align:center;font-weight:700;color:var(--primary);">@_pickedProduct.Description</div>
+
+                <div class="row" style="justify-content:center;">
+                    <button class="btn btn-outlined" style="width:52px;height:46px;font-size:20px;" @onclick="() => { if (_pickedQty > 1) _pickedQty--; }">-</button>
+                    <input class="input" type="number" min="1" @bind="_pickedQty" style="width:90px;text-align:center;font-size:20px;font-weight:800;" />
+                    <button class="btn btn-outlined" style="width:52px;height:46px;font-size:20px;" @onclick="() => _pickedQty++">+</button>
+                </div>
+
+                <div class="grid-2">
+                    <button class="btn btn-outlined" @onclick="() => _pickedProduct = null">@Loc.T("Btn_Cancel")</button>
+                    <button class="btn btn-primary" @onclick="ConfirmAddProduct">@Loc.T("Btn_Add")</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Modal: Cash Numpad -->
+    @if (_showCashModal)
+    {
+        <div class="modal-backdrop no-print">
+            <div class="modal-box stack" style="max-width:420px;">
+                <div class="card-title" style="text-align:center;margin:0;">@Loc.T("POS_CashPayment")</div>
+                <div style="text-align:center;font-size:20px;font-weight:800;color:var(--primary);">
+                    Total : @TotalAmount.ToString("N0") FCFA
+                </div>
+
+                @if (!string.IsNullOrEmpty(_cashModalError))
+                {
+                    <div class="alert alert-error" style="margin-bottom:0;">@_cashModalError</div>
+                }
+
+                <div class="row">
+                    <input class="input" style="flex:1;font-size:20px;font-weight:800;" @bind="_receivedString" @bind:event="oninput" placeholder="@Loc.T("POS_AmountGiven")" />
+                    <button class="btn btn-danger" @onclick="() => { _receivedString = string.Empty; _cashModalError = string.Empty; }">C</button>
+                </div>
+
+                <div style="text-align:center;font-weight:700;font-size:15px;" class="@(IsCashValid ? "text-success" : "text-danger")">
+                    @Loc.T("POS_ChangeDue") @ChangeAmount.ToString("N0") FCFA
+                </div>
+
+                <div class="quick-grid">
+                    <button class="btn btn-outlined btn-sm" @onclick="SetExactAmount">@Loc.T("POS_Exact")</button>
+                    <button class="btn btn-outlined btn-sm" @onclick='() => _receivedString = "5000"'>5 000</button>
+                    <button class="btn btn-outlined btn-sm" @onclick='() => _receivedString = "10000"'>10 000</button>
+                    <button class="btn btn-outlined btn-sm" @onclick='() => _receivedString = "20000"'>20 000</button>
+                </div>
+
+                <div class="numpad-grid">
+                    @foreach (var d in new[] { "7", "8", "9", "4", "5", "6", "1", "2", "3", "0", "00", "000" })
+                    {
+                        <button class="btn btn-outlined numpad-btn" @onclick="() => PressDigit(d)">@d</button>
+                    }
+                </div>
+
+                <div class="grid-2">
+                    <button class="btn btn-outlined" @onclick="() => { _showCashModal = false; _cashModalError = string.Empty; }">@Loc.T("Btn_Cancel")</button>
+                    <button class="btn btn-success" disabled="@(!IsCashValid)" @onclick="ConfirmCashPaymentAsync">
+                        @Loc.T("Btn_Confirm")
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Modal: Printable Receipt -->
+    <ReceiptModal Result="_lastReceipt"
+                  Items="_lastReceiptItems"
+                  Cashier="@Session.DisplayName"
+                  CustomerPhone="@_lastReceiptPhone"
+                  OnClose="() => _lastReceipt = null" />
+</RoleGuard>
+
+@code {
+    private readonly List<CartItem> _cart = new();
+    private string _barcodeSearch = string.Empty;
+    private string _discountString = string.Empty;
+    private double _discountPercent;
+    private string _paymentMode = "cash";
+    private string _customerPhone = string.Empty;
+
+    private bool _showCatalog;
+    private Product? _pickedProduct;
+    private int _pickedQty = 1;
+
+    private bool _showCashModal;
+    private string _receivedString = string.Empty;
+    private string _cashModalError = string.Empty;
+
+    private CheckoutResult? _lastReceipt;
+    private List<CartItem> _lastReceiptItems = new();
+    private string _lastReceiptPhone = string.Empty;
+
+    private string _message = string.Empty;
+    private bool _isError;
+
+    private double SubTotal => _cart.Sum(c => c.Total);
+    private double TotalAmount => SubTotal - (SubTotal * (_discountPercent / 100.0));
+    private double ReceivedAmount => PosStoreState.TryParseDecimalInput(_receivedString, out var v) ? v : 0;
+    private double ChangeAmount => ReceivedAmount - TotalAmount;
+    private bool IsCashValid => PosStoreState.TryParseDecimalInput(_receivedString, out var v) && double.IsFinite(v) && v >= TotalAmount && TotalAmount > 0;
+
+    protected override void OnInitialized() => Loc.OnChange += StateHasChanged;
+
+    private void OnDiscountChanged(ChangeEventArgs e)
+    {
+        _discountString = e.Value?.ToString() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(_discountString))
+        {
+            _discountPercent = 0;
+        }
+        else if (PosStoreState.TryParseDecimalInput(_discountString, out var parsed))
+        {
+            _discountPercent = PosStoreState.ClampDiscount(parsed);
+        }
+    }
+
+    private void OnBarcodeKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") SearchBarcode();
+    }
+
+    private void SearchBarcode()
+    {
+        if (string.IsNullOrWhiteSpace(_barcodeSearch)) return;
+        var q = _barcodeSearch.Trim();
+        var prod = Store.Products.FirstOrDefault(p => p.Barcode == q || p.ProductCode.Equals(q, StringComparison.OrdinalIgnoreCase));
+        if (prod == null)
+        {
+            ShowAlert("Produit introuvable pour ce code-barres.", true);
+        }
+        else
+        {
+            AddProductToCart(prod, 1);
+            _message = string.Empty;
+        }
+        _barcodeSearch = string.Empty;
+    }
+
+    private void PickProduct(Product p)
+    {
+        _pickedProduct = p;
+        _pickedQty = 1;
+    }
+
+    private void ConfirmAddProduct()
+    {
+        if (_pickedProduct == null || _pickedQty <= 0) return;
+        AddProductToCart(_pickedProduct, _pickedQty);
+        _pickedProduct = null;
+    }
+
+    private void AddProductToCart(Product p, int qty)
+    {
+        var existing = _cart.FirstOrDefault(c => c.ProductCode == p.ProductCode);
+        if (existing != null)
+        {
+            existing.Qty += qty;
+            existing.Total = existing.Qty * existing.Price;
+        }
+        else
+        {
+            _cart.Add(new CartItem
+            {
+                ProductCode = p.ProductCode,
+                ProductDescription = p.Description,
+                CostPrice = p.CostPrice,
+                Price = p.Price,
+                Qty = qty,
+                Total = p.Price * qty,
+                Date = DateTime.Now
+            });
+        }
+    }
+
+    private void RemoveItem(CartItem item) => _cart.Remove(item);
+
+    private void ClearCart()
+    {
+        _cart.Clear();
+        _discountString = string.Empty;
+        _discountPercent = 0;
+    }
+
+    private async Task StartCheckoutAsync()
+    {
+        _message = string.Empty;
+        if (_paymentMode == "wallet")
+        {
+            var itemsCopy = _cart.Select(c => new CartItem { ProductCode = c.ProductCode, ProductDescription = c.ProductDescription, Price = c.Price, CostPrice = c.CostPrice, Qty = c.Qty, Total = c.Total }).ToList();
+            var res = Store.CheckoutWallet(_cart, _discountPercent, _customerPhone.Trim(), Session.DisplayName);
+            if (!res.Success)
+            {
+                ShowAlert(res.Message, true);
+                return;
+            }
+            await Storage.PersistAsync(Store);
+            _lastReceipt = res;
+            _lastReceiptItems = itemsCopy;
+            _lastReceiptPhone = _customerPhone.Trim();
+            ClearCart();
+            _customerPhone = string.Empty;
+        }
+        else
+        {
+            _receivedString = string.Empty;
+            _showCashModal = true;
+        }
+    }
+
+    private void PressDigit(string d)
+    {
+        _receivedString = (_receivedString == "0" || string.IsNullOrEmpty(_receivedString)) ? d : _receivedString + d;
+    }
+
+    private void SetExactAmount() => _receivedString = Math.Ceiling(TotalAmount).ToString("0");
+
+    private async Task ConfirmCashPaymentAsync()
+    {
+        _cashModalError = string.Empty;
+        var itemsCopy = _cart.Select(c => new CartItem { ProductCode = c.ProductCode, ProductDescription = c.ProductDescription, Price = c.Price, CostPrice = c.CostPrice, Qty = c.Qty, Total = c.Total }).ToList();
+        var res = Store.CheckoutCash(_cart, _discountPercent, ReceivedAmount, _customerPhone.Trim(), Session.DisplayName);
+        if (!res.Success)
+        {
+            _cashModalError = res.Message;
+            return;
+        }
+        await Storage.PersistAsync(Store);
+        _showCashModal = false;
+        _lastReceipt = res;
+        _lastReceiptItems = itemsCopy;
+        _lastReceiptPhone = _customerPhone.Trim();
+        ClearCart();
+        _customerPhone = string.Empty;
+        _receivedString = string.Empty;
+    }
+
+    private void ShowAlert(string msg, bool error)
+    {
+        _message = msg;
+        _isError = error;
+    }
+
+    public void Dispose() => Loc.OnChange -= StateHasChanged;
+}

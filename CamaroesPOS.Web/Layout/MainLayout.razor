@@ -1,0 +1,154 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject SessionState Session
+@inject PosStoreState Store
+@inject BrowserStorageService Storage
+@inject LocalizationService Loc
+@inject NavigationManager Nav
+
+<div class="app-shell">
+    @if (_mobileOpen)
+    {
+        <div class="sidebar-backdrop" @onclick="() => _mobileOpen = false"></div>
+    }
+
+    <aside class="sidebar @(_mobileOpen ? "open" : "") no-print">
+        <div class="brand-header">
+            <div class="brand-icon">C</div>
+            <div>
+                <div class="brand-name">CAMAROES</div>
+                <div class="brand-sub">POS SYSTEM · WEB</div>
+            </div>
+        </div>
+
+        <nav class="nav-list" @onclick="() => _mobileOpen = false">
+            @if (Session.IsAdmin)
+            {
+                <NavLink class="nav-item" href="" Match="NavLinkMatch.All">
+                    <span>📊</span><span>@Loc.T("Nav_Dashboard")</span>
+                </NavLink>
+            }
+
+            <NavLink class="nav-item" href="pos">
+                <span>🛒</span><span>@Loc.T("Nav_POS")</span>
+            </NavLink>
+
+            <NavLink class="nav-item" href="inventory">
+                <span>📦</span><span>@Loc.T("Nav_Inventory")</span>
+            </NavLink>
+
+            <NavLink class="nav-item" href="wallets">
+                <span>👥</span><span>@Loc.T("Nav_Wallets")</span>
+            </NavLink>
+
+            <NavLink class="nav-item" href="vendors">
+                <span>🚚</span><span>@Loc.T("Nav_Vendors")</span>
+            </NavLink>
+
+            <NavLink class="nav-item" href="reports">
+                <span>📈</span><span>@Loc.T("Nav_Reports")</span>
+            </NavLink>
+
+            @if (Session.IsAdmin)
+            {
+                <NavLink class="nav-item" href="expenses">
+                    <span>💸</span><span>@Loc.T("Nav_Expenses")</span>
+                </NavLink>
+
+                <NavLink class="nav-item" href="settings">
+                    <span>⚙️</span><span>@Loc.T("Nav_Settings")</span>
+                </NavLink>
+            }
+        </nav>
+
+        <div class="sidebar-footer">
+            @if (Session.IsAuthenticated)
+            {
+                <div class="user-pill">
+                    <div class="user-pill-name">@Session.DisplayName</div>
+                    <div class="user-pill-role">@Session.Role</div>
+                </div>
+            }
+
+            <button class="btn btn-outlined btn-sm btn-block" @onclick="ResetDemoAsync">
+                ↺ @Loc.T("Nav_ResetDemo")
+            </button>
+
+            <a class="btn btn-outlined btn-sm btn-block" href="https://github.com/felix-ngan/CAMAROESPOS" target="_blank" rel="noopener">
+                ↗ @Loc.T("Nav_Github")
+            </a>
+
+            <button class="btn btn-danger btn-sm btn-block" @onclick="Logout">
+                ⎋ @Loc.T("Nav_Logout")
+            </button>
+        </div>
+    </aside>
+
+    <div class="main-area">
+        <header class="topbar no-print">
+            <div class="topbar-left">
+                <button class="btn btn-outlined btn-sm mobile-menu-btn" @onclick="() => _mobileOpen = !_mobileOpen">☰</button>
+                <div class="topbar-title">@GetPageTitle()</div>
+            </div>
+
+            <div class="topbar-actions">
+                <button class="btn btn-outlined btn-sm" @onclick="Loc.Toggle" title="Changer la langue (FR/EN)">
+                    @(Loc.CurrentLang == "fr" ? "EN" : "FR")
+                </button>
+                <span class="date-chip">📅 @Loc.T("Today") · @DateTime.Today.ToString("dd/MM/yyyy")</span>
+            </div>
+        </header>
+
+        <main>
+            @Body
+        </main>
+    </div>
+</div>
+
+@code {
+    private bool _mobileOpen;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Storage.LoadIntoAsync(Store);
+        await Storage.RestoreSessionAsync(Session, Store);
+        Session.OnChange += StateHasChanged;
+        Loc.OnChange += StateHasChanged;
+    }
+
+    private string GetPageTitle()
+    {
+        var path = Nav.ToBaseRelativePath(Nav.Uri).Split('?')[0].Trim('/').ToLowerInvariant();
+        return path switch
+        {
+            "" => Loc.T("Nav_Dashboard"),
+            "pos" => Loc.T("Nav_POS"),
+            "inventory" => Loc.T("Nav_Inventory"),
+            "wallets" => Loc.T("Nav_Wallets"),
+            "vendors" => Loc.T("Nav_Vendors"),
+            "reports" => Loc.T("Nav_Reports"),
+            "expenses" => Loc.T("Nav_Expenses"),
+            "settings" => Loc.T("Nav_Settings"),
+            _ => "CAMAROES POS"
+        };
+    }
+
+    private async Task ResetDemoAsync()
+    {
+        await Storage.ResetAsync(Store);
+        StateHasChanged();
+    }
+
+    private async Task Logout()
+    {
+        Session.Logout();
+        await Storage.ClearSessionAsync();
+        Nav.NavigateTo("/login", replace: true);
+    }
+
+    public void Dispose()
+    {
+        Session.OnChange -= StateHasChanged;
+        Loc.OnChange -= StateHasChanged;
+    }
+}
