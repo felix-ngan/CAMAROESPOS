@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export PATH="$HOME/.dotnet:$PATH"
+
+# Vercel minimal Linux containers often omit libicu; enable globalization invariant fallback when missing
+if [ "$(uname -s)" = "Linux" ]; then
+  if ! ldconfig -p 2>/dev/null | grep -q libicu; then
+    export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+  fi
+fi
+
 # Ensure .NET 8 SDK is available (works both locally and inside Vercel Linux build containers)
 if ! command -v dotnet >/dev/null 2>&1 || ! dotnet --list-sdks 2>/dev/null | grep -q '^8\.0\.'; then
   echo "Installing .NET 8 SDK..."

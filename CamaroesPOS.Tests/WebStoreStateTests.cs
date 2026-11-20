@@ -156,4 +156,49 @@ public class WebStoreStateTests
         string enTitle = loc.T("Nav_Dashboard");
         Assert.NotEqual(frTitle, enTitle);
     }
+
+    [Fact]
+    public void NonFiniteNumbers_AreRejectedInCheckoutWalletAndExpenses_AndInvariantParsingHandlesCommaAndDot()
+    {
+        var store = new PosStoreState();
+        store.SeedDemoData();
+        var cart = new List<CartItem>
+        {
+            new() { ProductCode = "P002", ProductDescription = "Souris", CostPrice = 9500, Price = 15000, Qty = 1, Total = 15000 }
+        };
+
+        Assert.False(store.CheckoutCash(cart, 0, double.PositiveInfinity, null, "Admin").Success);
+        Assert.False(store.CheckoutCash(cart, 0, double.NaN, null, "Admin").Success);
+        Assert.False(store.SaveWallet(new CustomerWallet { Phone = "0600000001" }, double.NaN, isNew: true).Success);
+        Assert.False(store.SaveWallet(new CustomerWallet { Phone = "0600000001" }, double.PositiveInfinity, isNew: true).Success);
+        Assert.False(store.SaveExpense(new Expense { Category = "Autre", Amount = double.NaN }, isNew: true, "Admin", isAdmin: true).Success);
+        Assert.False(store.SaveExpense(new Expense { Category = "Autre", Amount = double.PositiveInfinity }, isNew: true, "Admin", isAdmin: true).Success);
+
+        Assert.True(PosStoreState.TryParseDecimalInput("12,5", out double commaVal));
+        Assert.Equal(12.5, commaVal);
+        Assert.True(PosStoreState.TryParseDecimalInput("12.5", out double dotVal));
+        Assert.Equal(12.5, dotVal);
+        Assert.False(PosStoreState.TryParseDecimalInput("Infinity", out _));
+        Assert.False(PosStoreState.TryParseDecimalInput("NaN", out _));
+    }
+
+    [Fact]
+    public void SessionState_RestoresActiveUserByUsername_AndIgnoresInactiveOrUnknown()
+    {
+        var store = new PosStoreState();
+        store.SeedDemoData();
+        store.SaveUser(new User { Username = "disabled", Name = "Off", Password = "123", Role = "Cashier", IsActive = false }, isAdmin: true);
+
+        var session = new SessionState();
+        Assert.True(session.TryRestoreFromStore("caissier1", store));
+        Assert.True(session.IsAuthenticated);
+        Assert.False(session.IsAdmin);
+
+        session.Logout();
+        Assert.False(session.TryRestoreFromStore("disabled", store));
+        Assert.False(session.IsAuthenticated);
+
+        Assert.False(session.TryRestoreFromStore("unknown", store));
+        Assert.False(session.IsAuthenticated);
+    }
 }

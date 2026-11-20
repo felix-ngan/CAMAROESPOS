@@ -22,6 +22,29 @@ window.posInterop = {
             return false;
         }
     },
+    getSessionItem: function (key) {
+        try {
+            return window.sessionStorage.getItem(key);
+        } catch {
+            return null;
+        }
+    },
+    setSessionItem: function (key, value) {
+        try {
+            window.sessionStorage.setItem(key, value);
+            return true;
+        } catch {
+            return false;
+        }
+    },
+    removeSessionItem: function (key) {
+        try {
+            window.sessionStorage.removeItem(key);
+            return true;
+        } catch {
+            return false;
+        }
+    },
     printWindow: function () {
         window.print();
     }

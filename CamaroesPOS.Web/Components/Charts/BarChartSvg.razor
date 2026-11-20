@@ -1,9 +1,10 @@
 @using System.Globalization
+@inject LocalizationService Loc
 
 <div class="chart-box">
     @if (Items.Count == 0)
     {
-        <div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;">Aucune donnée</div>
+        <div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;">@Loc.T("Lbl_NoData")</div>
     }
     else
     {

@@ -67,7 +67,7 @@
             </div>
 
             <div class="row-between">
-                <span class="label-muted">@_cart.Sum(c => c.Qty) article(s)</span>
+                <span class="label-muted">@_cart.Sum(c => c.Qty) @Loc.T("Lbl_CartItems")</span>
                 <button class="btn btn-danger btn-sm" disabled="@(_cart.Count == 0)" @onclick="ClearCart">
                     @Loc.T("POS_Clear")
                 </button>
@@ -179,12 +179,17 @@
                     Total : @TotalAmount.ToString("N0") FCFA
                 </div>
 
+                @if (!string.IsNullOrEmpty(_cashModalError))
+                {
+                    <div class="alert alert-error" style="margin-bottom:0;">@_cashModalError</div>
+                }
+
                 <div class="row">
                     <input class="input" style="flex:1;font-size:20px;font-weight:800;" @bind="_receivedString" @bind:event="oninput" placeholder="@Loc.T("POS_AmountGiven")" />
-                    <button class="btn btn-danger" @onclick="() => _receivedString = string.Empty">C</button>
+                    <button class="btn btn-danger" @onclick="() => { _receivedString = string.Empty; _cashModalError = string.Empty; }">C</button>
                 </div>
 
-                <div style="text-align:center;font-weight:700;font-size:15px;" class="@(ChangeAmount >= 0 ? "text-success" : "text-danger")">
+                <div style="text-align:center;font-weight:700;font-size:15px;" class="@(IsCashValid ? "text-success" : "text-danger")">
                     @Loc.T("POS_ChangeDue") @ChangeAmount.ToString("N0") FCFA
                 </div>
 
@@ -203,8 +208,8 @@
                 </div>
 
                 <div class="grid-2">
-                    <button class="btn btn-outlined" @onclick="() => _showCashModal = false">@Loc.T("Btn_Cancel")</button>
-                    <button class="btn btn-success" disabled="@(ReceivedAmount < TotalAmount || TotalAmount <= 0)" @onclick="ConfirmCashPaymentAsync">
+                    <button class="btn btn-outlined" @onclick="() => { _showCashModal = false; _cashModalError = string.Empty; }">@Loc.T("Btn_Cancel")</button>
+                    <button class="btn btn-success" disabled="@(!IsCashValid)" @onclick="ConfirmCashPaymentAsync">
                         @Loc.T("Btn_Confirm")
                     </button>
                 </div>
@@ -234,6 +239,7 @@
 
     private bool _showCashModal;
     private string _receivedString = string.Empty;
+    private string _cashModalError = string.Empty;
 
     private CheckoutResult? _lastReceipt;
     private List<CartItem> _lastReceiptItems = new();
@@ -244,8 +250,9 @@
 
     private double SubTotal => _cart.Sum(c => c.Total);
     private double TotalAmount => SubTotal - (SubTotal * (_discountPercent / 100.0));
-    private double ReceivedAmount => double.TryParse(_receivedString, out var v) ? v : 0;
+    private double ReceivedAmount => PosStoreState.TryParseDecimalInput(_receivedString, out var v) ? v : 0;
     private double ChangeAmount => ReceivedAmount - TotalAmount;
+    private bool IsCashValid => PosStoreState.TryParseDecimalInput(_receivedString, out var v) && double.IsFinite(v) && v >= TotalAmount && TotalAmount > 0;
 
     protected override void OnInitialized() => Loc.OnChange += StateHasChanged;
 
@@ -256,7 +263,7 @@
         {
             _discountPercent = 0;
         }
-        else if (double.TryParse(_discountString, out var parsed))
+        else if (PosStoreState.TryParseDecimalInput(_discountString, out var parsed))
         {
             _discountPercent = PosStoreState.ClampDiscount(parsed);
         }
@@ -364,11 +371,12 @@
 
     private async Task ConfirmCashPaymentAsync()
     {
+        _cashModalError = string.Empty;
         var itemsCopy = _cart.Select(c => new CartItem { ProductCode = c.ProductCode, ProductDescription = c.ProductDescription, Price = c.Price, CostPrice = c.CostPrice, Qty = c.Qty, Total = c.Total }).ToList();
         var res = Store.CheckoutCash(_cart, _discountPercent, ReceivedAmount, _customerPhone.Trim(), Session.DisplayName);
         if (!res.Success)
         {
-            ShowAlert(res.Message, true);
+            _cashModalError = res.Message;
             return;
         }
         await Storage.PersistAsync(Store);

@@ -78,6 +78,7 @@
     protected override async Task OnInitializedAsync()
     {
         await Storage.LoadIntoAsync(Store);
+        await Storage.RestoreSessionAsync(Session, Store);
         Loc.OnChange += StateHasChanged;
         if (Session.IsAuthenticated)
         {
@@ -85,19 +86,19 @@
         }
     }
 
-    private void OnKeyDown(KeyboardEventArgs e)
+    private async Task OnKeyDown(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter") HandleLogin();
+        if (e.Key == "Enter") await HandleLogin();
     }
 
-    private void QuickLogin(bool asAdmin)
+    private async Task QuickLogin(bool asAdmin)
     {
         _username = asAdmin ? "admin" : "caissier1";
         _password = "123";
-        HandleLogin();
+        await HandleLogin();
     }
 
-    private void HandleLogin()
+    private async Task HandleLogin()
     {
         _error = string.Empty;
         var user = Store.Authenticate(_username.Trim(), _password);
@@ -107,6 +108,7 @@
             return;
         }
         Session.Login(user);
+        await Storage.SaveSessionAsync(user.Username);
         Nav.NavigateTo(Session.IsAdmin ? "/" : "/pos", replace: true);
     }
 

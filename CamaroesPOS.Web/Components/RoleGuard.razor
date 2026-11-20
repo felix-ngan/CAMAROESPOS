@@ -18,6 +18,7 @@
     protected override async Task OnInitializedAsync()
     {
         await Storage.LoadIntoAsync(Store);
+        await Storage.RestoreSessionAsync(Session, Store);
         if (!Session.IsAuthenticated)
         {
             Nav.NavigateTo("/login", replace: true);

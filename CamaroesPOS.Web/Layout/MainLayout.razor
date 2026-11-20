@@ -111,6 +111,7 @@
     protected override async Task OnInitializedAsync()
     {
         await Storage.LoadIntoAsync(Store);
+        await Storage.RestoreSessionAsync(Session, Store);
         Session.OnChange += StateHasChanged;
         Loc.OnChange += StateHasChanged;
     }
@@ -138,9 +139,10 @@
         StateHasChanged();
     }
 
-    private void Logout()
+    private async Task Logout()
     {
         Session.Logout();
+        await Storage.ClearSessionAsync();
         Nav.NavigateTo("/login", replace: true);
     }
 

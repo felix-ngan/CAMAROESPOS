@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using CamaroesPOS.Domain.Entities;
 
@@ -245,9 +246,21 @@ public class PosStoreState
 
     public static double ClampDiscount(double discountPercent)
     {
-        if (double.IsNaN(discountPercent) || double.IsInfinity(discountPercent) || discountPercent < 0) return 0;
+        if (!double.IsFinite(discountPercent) || discountPercent < 0) return 0;
         if (discountPercent > 100) return 100;
         return discountPercent;
+    }
+
+    public static bool TryParseDecimalInput(string? raw, out double value)
+    {
+        value = 0;
+        if (string.IsNullOrWhiteSpace(raw)) return false;
+        var normalized = raw.Trim().Replace(" ", "").Replace(',', '.');
+        if (!double.TryParse(normalized, NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed))
+            return false;
+        if (!double.IsFinite(parsed)) return false;
+        value = parsed;
+        return true;
     }
 
     public CheckoutResult CheckoutCash(List<CartItem> cart, double discountPercent, double receivedAmount, string? customerPhone, string cashier)
@@ -260,11 +273,11 @@ public class PosStoreState
         double discountAmount = subTotal * (discount / 100.0);
         double total = subTotal - discountAmount;
 
-        if (total <= 0)
+        if (!double.IsFinite(total) || total <= 0)
             return new CheckoutResult(false, "Le montant total doit être supérieur à zéro.");
 
-        if (double.IsNaN(receivedAmount) || receivedAmount < total)
-            return new CheckoutResult(false, "Le montant reçu est insuffisant.");
+        if (!double.IsFinite(receivedAmount) || receivedAmount < total)
+            return new CheckoutResult(false, "Le montant reçu est insuffisant ou invalide.");
 
         string transNo = DateTime.Now.ToString("yyyyMMddHHmmss");
         RecordSaleItems(cart, transNo, discount, total, customerPhone, cashier, "Espèces");
@@ -524,8 +537,8 @@ public class PosStoreState
     {
         if (string.IsNullOrWhiteSpace(wallet.Phone))
             return new OperationResult(false, "Le numéro de téléphone est obligatoire.");
-        if (rechargeAmount < 0)
-            return new OperationResult(false, "Le montant ne peut pas être négatif.");
+        if (!double.IsFinite(rechargeAmount) || rechargeAmount < 0)
+            return new OperationResult(false, "Le montant est invalide ou négatif.");
 
         wallet.CustomerName ??= string.Empty;
         wallet.Email ??= string.Empty;
@@ -661,7 +674,7 @@ public class PosStoreState
     public OperationResult SaveExpense(Expense expense, bool isNew, string addedBy, bool isAdmin)
     {
         if (!isAdmin) return new OperationResult(false, "Seul l'administrateur peut modifier ou ajouter des dépenses.");
-        if (string.IsNullOrWhiteSpace(expense.Category) || expense.Amount <= 0)
+        if (string.IsNullOrWhiteSpace(expense.Category) || !double.IsFinite(expense.Amount) || expense.Amount <= 0)
             return new OperationResult(false, "Veuillez renseigner une catégorie et un montant supérieur à zéro.");
 
         expense.Description ??= string.Empty;

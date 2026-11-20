@@ -31,7 +31,7 @@
                 <table class="data-table" style="font-size:12px;">
                     <thead>
                         <tr>
-                            <th>Article</th>
+                            <th>@Loc.T("Lbl_Item")</th>
                             <th class="text-right">@Loc.T("Col_Qty")</th>
                             <th class="text-right">@Loc.T("Col_Total")</th>
                         </tr>
@@ -54,7 +54,7 @@
                     @if (Result.DiscountAmount > 0)
                     {
                         <div class="row-between"><span>@Loc.T("POS_Subtotal")</span><span>@Result.SubTotal.ToString("N0") FCFA</span></div>
-                        <div class="row-between text-warning"><span>Réduction :</span><span>-@Result.DiscountAmount.ToString("N0") FCFA</span></div>
+                        <div class="row-between text-warning"><span>@Loc.T("Lbl_Discount")</span><span>-@Result.DiscountAmount.ToString("N0") FCFA</span></div>
                     }
                     <div class="row-between" style="font-size:16px;font-weight:800;color:#2B3674;margin-top:4px;">
                         <span>TOTAL :</span>
@@ -62,7 +62,7 @@
                     </div>
                     @if (Result.PaymentMode == "Espèces")
                     {
-                        <div class="row-between"><span>Reçu :</span><span>@Result.ReceivedAmount.ToString("N0") FCFA</span></div>
+                        <div class="row-between"><span>@Loc.T("Lbl_Received")</span><span>@Result.ReceivedAmount.ToString("N0") FCFA</span></div>
                         <div class="row-between text-success"><strong>@Loc.T("POS_ChangeDue")</strong><strong>@Result.ChangeAmount.ToString("N0") FCFA</strong></div>
                     }
                 </div>

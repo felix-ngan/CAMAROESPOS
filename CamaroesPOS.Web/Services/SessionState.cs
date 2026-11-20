@@ -18,6 +18,16 @@ public class SessionState
         OnChange?.Invoke();
     }
 
+    public bool TryRestoreFromStore(string? username, PosStoreState store)
+    {
+        if (string.IsNullOrWhiteSpace(username)) return false;
+        var user = store.Users.FirstOrDefault(u => u.Username == username && u.IsActive);
+        if (user == null) return false;
+        CurrentUser = user;
+        OnChange?.Invoke();
+        return true;
+    }
+
     public void Logout()
     {
         CurrentUser = null;

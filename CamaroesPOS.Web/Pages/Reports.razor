@@ -42,14 +42,14 @@
         <!-- Summary KPIs -->
         <div class="grid-2">
             <div class="card">
-                <span class="label-muted">Chiffre d'Affaires</span>
+                <span class="label-muted">@Loc.T("Lbl_Revenue")</span>
                 <div class="kpi-value text-primary">@FilteredSales.Sum(s => s.Total).ToString("N0") FCFA</div>
-                <div class="kpi-sub">@FilteredSales.Count() ligne(s) de vente</div>
+                <div class="kpi-sub">@FilteredSales.Count() @Loc.T("Lbl_SalesLines")</div>
             </div>
             <div class="card">
                 <span class="label-muted">@Loc.T("Dash_ItemsSold")</span>
                 <div class="kpi-value">@FilteredSales.Sum(s => s.Qty)</div>
-                <div class="kpi-sub">Réductions : @FilteredSales.Sum(s => s.Discount).ToString("N0") FCFA</div>
+                <div class="kpi-sub">@Loc.T("Lbl_Discounts") : @FilteredSales.Sum(s => s.Discount).ToString("N0") FCFA</div>
             </div>
         </div>
 
@@ -70,7 +70,7 @@
                         <thead>
                             <tr>
                                 <th>@Loc.T("Col_Date")</th>
-                                <th>N° Trans</th>
+                                <th>@Loc.T("Lbl_TransNo")</th>
                                 <th>@Loc.T("Col_Description")</th>
                                 <th class="text-right">@Loc.T("Col_Qty")</th>
                                 <th class="text-right">@Loc.T("Col_Total")</th>
@@ -144,12 +144,12 @@
                         <thead>
                             <tr>
                                 <th>@Loc.T("Col_Date")</th>
-                                <th>Réf.</th>
+                                <th>@Loc.T("Lbl_Ref")</th>
                                 <th>@Loc.T("Col_Description")</th>
                                 <th>@Loc.T("Col_Vendor")</th>
                                 <th class="text-right">@Loc.T("Col_Qty")</th>
-                                <th>Par</th>
-                                <th>Motif</th>
+                                <th>@Loc.T("Lbl_By")</th>
+                                <th>@Loc.T("Lbl_Reason")</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -176,11 +176,11 @@
                         <thead>
                             <tr>
                                 <th>@Loc.T("Col_Date")</th>
-                                <th>N° Trans</th>
+                                <th>@Loc.T("Lbl_TransNo")</th>
                                 <th>@Loc.T("Col_Description")</th>
                                 <th class="text-right">@Loc.T("Col_Total")</th>
-                                <th>Annulé par</th>
-                                <th>Raison</th>
+                                <th>@Loc.T("Lbl_CancelledBy")</th>
+                                <th>@Loc.T("Lbl_Reason")</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -206,7 +206,7 @@
                         <thead>
                             <tr>
                                 <th>@Loc.T("Col_Date")</th>
-                                <th>N° Trans</th>
+                                <th>@Loc.T("Lbl_TransNo")</th>
                                 <th>@Loc.T("Col_Phone")</th>
                                 <th>Type</th>
                                 <th class="text-right">@Loc.T("Col_Amount")</th>
