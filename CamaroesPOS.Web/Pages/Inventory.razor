@@ -1,0 +1,273 @@
+@page "/inventory"
+@implements IDisposable
+@inject PosStoreState Store
+@inject BrowserStorageService Storage
+@inject SessionState Session
+@inject LocalizationService Loc
+
+<PageTitle>@Loc.T("Nav_Inventory") — CAMAROES POS</PageTitle>
+
+<RoleGuard>
+    @if (!string.IsNullOrEmpty(_msg))
+    {
+        <div class="alert @(_err ? "alert-error" : "alert-success")">
+            <span>@_msg</span>
+            <button class="btn btn-sm" @onclick="() => _msg = string.Empty">×</button>
+        </div>
+    }
+
+    <div class="@(_isEditing || _isAdjusting ? "grid-split" : "")">
+        <div class="card stack">
+            <div class="row-between">
+                <input class="input" style="flex:1;min-width:220px;" @bind="_search" @bind:event="oninput" placeholder="@Loc.T("Inv_Search")" />
+                @if (Session.IsAdmin)
+                {
+                    <div class="row">
+                        <button class="btn btn-outlined btn-sm" @onclick="() => _showBrandCat = true">🏷 @Loc.T("Inv_BrandsCategories")</button>
+                        <button class="btn btn-primary btn-sm" @onclick="OpenAdd">+ @Loc.T("Inv_AddProduct")</button>
+                    </div>
+                }
+            </div>
+
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>@Loc.T("Col_Code")</th>
+                            <th>@Loc.T("Col_Barcode")</th>
+                            <th>@Loc.T("Col_Description")</th>
+                            <th>@Loc.T("Col_Brand")</th>
+                            <th>@Loc.T("Col_Category")</th>
+                            <th>@Loc.T("Col_Vendor")</th>
+                            <th class="text-right">@Loc.T("Inv_SalePrice")</th>
+                            <th class="text-right">Stock</th>
+                            @if (Session.IsAdmin)
+                            {
+                                <th>@Loc.T("Col_Actions")</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in FilteredProducts)
+                        {
+                            <tr>
+                                <td><strong>@p.ProductCode</strong></td>
+                                <td>@p.Barcode</td>
+                                <td>@p.Description</td>
+                                <td>@p.BrandName</td>
+                                <td>@p.CategoryName</td>
+                                <td>@p.VendorName</td>
+                                <td class="text-right">@p.Price.ToString("N0")</td>
+                                <td class="text-right">
+                                    <span class="badge @(p.Qty <= p.Reorder ? "badge-danger" : "badge-success")">@p.Qty</span>
+                                </td>
+                                @if (Session.IsAdmin)
+                                {
+                                    <td>
+                                        <div class="row" style="gap:4px;">
+                                            <button class="btn btn-outlined btn-sm" title="Ajuster stock" @onclick="() => OpenAdjust(p)">↕</button>
+                                            <button class="btn btn-outlined btn-sm" title="Modifier" @onclick="() => OpenEdit(p)">✏️</button>
+                                            <button class="btn btn-danger btn-sm" title="Supprimer" @onclick="() => DeleteProductAsync(p)">🗑</button>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (_isEditing && _editModel != null && Session.IsAdmin)
+        {
+            <div class="card stack">
+                <div class="card-title" style="margin:0;">@Loc.T("Inv_ProductSheet")</div>
+
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Code")</label>
+                    <input class="input" @bind="_editModel.ProductCode" disabled="@(!_isNew)" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Barcode")</label>
+                    <input class="input" @bind="_editModel.Barcode" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Description")</label>
+                    <input class="input" @bind="_editModel.Description" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Brand")</label>
+                    <select class="input" @bind="_editModel.BrandName">
+                        <option value="">—</option>
+                        @foreach (var b in Store.Brands)
+                        {
+                            <option value="@b.BrandName">@b.BrandName</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Category")</label>
+                    <select class="input" @bind="_editModel.CategoryName">
+                        <option value="">—</option>
+                        @foreach (var c in Store.Categories)
+                        {
+                            <option value="@c.CategoryName">@c.CategoryName</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Vendor")</label>
+                    <select class="input" @bind="_editModel.VendorId">
+                        <option value="0">—</option>
+                        @foreach (var v in Store.Vendors)
+                        {
+                            <option value="@v.Id">@v.VendorName</option>
+                        }
+                    </select>
+                </div>
+                <div class="grid-2">
+                    <div>
+                        <label class="label-muted">@Loc.T("Inv_SalePrice")</label>
+                        <input class="input" type="number" @bind="_editModel.Price" />
+                    </div>
+                    <div>
+                        <label class="label-muted">@Loc.T("Inv_CostPrice")</label>
+                        <input class="input" type="number" @bind="_editModel.CostPrice" />
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div>
+                        <label class="label-muted">@Loc.T("Inv_CurrentStock")</label>
+                        <input class="input" type="number" min="0" @bind="_editModel.Qty" />
+                    </div>
+                    <div>
+                        <label class="label-muted">@Loc.T("Inv_Reorder")</label>
+                        <input class="input" type="number" min="0" @bind="_editModel.Reorder" />
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <button class="btn btn-outlined" @onclick="() => _isEditing = false">@Loc.T("Btn_Cancel")</button>
+                    <button class="btn btn-primary" @onclick="SaveProductAsync">@Loc.T("Btn_Save")</button>
+                </div>
+            </div>
+        }
+
+        @if (_isAdjusting && _adjustTarget != null && Session.IsAdmin)
+        {
+            <div class="card stack">
+                <div class="card-title" style="margin:0;">@Loc.T("Inv_AdjustStock")</div>
+                <div style="font-weight:700;color:var(--primary);">@_adjustTarget.Description</div>
+                <div class="label-muted">@Loc.T("Inv_CurrentStock") : @_adjustTarget.Qty</div>
+
+                <div>
+                    <label class="label-muted">@Loc.T("Inv_OpType")</label>
+                    <select class="input" @bind="_adjType">
+                        <option value="Entrée">Entrée</option>
+                        <option value="Sortie">Sortie</option>
+                        <option value="Ajustement (Inventaire)">Ajustement (Inventaire)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Col_Qty")</label>
+                    <input class="input" type="number" min="0" @bind="_adjQty" />
+                </div>
+                <div>
+                    <label class="label-muted">@Loc.T("Inv_Justification")</label>
+                    <textarea class="input" rows="3" @bind="_adjReason"></textarea>
+                </div>
+                <div class="grid-2">
+                    <button class="btn btn-outlined" @onclick="() => _isAdjusting = false">@Loc.T("Btn_Cancel")</button>
+                    <button class="btn btn-success" @onclick="SaveAdjustmentAsync">@Loc.T("Btn_Confirm")</button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <BrandCategoryModal IsOpen="_showBrandCat" OnClose="() => _showBrandCat = false" />
+</RoleGuard>
+
+@code {
+    private string _search = string.Empty;
+    private bool _isEditing;
+    private bool _isNew;
+    private Product? _editModel;
+
+    private bool _isAdjusting;
+    private Product? _adjustTarget;
+    private string _adjType = "Entrée";
+    private int _adjQty;
+    private string _adjReason = string.Empty;
+
+    private bool _showBrandCat;
+    private string _msg = string.Empty;
+    private bool _err;
+
+    private IEnumerable<Product> FilteredProducts => string.IsNullOrWhiteSpace(_search)
+        ? Store.Products
+        : Store.Products.Where(p =>
+            (p.ProductCode?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (p.Description?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (p.BrandName?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (p.CategoryName?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    protected override void OnInitialized()
+    {
+        Store.OnChanged += StateHasChanged;
+        Loc.OnChange += StateHasChanged;
+    }
+
+    private void OpenAdd()
+    {
+        if (!Session.IsAdmin) return;
+        _editModel = new Product { ProductCode = "", Barcode = "", Description = "", BrandName = "", CategoryName = "", VendorName = "", Reorder = 5 };
+        _isNew = true; _isEditing = true; _isAdjusting = false;
+    }
+
+    private void OpenEdit(Product p)
+    {
+        if (!Session.IsAdmin) return;
+        _editModel = new Product
+        {
+            ProductCode = p.ProductCode, Barcode = p.Barcode, Description = p.Description,
+            BrandName = p.BrandName, CategoryName = p.CategoryName, VendorId = p.VendorId, VendorName = p.VendorName,
+            CostPrice = p.CostPrice, Price = p.Price, Qty = p.Qty, Reorder = p.Reorder
+        };
+        _isNew = false; _isEditing = true; _isAdjusting = false;
+    }
+
+    private async Task SaveProductAsync()
+    {
+        if (_editModel == null) return;
+        var res = Store.SaveProduct(_editModel, _isNew, Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) { _isEditing = false; await Storage.PersistAsync(Store); }
+    }
+
+    private async Task DeleteProductAsync(Product p)
+    {
+        var res = Store.DeleteProduct(p.ProductCode, Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) await Storage.PersistAsync(Store);
+    }
+
+    private void OpenAdjust(Product p)
+    {
+        if (!Session.IsAdmin) return;
+        _adjustTarget = p; _adjType = "Entrée"; _adjQty = 0; _adjReason = string.Empty;
+        _isAdjusting = true; _isEditing = false;
+    }
+
+    private async Task SaveAdjustmentAsync()
+    {
+        if (_adjustTarget == null) return;
+        var res = Store.AdjustStock(_adjustTarget.ProductCode, _adjType, _adjQty, _adjReason, Session.CurrentUser?.Username ?? "admin", Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) { _isAdjusting = false; await Storage.PersistAsync(Store); }
+    }
+
+    public void Dispose()
+    {
+        Store.OnChanged -= StateHasChanged;
+        Loc.OnChange -= StateHasChanged;
+    }
+}

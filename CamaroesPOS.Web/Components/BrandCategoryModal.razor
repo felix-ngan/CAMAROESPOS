@@ -1,0 +1,121 @@
+@inject PosStoreState Store
+@inject BrowserStorageService Storage
+@inject SessionState Session
+@inject LocalizationService Loc
+
+@if (IsOpen)
+{
+    <div class="modal-backdrop">
+        <div class="modal-box modal-lg stack">
+            <div class="row-between">
+                <div class="card-title" style="margin:0;">@Loc.T("Inv_BrandsCategories")</div>
+                <button class="btn btn-outlined btn-sm" @onclick="OnClose">@Loc.T("Btn_Close")</button>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_msg))
+            {
+                <div class="alert @(_err ? "alert-error" : "alert-success")">@_msg</div>
+            }
+
+            <div class="grid-2">
+                <!-- Brands -->
+                <div class="card stack" style="box-shadow:none;">
+                    <div class="card-title" style="margin:0;">@Loc.T("Col_Brand")</div>
+                    <div class="row">
+                        <input class="input" style="flex:1;" @bind="_brandName" placeholder="@Loc.T("Col_Brand")" />
+                        <button class="btn btn-primary btn-sm" @onclick="SaveBrandAsync">@Loc.T("Btn_Save")</button>
+                        @if (_editBrandId.HasValue)
+                        {
+                            <button class="btn btn-outlined btn-sm" @onclick="CancelBrand">×</button>
+                        }
+                    </div>
+                    <table class="data-table">
+                        <tbody>
+                            @foreach (var b in Store.Brands)
+                            {
+                                <tr>
+                                    <td>@b.BrandName</td>
+                                    <td class="text-right">
+                                        <button class="btn btn-outlined btn-sm" @onclick="() => { _editBrandId = b.Id; _brandName = b.BrandName; }">✏️</button>
+                                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteBrandAsync(b.Id)">🗑</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Categories -->
+                <div class="card stack" style="box-shadow:none;">
+                    <div class="card-title" style="margin:0;">@Loc.T("Col_Category")</div>
+                    <div class="row">
+                        <input class="input" style="flex:1;" @bind="_catName" placeholder="@Loc.T("Col_Category")" />
+                        <button class="btn btn-primary btn-sm" @onclick="SaveCatAsync">@Loc.T("Btn_Save")</button>
+                        @if (_editCatId.HasValue)
+                        {
+                            <button class="btn btn-outlined btn-sm" @onclick="CancelCat">×</button>
+                        }
+                    </div>
+                    <table class="data-table">
+                        <tbody>
+                            @foreach (var c in Store.Categories)
+                            {
+                                <tr>
+                                    <td>@c.CategoryName</td>
+                                    <td class="text-right">
+                                        <button class="btn btn-outlined btn-sm" @onclick="() => { _editCatId = c.Id; _catName = c.CategoryName; }">✏️</button>
+                                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteCatAsync(c.Id)">🗑</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private int? _editBrandId;
+    private string _brandName = string.Empty;
+    private int? _editCatId;
+    private string _catName = string.Empty;
+    private string _msg = string.Empty;
+    private bool _err;
+
+    private async Task SaveBrandAsync()
+    {
+        var res = Store.SaveBrand(_editBrandId, _brandName.Trim(), Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) { CancelBrand(); await Storage.PersistAsync(Store); }
+    }
+
+    private void CancelBrand() { _editBrandId = null; _brandName = string.Empty; }
+
+    private async Task DeleteBrandAsync(int id)
+    {
+        var res = Store.DeleteBrand(id, Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) await Storage.PersistAsync(Store);
+    }
+
+    private async Task SaveCatAsync()
+    {
+        var res = Store.SaveCategory(_editCatId, _catName.Trim(), Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) { CancelCat(); await Storage.PersistAsync(Store); }
+    }
+
+    private void CancelCat() { _editCatId = null; _catName = string.Empty; }
+
+    private async Task DeleteCatAsync(int id)
+    {
+        var res = Store.DeleteCategory(id, Session.IsAdmin);
+        _msg = res.Message; _err = !res.Success;
+        if (res.Success) await Storage.PersistAsync(Store);
+    }
+}
