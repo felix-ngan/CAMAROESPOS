@@ -1,114 +1,81 @@
-<h1 align="center">CAMAROES POS - Modern Edition</h1>
+<h1 align="center">CAMAROES POS — v2 Portfolio Edition</h1>
 
 <p align="center">
-  <strong>Système de Point de Vente (POS) moderne, élégant et complet</strong>
+  <strong>Système de Point de Vente (POS) moderne .NET 8 multiplateforme (Web PWA · macOS · Windows · Linux)</strong><br />
+  <a href="https://camaroespos.vercel.app/">🚀 Démo Live (Blazor WebAssembly PWA sur Vercel)</a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Plateforme-Windows-blue.svg" alt="Platform">
-  <img src="https://img.shields.io/badge/Language-C%23-239120.svg" alt="C#">
-  <img src="https://img.shields.io/badge/Framework-.NET%208.0%20WPF-512BD4.svg" alt=".NET WPF">
-  <img src="https://img.shields.io/badge/Architecture-MVVM-FF4081.svg" alt="MVVM">
-  <img src="https://img.shields.io/badge/Database-SQLite-003B57.svg" alt="SQLite">
+  <img src="https://img.shields.io/badge/Framework-.NET%208.0-512BD4.svg" alt=".NET 8">
+  <img src="https://img.shields.io/badge/Web-Blazor%20WASM%20PWA-512BD4.svg" alt="Blazor WASM">
+  <img src="https://img.shields.io/badge/Desktop-Avalonia%20UI%20%2B%20WPF-1D72E8.svg" alt="Avalonia UI">
+  <img src="https://img.shields.io/badge/Architecture-Clean%20Architecture-15803D.svg" alt="Clean Architecture">
+  <img src="https://img.shields.io/badge/Security-PBKDF2%20%2B%20HMAC%20%2B%20CSP-DC2626.svg" alt="Security">
 </p>
 
 ---
 
-## 📖 Description
+## 📖 Présentation
 
-**CAMAROES POS** a été entièrement repensé et réécrit pour offrir une expérience utilisateur de premier ordre. Cette nouvelle version abandonne Windows Forms et SQL Server au profit d'une architecture **WPF moderne** (basée sur le pattern MVVM) et d'une base de données locale ultra-rapide **SQLite** via **Entity Framework Core**.
+**CAMAROES POS v2** est une application de Point de Vente (POS) complète conçue pour le contexte commercial **camerounais / CEMAC** (FCFA, **TVA 19,25 %** HT/TTC, **NIU/RCCM**, **MTN MoMo & Orange Money**, bilingue **FR/EN**), architecturée en **C# 12 / .NET 8** selon les principes de Clean Architecture.
 
-L'interface graphique s'appuie sur `MaterialDesignInXamlToolkit` pour un design épuré, fluide et professionnel, digne des meilleurs standards de l'industrie. Les reçus et les rapports sont générés dynamiquement en PDF de haute qualité grâce à `QuestPDF`, et les tableaux de bord interactifs prennent vie grâce à `LiveCharts`.
-
-## ✨ Fonctionnalités Principales
-
-*   🛍️ **Caisse (POS) Rapide et Intuitive** : Gestion de panier, recherche instantanée par code-barres ou description, application de réductions (en pourcentage calculé automatiquement), et encaissements multi-moyens de paiement (Espèces, Mobile Money).
-*   📦 **Gestion Avancée des Stocks** : Inventaire complet, ajustements de stocks tracés (Entrées, Sorties, Ajustements d'inventaire), et gestion centralisée des Marques et Catégories.
-*   📊 **Tableau de Bord Interactif** : Vision globale de la santé financière. Graphiques d'évolution des ventes, mouvements de stocks sur 7 jours, calcul du bénéfice net (Revenus - Coûts d'achat - Dépenses), et cartes dynamiques du volume de stock.
-*   👥 **CRM & Fidélité (Portefeuilles Clients)** : Gestion des clients, suivi des achats, accumulation de points de fidélité et paiements directs par portefeuille virtuel.
-*   🧾 **Génération de PDF Professionnels** : Reçus de caisse détaillés et rapports des ventes (quotidiens, hebdomadaires, mensuels) exportables en PDF.
-*   🔒 **Sécurité et Rôles** : Accès différencié (Administrateur / Caissier) protégeant les opérations sensibles comme l'ajustement des stocks, la gestion des utilisateurs ou l'annulation de commandes.
-*   🔍 **Recherche Globale Intelligente** : Recherche instantanée et filtrage en temps réel dans les listes de produits, fournisseurs et utilisateurs.
-*   🌍 **Bilingue (Français / Anglais)** : Basculez l'interface instantanément d'une langue à l'autre grâce à un système dynamique de ressources XAML (i18n), idéal pour le contexte bilingue du Cameroun.
+La solution partage un cœur métier unique (`CamaroesPOS.Domain` + `CamaroesPOS.Application`) entre une **PWA Blazor WebAssembly** déployée gratuitement sur Vercel et une application **Desktop multiplateforme (Avalonia UI)** + version **Windows WPF**.
 
 ---
 
-## 🛠 Stack Technique (Technologies Utilisées)
+## ✨ Fonctionnalités Clés (v2)
 
-Ce projet est une vitrine de l'écosystème .NET moderne pour le développement Desktop Windows :
-
-*   **Langage** : C# 12
-*   **Framework** : .NET 8.0 (Windows Presentation Foundation - WPF)
-*   **Architecture** : MVVM (Model-View-ViewModel) garantissant un code découplé et testable.
-*   **ORM (Database)** : Entity Framework Core 8.0 couplé à SQLite (aucune installation de serveur requise).
-*   **UI & Design** : Material Design In XAML Toolkit pour les contrôles et les icônes.
-*   **Graphiques** : LiveCharts.Wpf pour la Data Visualization interactive.
-*   **Génération PDF** : QuestPDF (génération fluide basée sur un modèle de mise en page moderne).
+* 🛒 **Caisse POS Tactile Split-Screen (Style Square / Loyverse)** : Catalogue produits visible en permanence avec filtrage par catégorie et ajout en **1 clic**, steppers `-`/`+` inline, blocage strict de la survente de stock, mise en attente de tickets (**Hold / Resume**), et raccourcis clavier (`F2`, `F9`, `Esc`).
+* 📱 **Paiements Multi-Canaux Cameroun** : **Espèces** (pavé tactile FCFA), **MTN MoMo** & **Orange Money** (simulation réaliste de Push USSD exploitant les codes marchands de la boutique), **Portefeuille Client (CRM)**, et **Paiement Mixte (Split Payment)**.
+* 🧾 **Facturation & Reçus Conformes** : Décomposition automatique **HT / TVA (19,25 %) / Remise / TTC** en précision exacte `decimal`, affichage **NIU / RCCM / Réf. paiement**, **QR Code SVG** de vérification, aperçu et impression **Ticket Thermique 80 mm** ou **Format A4**.
+* 💼 **Sessions de Caisse (Rapport Z) & Remboursements Fiables** : Ouverture/clôture de caisse avec calcul automatique de l'écart de caisse ; annulation/remboursement de ticket complet avec **restauration du stock**, **recrédit automatique du portefeuille client** et inversion des points fidélité.
+* 📊 **Tableau de Bord & Rapports Groupés** : Sélecteur de période cohérent (`Aujourd'hui`, `7 j`, `30 j`, `Tout`), graphiques SVG natifs avec axes Y gradués et tooltips tactiles, ventes regroupées par ticket, **Journal d'Audit**, **Export CSV** (Excel UTF-8) et **Sauvegarde/Restauration JSON**.
+* 🔒 **Sécurité & Accessibilité (WCAG 2.1 AA)** : Mots de passe hachés **PBKDF2-SHA256** (100 000 itérations + sel aléatoire), sessions signées **HMAC-SHA256**, en-têtes HTTP de sécurité (`CSP`, `X-Frame-Options`, `nosniff`), modales de confirmation sur toutes les actions destructives, **Mode Sombre** et support **PWA hors-ligne**.
 
 ---
 
-## 🚀 Guide d'Installation et Lancement Rapide
+## 🏗️ Architecture de la Solution
 
-Grâce à SQLite, l'installation est d'une simplicité déconcertante. Aucun serveur de base de données complexe n'est requis.
+```text
+CAMAROESPOS/
+├── CamaroesPOS.Domain/        # Entités métier pures en précision decimal (Product, SoldItem, CashShift, AuditEntry, Store...)
+├── CamaroesPOS.Application/   # Logique partagée : PasswordHasher (PBKDF2), SessionTokenService (HMAC), PosCalculator (TVA 19,25 %), TransactionNumberGenerator
+├── CamaroesPOS.Data/          # PosDbContext (EF Core 8 + SQLite, PK & Index)
+├── CamaroesPOS.Web/           # PWA Blazor WebAssembly (.NET 8) déployée sur Vercel
+├── CamaroesPOS.UI.Avalonia/   # Client Desktop multiplateforme (macOS, Windows, Linux)
+├── CamaroesPOS.UI/            # Client Desktop Windows WPF (maintenu compatible decimal)
+└── CamaroesPOS.Tests/         # Suite de tests unitaires xUnit (sécurité, intégrité financière, stock, remboursements, i18n)
+```
+
+---
+
+## 🚀 Lancer Localement & Tests
 
 ### Prérequis
-*   [SDK .NET 8.0](https://dotnet.microsoft.com/download/dotnet/8.0) ou Visual Studio 2022.
+* [SDK .NET 8.0](https://dotnet.microsoft.com/download/dotnet/8.0)
 
-### Compilation et Lancement
+### 1. Version Web (Blazor WebAssembly PWA)
+```bash
+dotnet run --project CamaroesPOS.Web
+```
+Build statique de production Vercel (`dist/wwwroot`) :
+```bash
+bash vercel-build.sh
+```
 
-#### Version Web — Blazor WebAssembly (.NET 8, déployable gratuitement sur Vercel)
-Partage directement `CamaroesPOS.Domain` (100 % C# / .NET 8), persiste les données par visiteur dans `localStorage`, inclut un accès démo 1-clic (Admin / Caissier) et des reçus/rapports imprimables en PDF.
-1. Lancer localement :
-   ```bash
-   dotnet run --project CamaroesPOS.Web
-   ```
-2. Publier en Release statique (`dist/wwwroot`) :
-   ```bash
-   bash vercel-build.sh
-   ```
-3. **Déploiement automatique gratuit sur Vercel** : importez ce dépôt GitHub dans votre tableau de bord [Vercel](https://vercel.com/new) — `vercel.json` et `vercel-build.sh` installent .NET 8, publient Blazor WebAssembly et configurent le routage SPA automatiquement.
+### 2. Version Desktop Multiplateforme (Avalonia UI)
+```bash
+dotnet build CamaroesPOS_Avalonia.sln
+dotnet run --project CamaroesPOS.UI.Avalonia
+```
 
-#### Version Multiplateforme Desktop — macOS, Windows et Linux (Avalonia UI)
-1. Assurez-vous d'avoir le **SDK .NET 8.0** installé (`dotnet --version`).
-2. Compilez et lancez l'application directement :
-   ```bash
-   dotnet build CamaroesPOS_Avalonia.sln
-   dotnet run --project CamaroesPOS.UI.Avalonia
-   ```
-3. Pour exécuter la suite de tests automatisés :
-   ```bash
-   dotnet test CamaroesPOS_Avalonia.sln
-   ```
-
-#### Version Windows Classique (WPF)
-1. Clonez ce dépôt :
-   ```bash
-   git clone https://github.com/felix-ngan/CAMAROESPOS.git
-   ```
-2. Placez-vous dans le répertoire du projet :
-   ```bash
-   cd CamaroesPOS.UI
-   ```
-3. Compilez et exécutez le projet :
-   ```bash
-   dotnet run
-   ```
-*Note : Au premier lancement, la base de données SQLite (`camaroespos.db`) sera générée automatiquement dans le dossier d'exécution et pré-remplie avec un compte Administrateur par défaut (voir les instructions dans l'application ou initialisez votre propre compte).*
-
----
-
-## 📸 Aperçu du Code (Pour les Développeurs)
-
-La structure du projet respecte les principes de séparation des responsabilités :
-- `CamaroesPOS.Domain` : Contient les entités métiers (`Product`, `SoldItem`, `CustomerWallet`, etc.).
-- `CamaroesPOS.Data` : Contexte Entity Framework (`PosDbContext`).
-- `CamaroesPOS.UI` : L'application principale contenant les `Views` (Fichiers XAML) et les `ViewModels` (Logique de présentation C#).
-- `CamaroesPOS.UI/Services/PdfService.cs` : Service dédié à la génération complexe de documents PDF.
-
-L'utilisation généralisée de `INotifyPropertyChanged` et de `RelayCommand` assure un binding de données (Data Binding) fluide et réactif entre le C# et le XAML.
+### 3. Suite de Tests Automatisés (xUnit)
+```bash
+dotnet test CamaroesPOS_Avalonia.sln --verbosity normal
+```
 
 ---
 
 <p align="center">
-  <i>Développé avec passion pour illustrer la puissance du C# moderne dans la conception d'applications Desktop professionnelles.</i>
+  <i>Développé par <a href="https://github.com/felix-ngan">felix-ngan</a> — Vitrine d'ingénierie .NET 8 / C# moderne.</i>
 </p>

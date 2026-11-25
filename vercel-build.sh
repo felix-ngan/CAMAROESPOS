@@ -23,10 +23,32 @@ echo "Using dotnet: $(dotnet --version)"
 rm -rf dist
 dotnet publish CamaroesPOS.Web/CamaroesPOS.Web.csproj -c Release -o dist
 
-# Emit rewrites-only vercel.json inside dist/wwwroot for direct static CLI deploys
+# Emit headers + rewrites vercel.json inside dist/wwwroot for direct static CLI deploys
 cat > dist/wwwroot/vercel.json <<'EOF'
 {
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self';" }
+      ]
+    },
+    {
+      "source": "/_framework/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ],
   "rewrites": [
+    {
+      "source": "/favicon.ico",
+      "destination": "/favicon.svg"
+    },
     {
       "source": "/((?!_framework/|css/|js/|.*\\..*).*)",
       "destination": "/index.html"
@@ -35,4 +57,4 @@ cat > dist/wwwroot/vercel.json <<'EOF'
 }
 EOF
 
-echo "Blazor WebAssembly published cleanly to dist/wwwroot"
+echo "Blazor WebAssembly PWA published cleanly to dist/wwwroot"

@@ -1,0 +1,18 @@
+{
+  "name": "CAMAROES POS — Portfolio Showcase v2",
+  "short_name": "CAMAROES POS",
+  "description": "Système de Point de Vente (POS) moderne .NET 8 Blazor WebAssembly bilingue FR/EN, conçu pour le commerce au Cameroun (FCFA, TVA 19,25 %, MTN MoMo & Orange Money, Rapport Z, CRM).",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F7FE",
+  "theme_color": "#1D72E8",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
