@@ -31,7 +31,7 @@ public partial class LoginWindow : Window
     private void OpenMainWindow()
     {
         var mainWindow = new MainWindow();
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (global::Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = mainWindow;
         }

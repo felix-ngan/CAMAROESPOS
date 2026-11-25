@@ -107,8 +107,8 @@
             _error = Loc.T("Login_Error");
             return;
         }
-        Session.Login(user);
-        await Storage.SaveSessionAsync(user.Username);
+        var token = Session.Login(user);
+        await Storage.SaveSessionTokenAsync(token);
         Nav.NavigateTo(Session.IsAdmin ? "/" : "/pos", replace: true);
     }
 

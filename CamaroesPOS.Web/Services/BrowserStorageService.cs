@@ -4,9 +4,15 @@ namespace CamaroesPOS.Web.Services;
 
 public class BrowserStorageService
 {
-    private const string StorageKey = "camaroes_pos_web_v1";
-    private const string SessionKey = "camaroes_pos_session_user_v1";
+    private const string StorageKey = "camaroes_pos_web_v2";
+    private const string SessionTokenKey = "camaroes_pos_session_token_v2";
+    private const string ThemeKey = "camaroes_pos_theme_v2";
+    private const string LangKey = "camaroes_pos_lang_v2";
+
     private readonly IJSRuntime _js;
+
+    public bool StorageQuotaExceeded { get; private set; }
+    public event Action? OnStorageWarning;
 
     public BrowserStorageService(IJSRuntime js)
     {
@@ -36,8 +42,12 @@ public class BrowserStorageService
         if (session.IsAuthenticated) return;
         try
         {
-            var username = await _js.InvokeAsync<string?>("posInterop.getSessionItem", SessionKey);
-            session.TryRestoreFromStore(username, store);
+            var token = await _js.InvokeAsync<string?>("posInterop.getSessionItem", SessionTokenKey);
+            if (!session.TryRestoreFromToken(token, store) && !string.IsNullOrWhiteSpace(token))
+            {
+                // Clear invalid/tampered/expired token
+                await ClearSessionAsync();
+            }
         }
         catch
         {
@@ -45,11 +55,11 @@ public class BrowserStorageService
         }
     }
 
-    public async Task SaveSessionAsync(string username)
+    public async Task SaveSessionTokenAsync(string token)
     {
         try
         {
-            await _js.InvokeVoidAsync("posInterop.setSessionItem", SessionKey, username);
+            await _js.InvokeVoidAsync("posInterop.setSessionItem", SessionTokenKey, token);
         }
         catch
         {
@@ -61,7 +71,7 @@ public class BrowserStorageService
     {
         try
         {
-            await _js.InvokeVoidAsync("posInterop.removeSessionItem", SessionKey);
+            await _js.InvokeVoidAsync("posInterop.removeSessionItem", SessionTokenKey);
         }
         catch
         {
@@ -69,15 +79,20 @@ public class BrowserStorageService
         }
     }
 
-    public async Task PersistAsync(PosStoreState store)
+    public async Task<bool> PersistAsync(PosStoreState store)
     {
         try
         {
-            await _js.InvokeVoidAsync("posInterop.setItem", StorageKey, store.ExportSnapshotJson());
+            bool saved = await _js.InvokeAsync<bool>("posInterop.setItem", StorageKey, store.ExportSnapshotJson());
+            StorageQuotaExceeded = !saved;
+            if (!saved) OnStorageWarning?.Invoke();
+            return saved;
         }
         catch
         {
-            // Private browsing / quota exceeded fallback: keep running in memory
+            StorageQuotaExceeded = true;
+            OnStorageWarning?.Invoke();
+            return false;
         }
     }
 
@@ -89,10 +104,63 @@ public class BrowserStorageService
         }
         catch
         {
-            // Ignore storage errors
+            // Ignore
         }
+        StorageQuotaExceeded = false;
         store.SeedDemoData();
         await PersistAsync(store);
+    }
+
+    public async Task<string> LoadThemeAsync()
+    {
+        try
+        {
+            var theme = await _js.InvokeAsync<string?>("posInterop.getItem", ThemeKey);
+            var resolved = theme == "dark" ? "dark" : "light";
+            await _js.InvokeVoidAsync("posInterop.setTheme", resolved);
+            return resolved;
+        }
+        catch
+        {
+            return "light";
+        }
+    }
+
+    public async Task SaveThemeAsync(string theme)
+    {
+        try
+        {
+            await _js.InvokeVoidAsync("posInterop.setTheme", theme);
+            await _js.InvokeVoidAsync("posInterop.setItem", ThemeKey, theme);
+        }
+        catch
+        {
+            // Ignore
+        }
+    }
+
+    public async Task<string?> LoadLangAsync()
+    {
+        try { return await _js.InvokeAsync<string?>("posInterop.getItem", LangKey); }
+        catch { return null; }
+    }
+
+    public async Task SaveLangAsync(string lang)
+    {
+        try { await _js.InvokeVoidAsync("posInterop.setItem", LangKey, lang); }
+        catch { }
+    }
+
+    public async Task DownloadFileAsync(string filename, string content, string mimeType = "text/plain;charset=utf-8")
+    {
+        try
+        {
+            await _js.InvokeVoidAsync("posInterop.downloadFile", filename, content, mimeType);
+        }
+        catch
+        {
+            // Ignore
+        }
     }
 
     public async Task PrintAsync()

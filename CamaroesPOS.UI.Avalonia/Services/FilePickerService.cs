@@ -48,7 +48,7 @@ public static class FilePickerService
 
     private static Window? GetActiveWindow()
     {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (global::Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             foreach (var w in desktop.Windows)
             {

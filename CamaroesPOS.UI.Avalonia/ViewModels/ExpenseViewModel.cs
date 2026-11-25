@@ -29,8 +29,8 @@ public class ExpenseViewModel : INotifyPropertyChanged
     private bool _isNewExpense;
     public bool IsNewExpense { get => _isNewExpense; set { _isNewExpense = value; OnPropertyChanged(); } }
 
-    private double _totalExpenses;
-    public double TotalExpenses { get => _totalExpenses; set { _totalExpenses = value; OnPropertyChanged(); } }
+    private decimal _totalExpenses;
+    public decimal TotalExpenses { get => _totalExpenses; set { _totalExpenses = value; OnPropertyChanged(); } }
 
     public bool IsAdmin => SessionService.IsAdmin;
 

@@ -229,7 +229,7 @@
     private readonly List<CartItem> _cart = new();
     private string _barcodeSearch = string.Empty;
     private string _discountString = string.Empty;
-    private double _discountPercent;
+    private decimal _discountPercent;
     private string _paymentMode = "cash";
     private string _customerPhone = string.Empty;
 
@@ -248,11 +248,11 @@
     private string _message = string.Empty;
     private bool _isError;
 
-    private double SubTotal => _cart.Sum(c => c.Total);
-    private double TotalAmount => SubTotal - (SubTotal * (_discountPercent / 100.0));
-    private double ReceivedAmount => PosStoreState.TryParseDecimalInput(_receivedString, out var v) ? v : 0;
-    private double ChangeAmount => ReceivedAmount - TotalAmount;
-    private bool IsCashValid => PosStoreState.TryParseDecimalInput(_receivedString, out var v) && double.IsFinite(v) && v >= TotalAmount && TotalAmount > 0;
+    private decimal SubTotal => _cart.Sum(c => c.Total);
+    private decimal TotalAmount => SubTotal - decimal.Round(SubTotal * (_discountPercent / 100m), 0, MidpointRounding.AwayFromZero);
+    private decimal ReceivedAmount => PosStoreState.TryParseDecimalInput(_receivedString, out var v) ? v : 0m;
+    private decimal ChangeAmount => ReceivedAmount - TotalAmount;
+    private bool IsCashValid => PosStoreState.TryParseDecimalInput(_receivedString, out var v) && v >= TotalAmount && TotalAmount > 0m;
 
     protected override void OnInitialized() => Loc.OnChange += StateHasChanged;
 

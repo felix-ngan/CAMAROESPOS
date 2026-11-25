@@ -190,10 +190,10 @@
 
     private List<(string Label, double Value)> ProfitItems => new()
     {
-        (Loc.T("Lbl_Revenue"), _m.TotalSalesAllTime),
-        (Loc.T("Lbl_Costs"), _m.TotalCOGS),
-        (Loc.T("Lbl_Expenses"), _m.TotalExpenses),
-        (Loc.T("Lbl_Profit"), Math.Max(0, _m.NetProfit))
+        (Loc.T("Lbl_Revenue"), (double)_m.PeriodSales),
+        (Loc.T("Lbl_Costs"), (double)_m.TotalCOGS),
+        (Loc.T("Lbl_Expenses"), (double)_m.TotalExpenses),
+        (Loc.T("Lbl_Profit"), (double)Math.Max(0m, _m.NetProfit))
     };
 
     private IEnumerable<User> FilteredUsers => string.IsNullOrWhiteSpace(_userSearch)

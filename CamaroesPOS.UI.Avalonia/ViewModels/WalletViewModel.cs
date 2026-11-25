@@ -22,8 +22,8 @@ public class WalletViewModel : INotifyPropertyChanged
     private bool _isNewWallet;
     public bool IsNewWallet { get => _isNewWallet; set { _isNewWallet = value; OnPropertyChanged(); } }
 
-    private double _rechargeAmount;
-    public double RechargeAmount { get => _rechargeAmount; set { _rechargeAmount = value; OnPropertyChanged(); } }
+    private decimal _rechargeAmount;
+    public decimal RechargeAmount { get => _rechargeAmount; set { _rechargeAmount = value; OnPropertyChanged(); } }
 
     public RelayCommand<object?> CreateWalletCommand { get; }
     public RelayCommand<CustomerWallet> RechargeCommand { get; }

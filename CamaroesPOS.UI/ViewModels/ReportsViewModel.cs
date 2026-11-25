@@ -26,8 +26,8 @@ namespace CamaroesPOS.UI.ViewModels
         private string _searchText;
         public string SearchText { get => _searchText; set { _searchText = value; OnPropertyChanged(); } }
 
-        private double _totalSalesAmount;
-        public double TotalSalesAmount { get => _totalSalesAmount; set { _totalSalesAmount = value; OnPropertyChanged(); } }
+        private decimal _totalSalesAmount;
+        public decimal TotalSalesAmount { get => _totalSalesAmount; set { _totalSalesAmount = value; OnPropertyChanged(); } }
 
         private int _totalItemsSold;
         public int TotalItemsSold { get => _totalItemsSold; set { _totalItemsSold = value; OnPropertyChanged(); } }
@@ -78,7 +78,7 @@ namespace CamaroesPOS.UI.ViewModels
                 {
                     var pdfService = new CamaroesPOS.UI.Services.PdfService();
                     
-                    double totalDiscounts = Transactions.Sum(t => (double?)t.Discount) ?? 0;
+                    decimal totalDiscounts = Transactions.Sum(t => t.Discount);
                     
                     pdfService.GenerateSalesReportPdf(
                         StartDate ?? DateTime.Now, 
@@ -123,7 +123,7 @@ namespace CamaroesPOS.UI.ViewModels
                 Transactions.Clear();
                 foreach (var item in salesResults) Transactions.Add(item);
 
-                TotalSalesAmount = salesResults.Sum(t => (double?)t.Total) ?? 0;
+                TotalSalesAmount = salesResults.Sum(t => t.Total);
                 TotalItemsSold = salesResults.Sum(t => (int?)t.Qty) ?? 0;
 
                 // 2. Produits (Inventory Status)

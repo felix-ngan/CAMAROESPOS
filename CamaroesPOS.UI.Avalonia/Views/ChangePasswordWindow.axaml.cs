@@ -1,6 +1,7 @@
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using CamaroesPOS.Application.Security;
 using CamaroesPOS.Data;
 using CamaroesPOS.UI.Avalonia.Services;
 
@@ -46,15 +47,15 @@ public partial class ChangePasswordWindow : Window
 
         using (var context = new PosDbContext())
         {
-            var user = context.Users.FirstOrDefault(u => u.Username == _username && u.Password == oldPass);
-            if (user == null)
+            var user = context.Users.FirstOrDefault(u => u.Username == _username);
+            if (user == null || !PasswordHasher.Verify(oldPass, user.Password))
             {
                 TxtError.Text = "L'ancien mot de passe est incorrect.";
                 TxtError.IsVisible = true;
                 return;
             }
 
-            user.Password = newPass;
+            user.Password = PasswordHasher.Hash(newPass);
             context.SaveChanges();
         }
 

@@ -143,7 +143,7 @@ public partial class MainWindow : Window
     {
         SessionService.Clear();
         var loginWin = new LoginWindow();
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (global::Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = loginWin;
         }
@@ -153,8 +153,8 @@ public partial class MainWindow : Window
 
     private void SyncLanguageButton()
     {
-        if (Application.Current == null) return;
-        var current = Application.Current.Resources.MergedDictionaries
+        if (global::Avalonia.Application.Current == null) return;
+        var current = global::Avalonia.Application.Current.Resources.MergedDictionaries
             .OfType<ResourceInclude>()
             .FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("/Resources/Langs/Strings."));
 
@@ -164,12 +164,12 @@ public partial class MainWindow : Window
 
     private void BtnLangToggle_Click(object? sender, RoutedEventArgs e)
     {
-        if (sender is not Button btn || Application.Current == null) return;
+        if (sender is not Button btn || global::Avalonia.Application.Current == null) return;
 
         string targetLang = btn.Content?.ToString() == "EN" ? "en" : "fr";
         btn.Content = targetLang == "en" ? "FR" : "EN";
 
-        var merged = Application.Current.Resources.MergedDictionaries;
+        var merged = global::Avalonia.Application.Current.Resources.MergedDictionaries;
         var existing = merged
             .OfType<ResourceInclude>()
             .FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("/Resources/Langs/Strings."));

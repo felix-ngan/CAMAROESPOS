@@ -15,8 +15,8 @@ namespace CamaroesPOS.UI.Avalonia.ViewModels;
 
 public class DashboardViewModel : INotifyPropertyChanged
 {
-    private double _todaySales;
-    public double TodaySales { get => _todaySales; set { _todaySales = value; OnPropertyChanged(); } }
+    private decimal _todaySales;
+    public decimal TodaySales { get => _todaySales; set { _todaySales = value; OnPropertyChanged(); } }
 
     private int _totalProducts;
     public int TotalProducts { get => _totalProducts; set { _totalProducts = value; OnPropertyChanged(); } }
@@ -45,8 +45,8 @@ public class DashboardViewModel : INotifyPropertyChanged
     private ObservableCollection<Product> _criticalStockList = new();
     public ObservableCollection<Product> CriticalStockList { get => _criticalStockList; set { _criticalStockList = value; OnPropertyChanged(); } }
 
-    private double _totalWalletsBalance;
-    public double TotalWalletsBalance { get => _totalWalletsBalance; set { _totalWalletsBalance = value; OnPropertyChanged(); } }
+    private decimal _totalWalletsBalance;
+    public decimal TotalWalletsBalance { get => _totalWalletsBalance; set { _totalWalletsBalance = value; OnPropertyChanged(); } }
 
     private int _totalCustomers;
     public int TotalCustomers { get => _totalCustomers; set { _totalCustomers = value; OnPropertyChanged(); } }
@@ -54,8 +54,8 @@ public class DashboardViewModel : INotifyPropertyChanged
     private int _totalLoyaltyPoints;
     public int TotalLoyaltyPoints { get => _totalLoyaltyPoints; set { _totalLoyaltyPoints = value; OnPropertyChanged(); } }
 
-    private double _totalSalesAllTime;
-    public double TotalSalesAllTime { get => _totalSalesAllTime; set { _totalSalesAllTime = value; OnPropertyChanged(); } }
+    private decimal _totalSalesAllTime;
+    public decimal TotalSalesAllTime { get => _totalSalesAllTime; set { _totalSalesAllTime = value; OnPropertyChanged(); } }
 
     private int _totalItemsSoldToday;
     public int TotalItemsSoldToday { get => _totalItemsSoldToday; set { _totalItemsSoldToday = value; OnPropertyChanged(); } }
@@ -63,8 +63,8 @@ public class DashboardViewModel : INotifyPropertyChanged
     private int _totalItemsSoldAllTime;
     public int TotalItemsSoldAllTime { get => _totalItemsSoldAllTime; set { _totalItemsSoldAllTime = value; OnPropertyChanged(); } }
 
-    private double _totalCancelledAmount;
-    public double TotalCancelledAmount { get => _totalCancelledAmount; set { _totalCancelledAmount = value; OnPropertyChanged(); } }
+    private decimal _totalCancelledAmount;
+    public decimal TotalCancelledAmount { get => _totalCancelledAmount; set { _totalCancelledAmount = value; OnPropertyChanged(); } }
 
     private int _totalUsers;
     public int TotalUsers { get => _totalUsers; set { _totalUsers = value; OnPropertyChanged(); } }
@@ -75,20 +75,20 @@ public class DashboardViewModel : INotifyPropertyChanged
     private int _cashierCount;
     public int CashierCount { get => _cashierCount; set { _cashierCount = value; OnPropertyChanged(); } }
 
-    private double _totalDiscountAmount;
-    public double TotalDiscountAmount { get => _totalDiscountAmount; set { _totalDiscountAmount = value; OnPropertyChanged(); } }
+    private decimal _totalDiscountAmount;
+    public decimal TotalDiscountAmount { get => _totalDiscountAmount; set { _totalDiscountAmount = value; OnPropertyChanged(); } }
 
     private int _totalVendors;
     public int TotalVendors { get => _totalVendors; set { _totalVendors = value; OnPropertyChanged(); } }
 
-    private double _totalCogs;
-    public double TotalCOGS { get => _totalCogs; set { _totalCogs = value; OnPropertyChanged(); } }
+    private decimal _totalCogs;
+    public decimal TotalCOGS { get => _totalCogs; set { _totalCogs = value; OnPropertyChanged(); } }
 
-    private double _totalExpenses;
-    public double TotalExpensesDashboard { get => _totalExpenses; set { _totalExpenses = value; OnPropertyChanged(); } }
+    private decimal _totalExpenses;
+    public decimal TotalExpensesDashboard { get => _totalExpenses; set { _totalExpenses = value; OnPropertyChanged(); } }
 
-    private double _netProfit;
-    public double NetProfit { get => _netProfit; set { _netProfit = value; OnPropertyChanged(); } }
+    private decimal _netProfit;
+    public decimal NetProfit { get => _netProfit; set { _netProfit = value; OnPropertyChanged(); } }
 
     private ISeries[] _salesChart = Array.Empty<ISeries>();
     public ISeries[] SalesChart { get => _salesChart; set { _salesChart = value; OnPropertyChanged(); } }
@@ -179,14 +179,19 @@ public class DashboardViewModel : INotifyPropertyChanged
         var yesterday = today.AddDays(-1);
 
         // 1 & 2. Ventes du jour et Chiffre d'affaires
-        TodaySales = context.SoldItems.Where(s => s.SoldDate >= today && s.SoldDate < tomorrow).Sum(s => (double?)s.Total) ?? 0;
-        TotalSalesAllTime = context.SoldItems.Sum(s => (double?)s.Total) ?? 0;
-        var yesterdaySales = context.SoldItems.Where(s => s.SoldDate >= yesterday && s.SoldDate < today).Sum(s => (double?)s.Total) ?? 0;
+        var allSold = context.SoldItems.ToList();
+        var allCancelled = context.CancelledOrders.ToList();
+        var allExpenses = context.Expenses.ToList();
+        var allWallets = context.CustomerWallets.ToList();
+
+        TodaySales = allSold.Where(s => s.SoldDate >= today && s.SoldDate < tomorrow).Sum(s => s.Total);
+        TotalSalesAllTime = allSold.Sum(s => s.Total);
+        var yesterdaySales = allSold.Where(s => s.SoldDate >= yesterday && s.SoldDate < today).Sum(s => s.Total);
 
         TodaySalesChart = new ISeries[]
         {
-            new PieSeries<double> { Name = "Aujourd'hui", Values = new[] { TodaySales }, Fill = new SolidColorPaint(SKColors.DodgerBlue) },
-            new PieSeries<double> { Name = "Hier", Values = new[] { yesterdaySales }, Fill = new SolidColorPaint(SKColors.LightGray) }
+            new PieSeries<double> { Name = "Aujourd'hui", Values = new[] { (double)TodaySales }, Fill = new SolidColorPaint(SKColors.DodgerBlue) },
+            new PieSeries<double> { Name = "Hier", Values = new[] { (double)yesterdaySales }, Fill = new SolidColorPaint(SKColors.LightGray) }
         };
 
         var salesValues = new double[7];
@@ -195,7 +200,7 @@ public class DashboardViewModel : INotifyPropertyChanged
         {
             var d = today.AddDays(-i);
             var nextD = d.AddDays(1);
-            salesValues[6 - i] = context.SoldItems.Where(s => s.SoldDate >= d && s.SoldDate < nextD).Sum(s => (double?)s.Total) ?? 0;
+            salesValues[6 - i] = (double)allSold.Where(s => s.SoldDate >= d && s.SoldDate < nextD).Sum(s => s.Total);
             dayLabels[6 - i] = d.ToString("dd MMM");
         }
         DaysXAxes = new[] { new Axis { Labels = dayLabels } };
@@ -252,20 +257,20 @@ public class DashboardViewModel : INotifyPropertyChanged
         HasCriticalStock = CriticalStockList.Any();
 
         // 5. Portefeuilles & CRM
-        TotalCustomers = context.CustomerWallets.Count();
-        TotalLoyaltyPoints = context.CustomerWallets.Sum(w => (int?)w.LoyaltyPoints) ?? 0;
-        TotalWalletsBalance = context.CustomerWallets.Sum(w => (double?)w.Balance) ?? 0;
-        var topCustomers = context.CustomerWallets.OrderByDescending(w => w.TotalSpent).Take(5).ToList();
+        TotalCustomers = allWallets.Count;
+        TotalLoyaltyPoints = allWallets.Sum(w => w.LoyaltyPoints);
+        TotalWalletsBalance = allWallets.Sum(w => w.Balance);
+        var topCustomers = allWallets.OrderByDescending(w => w.TotalSpent).Take(5).ToList();
         WalletsYAxes = new[] { new Axis { Labels = topCustomers.Select(w => string.IsNullOrEmpty(w.CustomerName) ? (w.Phone ?? "") : w.CustomerName).ToArray() } };
         WalletsChart = new ISeries[]
         {
-            new RowSeries<double> { Name = "Total Achats", Values = topCustomers.Select(w => w.TotalSpent).ToArray(), Fill = new SolidColorPaint(SKColors.Teal) }
+            new RowSeries<double> { Name = "Total Achats", Values = topCustomers.Select(w => (double)w.TotalSpent).ToArray(), Fill = new SolidColorPaint(SKColors.Teal) }
         };
 
         // 6. Articles vendus
-        TotalItemsSoldToday = context.SoldItems.Where(s => s.SoldDate >= today && s.SoldDate < tomorrow).Sum(s => (int?)s.Qty) ?? 0;
-        TotalItemsSoldAllTime = context.SoldItems.Sum(s => (int?)s.Qty) ?? 0;
-        var topSoldToday = context.SoldItems
+        TotalItemsSoldToday = allSold.Where(s => s.SoldDate >= today && s.SoldDate < tomorrow).Sum(s => s.Qty);
+        TotalItemsSoldAllTime = allSold.Sum(s => s.Qty);
+        var topSoldToday = allSold
             .Where(s => s.SoldDate >= today && s.SoldDate < tomorrow)
             .GroupBy(s => s.Description)
             .Select(g => new { Desc = g.Key ?? "", Qty = g.Sum(s => s.Qty) })
@@ -279,13 +284,13 @@ public class DashboardViewModel : INotifyPropertyChanged
         };
 
         // 7. Annulations
-        TotalCancelledAmount = context.CancelledOrders.Sum(c => (double?)c.Total) ?? 0;
+        TotalCancelledAmount = allCancelled.Sum(c => c.Total);
         var cancelValues = new double[7];
         for (int i = 6; i >= 0; i--)
         {
             var d = today.AddDays(-i);
             var nextD = d.AddDays(1);
-            cancelValues[6 - i] = context.CancelledOrders.Where(c => c.SoldDate >= d && c.SoldDate < nextD).Sum(c => (double?)c.Total) ?? 0;
+            cancelValues[6 - i] = (double)allCancelled.Where(c => c.SoldDate >= d && c.SoldDate < nextD).Sum(c => c.Total);
         }
         CancelledChart = new ISeries[]
         {
@@ -303,13 +308,13 @@ public class DashboardViewModel : INotifyPropertyChanged
         UsersChart = usersByRole.Select(ur => (ISeries)new PieSeries<int> { Name = ur.Role, Values = new[] { ur.Count } }).ToArray();
 
         // 9. Réductions
-        TotalDiscountAmount = context.SoldItems.Sum(s => (double?)s.Discount) ?? 0;
+        TotalDiscountAmount = allSold.Sum(s => s.Discount);
         var discountValues = new double[7];
         for (int i = 6; i >= 0; i--)
         {
             var d = today.AddDays(-i);
             var nextD = d.AddDays(1);
-            discountValues[6 - i] = context.SoldItems.Where(s => s.SoldDate >= d && s.SoldDate < nextD).Sum(s => (double?)s.Discount) ?? 0;
+            discountValues[6 - i] = (double)allSold.Where(s => s.SoldDate >= d && s.SoldDate < nextD).Sum(s => s.Discount);
         }
         DiscountChart = new ISeries[]
         {
@@ -328,8 +333,8 @@ public class DashboardViewModel : INotifyPropertyChanged
         VendorsChart = productsByVendor.Select(pv => (ISeries)new PieSeries<int> { Name = pv.Vendor, Values = new[] { pv.Count } }).ToArray();
 
         // 11. Bénéfice Net
-        TotalCOGS = context.SoldItems.Sum(s => (double?)(s.CostPrice * s.Qty)) ?? 0;
-        TotalExpensesDashboard = context.Expenses.Sum(e => (double?)e.Amount) ?? 0;
+        TotalCOGS = allSold.Sum(s => s.CostPrice * s.Qty);
+        TotalExpensesDashboard = allExpenses.Sum(e => e.Amount);
         NetProfit = TotalSalesAllTime - TotalCOGS - TotalExpensesDashboard;
         ProfitXAxes = new[] { new Axis { Labels = new[] { "Revenus", "Coûts", "Dépenses", "Bénéfice Net" } } };
         ProfitChart = new ISeries[]
@@ -337,15 +342,15 @@ public class DashboardViewModel : INotifyPropertyChanged
             new ColumnSeries<double>
             {
                 Name = "Montants",
-                Values = new[] { TotalSalesAllTime, TotalCOGS, TotalExpensesDashboard, NetProfit },
+                Values = new[] { (double)TotalSalesAllTime, (double)TotalCOGS, (double)TotalExpensesDashboard, (double)NetProfit },
                 Fill = new SolidColorPaint(SKColors.DodgerBlue)
             }
         };
 
         // 12. Modes de paiement
-        var payments = context.SoldItems
+        var payments = allSold
             .GroupBy(s => s.PaymentMode ?? "Espèces")
-            .Select(g => new { Mode = g.Key, Total = g.Sum(s => s.Total) })
+            .Select(g => new { Mode = g.Key, Total = (double)g.Sum(s => s.Total) })
             .ToList();
         PaymentModesChart = payments.Select(p => (ISeries)new PieSeries<double> { Name = p.Mode, Values = new[] { p.Total } }).ToArray();
     }

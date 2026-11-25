@@ -6,7 +6,7 @@ using CamaroesPOS.UI.Avalonia.Views;
 
 namespace CamaroesPOS.UI.Avalonia;
 
-public partial class App : Application
+public partial class App : global::Avalonia.Application
 {
     public override void Initialize()
     {

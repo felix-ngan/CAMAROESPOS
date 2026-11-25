@@ -48,8 +48,8 @@ namespace CamaroesPOS.UI.ViewModels
             set { _isNewExpense = value; OnPropertyChanged(); }
         }
 
-        private double _totalExpenses;
-        public double TotalExpenses
+        private decimal _totalExpenses;
+        public decimal TotalExpenses
         {
             get => _totalExpenses;
             set { _totalExpenses = value; OnPropertyChanged(); }

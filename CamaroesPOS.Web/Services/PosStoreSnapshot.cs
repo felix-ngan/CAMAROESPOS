@@ -4,6 +4,7 @@ namespace CamaroesPOS.Web.Services;
 
 public class PosStoreSnapshot
 {
+    public int SchemaVersion { get; set; } = 2;
     public List<Product> Products { get; set; } = new();
     public List<Brand> Brands { get; set; } = new();
     public List<Category> Categories { get; set; } = new();
@@ -15,12 +16,7 @@ public class PosStoreSnapshot
     public List<CancelledOrder> CancelledOrders { get; set; } = new();
     public List<Expense> Expenses { get; set; } = new();
     public List<User> Users { get; set; } = new();
-    public Store Store { get; set; } = new()
-    {
-        StoreName = "CAMAROES POS",
-        Address = "Douala, Cameroun",
-        Logo = Array.Empty<byte>(),
-        MomoCode = "MTN-237-001",
-        OrangeCode = "OM-237-002"
-    };
+    public List<CashShift> CashShifts { get; set; } = new();
+    public List<AuditEntry> AuditLogs { get; set; } = new();
+    public Store Store { get; set; } = new();
 }
