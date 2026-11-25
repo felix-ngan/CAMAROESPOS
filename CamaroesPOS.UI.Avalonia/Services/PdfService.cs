@@ -9,7 +9,7 @@ namespace CamaroesPOS.UI.Avalonia.Services;
 
 public class PdfService
 {
-    public void GenerateReceiptPdf(string transactionNo, string cashier, double totalAmount, double receivedAmount, double changeAmount, string customerPhone, IEnumerable<CartItem> items, string path, double discountAmount = 0)
+    public void GenerateReceiptPdf(string transactionNo, string cashier, decimal totalAmount, decimal receivedAmount, decimal changeAmount, string customerPhone, IEnumerable<CartItem> items, string path, decimal discountAmount = 0m)
     {
         Document.Create(container =>
         {
@@ -51,7 +51,7 @@ public class PdfService
         });
     }
 
-    private void ComposeReceiptContent(IContainer container, IEnumerable<CartItem> items, double totalAmount, double receivedAmount, double changeAmount, double discountAmount)
+    private void ComposeReceiptContent(IContainer container, IEnumerable<CartItem> items, decimal totalAmount, decimal receivedAmount, decimal changeAmount, decimal discountAmount)
     {
         container.PaddingVertical(10).Column(column =>
         {
@@ -86,15 +86,15 @@ public class PdfService
 
             column.Item().PaddingVertical(10).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
 
-            if (discountAmount > 0)
+            if (discountAmount > 0m)
             {
-                double subTotal = totalAmount + discountAmount;
+                decimal subTotal = totalAmount + discountAmount;
                 column.Item().AlignRight().Text($"Sous-total : {subTotal:N0} FCFA");
                 column.Item().AlignRight().Text($"Réduction : -{discountAmount:N0} FCFA").FontColor(Colors.Orange.Darken1);
             }
 
             column.Item().AlignRight().Text($"TOTAL À PAYER : {totalAmount:N0} FCFA").FontSize(14).Bold();
-            if (receivedAmount > 0)
+            if (receivedAmount > 0m)
             {
                 column.Item().AlignRight().Text($"Reçu : {receivedAmount:N0} FCFA");
                 column.Item().AlignRight().Text($"Rendu : {changeAmount:N0} FCFA");
@@ -107,7 +107,7 @@ public class PdfService
         container.AlignCenter().Text("Merci de votre visite !").Italic();
     }
 
-    public void GenerateSalesReportPdf(DateTime startDate, DateTime endDate, double totalSales, double totalDiscounts, int totalTransactions, IEnumerable<SoldItem> soldItems, string path)
+    public void GenerateSalesReportPdf(DateTime startDate, DateTime endDate, decimal totalSales, decimal totalDiscounts, int totalTransactions, IEnumerable<SoldItem> soldItems, string path)
     {
         Document.Create(container =>
         {
@@ -144,7 +144,7 @@ public class PdfService
         });
     }
 
-    private void ComposeReportContent(IContainer container, IEnumerable<SoldItem> items, double totalSales, double totalDiscounts, int totalTransactions)
+    private void ComposeReportContent(IContainer container, IEnumerable<SoldItem> items, decimal totalSales, decimal totalDiscounts, int totalTransactions)
     {
         container.PaddingVertical(20).Column(column =>
         {

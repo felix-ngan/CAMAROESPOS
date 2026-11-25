@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using CamaroesPOS.Application.Security;
 using CamaroesPOS.Data;
 using CamaroesPOS.Domain.Entities;
 using CamaroesPOS.UI.Avalonia.Services;
@@ -30,7 +31,7 @@ public class SettingsViewModel : INotifyPropertyChanged
                 NewUsername = _selectedUser.Username;
                 NewName = _selectedUser.Name;
                 NewRole = _selectedUser.Role;
-                NewPassword = _selectedUser.Password;
+                NewPassword = string.Empty; // Never pre-fill stored password hash
                 IsActiveUser = _selectedUser.IsActive;
             }
         }
@@ -92,7 +93,7 @@ public class SettingsViewModel : INotifyPropertyChanged
 
     public SettingsViewModel()
     {
-        SaveUserCommand = new RelayCommand<object?>(_ => SaveUserAsync(), _ => !string.IsNullOrWhiteSpace(NewUsername) && !string.IsNullOrWhiteSpace(NewPassword));
+        SaveUserCommand = new RelayCommand<object?>(_ => SaveUserAsync(), _ => !string.IsNullOrWhiteSpace(NewUsername) && (_selectedUser != null || !string.IsNullOrWhiteSpace(NewPassword)));
         ClearUserCommand = new RelayCommand<object?>(_ => ClearUser());
         SaveStoreCommand = new RelayCommand<object?>(_ => SaveStoreAsync(), _ => !string.IsNullOrWhiteSpace(StoreName));
         ChangePasswordCommand = new RelayCommand<object?>(_ => ChangePasswordAsync());
@@ -133,7 +134,8 @@ public class SettingsViewModel : INotifyPropertyChanged
             {
                 existing.Name = string.IsNullOrWhiteSpace(NewName) ? NewUsername : NewName;
                 existing.Role = NewRole;
-                existing.Password = NewPassword;
+                if (!string.IsNullOrWhiteSpace(NewPassword))
+                    existing.Password = PasswordHasher.Hash(NewPassword);
                 existing.IsActive = IsActiveUser;
             }
             else
@@ -143,7 +145,7 @@ public class SettingsViewModel : INotifyPropertyChanged
                     Username = NewUsername,
                     Name = string.IsNullOrWhiteSpace(NewName) ? NewUsername : NewName,
                     Role = NewRole,
-                    Password = NewPassword,
+                    Password = PasswordHasher.Hash(NewPassword),
                     IsActive = IsActiveUser
                 });
             }
@@ -197,13 +199,13 @@ public class SettingsViewModel : INotifyPropertyChanged
 
         using (var context = new PosDbContext())
         {
-            var user = context.Users.FirstOrDefault(u => u.Username == username && u.Password == OldPassword);
-            if (user == null)
+            var user = context.Users.FirstOrDefault(u => u.Username == username);
+            if (user == null || !PasswordHasher.Verify(OldPassword, user.Password))
             {
                 await DialogService.ShowErrorAsync("L'ancien mot de passe est incorrect.", "Erreur");
                 return;
             }
-            user.Password = ProfileNewPassword;
+            user.Password = PasswordHasher.Hash(ProfileNewPassword);
             context.SaveChanges();
         }
 
@@ -215,7 +217,7 @@ public class SettingsViewModel : INotifyPropertyChanged
 
     private async void OpenChangePasswordWindowAsync()
     {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+        if (global::Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
         {
             var win = new ChangePasswordWindow(SessionService.CurrentUser ?? string.Empty);
             await win.ShowDialog(desktop.MainWindow);

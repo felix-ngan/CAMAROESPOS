@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using CamaroesPOS.Application.Services;
 using CamaroesPOS.Data;
 using CamaroesPOS.Domain.Entities;
 using CamaroesPOS.UI.Avalonia.Services;
@@ -36,18 +37,16 @@ public class POSViewModel : INotifyPropertyChanged
     public RelayCommand<object?> IncreaseQtyCommand { get; }
     public RelayCommand<object?> DecreaseQtyCommand { get; }
 
-    private double _subTotalAmount;
-    public double SubTotalAmount { get => _subTotalAmount; set { _subTotalAmount = value; OnPropertyChanged(); } }
+    private decimal _subTotalAmount;
+    public decimal SubTotalAmount { get => _subTotalAmount; set { _subTotalAmount = value; OnPropertyChanged(); } }
 
-    private double _discountPercentage;
-    public double DiscountPercentage
+    private decimal _discountPercentage;
+    public decimal DiscountPercentage
     {
         get => _discountPercentage;
         set
         {
-            if (double.IsNaN(value) || double.IsInfinity(value) || value < 0) value = 0;
-            if (value > 100) value = 100;
-            _discountPercentage = value;
+            _discountPercentage = PosCalculator.ClampDiscount(value);
             OnPropertyChanged();
             UpdateTotalAmount();
             RaiseCommandsChanged();
@@ -64,17 +63,17 @@ public class POSViewModel : INotifyPropertyChanged
             OnPropertyChanged();
             if (string.IsNullOrWhiteSpace(_discountPercentageString))
             {
-                DiscountPercentage = 0;
+                DiscountPercentage = 0m;
             }
-            else if (double.TryParse(_discountPercentageString, out double parsed) && !double.IsNaN(parsed) && !double.IsInfinity(parsed))
+            else if (PosCalculator.TryParseDecimalInput(_discountPercentageString, out decimal parsed))
             {
                 DiscountPercentage = parsed;
             }
         }
     }
 
-    private double _totalAmount;
-    public double TotalAmount { get => _totalAmount; set { _totalAmount = value; OnPropertyChanged(); } }
+    private decimal _totalAmount;
+    public decimal TotalAmount { get => _totalAmount; set { _totalAmount = value; OnPropertyChanged(); } }
 
     private int _paymentMethodIndex;
     public int PaymentMethodIndex
@@ -140,11 +139,11 @@ public class POSViewModel : INotifyPropertyChanged
         }
     }
 
-    private double _receivedAmount;
-    public double ReceivedAmount { get => _receivedAmount; set { _receivedAmount = value; OnPropertyChanged(); } }
+    private decimal _receivedAmount;
+    public decimal ReceivedAmount { get => _receivedAmount; set { _receivedAmount = value; OnPropertyChanged(); } }
 
-    private double _changeAmount;
-    public double ChangeAmount { get => _changeAmount; set { _changeAmount = value; OnPropertyChanged(); } }
+    private decimal _changeAmount;
+    public decimal ChangeAmount { get => _changeAmount; set { _changeAmount = value; OnPropertyChanged(); } }
 
     public POSViewModel()
     {
@@ -210,7 +209,16 @@ public class POSViewModel : INotifyPropertyChanged
 
     public void AddProductToCart(Product product, int qty)
     {
+        if (qty <= 0) return;
         var existingItem = Cart.FirstOrDefault(c => c.ProductCode == product.ProductCode);
+        int requestedTotal = (existingItem?.Qty ?? 0) + qty;
+        if (product.Qty >= 0 && requestedTotal > product.Qty)
+        {
+            // Prevent overselling beyond available stock
+            qty = Math.Max(0, product.Qty - (existingItem?.Qty ?? 0));
+            if (qty <= 0) return;
+        }
+
         if (existingItem != null)
         {
             existingItem.Qty += qty;
@@ -229,6 +237,7 @@ public class POSViewModel : INotifyPropertyChanged
                 Price = product.Price,
                 Qty = qty,
                 Total = product.Price * qty,
+                IsTaxable = product.IsTaxable,
                 Date = DateTime.Now
             });
         }
@@ -239,8 +248,9 @@ public class POSViewModel : INotifyPropertyChanged
 
     private void UpdateTotalAmount()
     {
-        SubTotalAmount = Cart.Sum(c => c.Total);
-        TotalAmount = SubTotalAmount - (SubTotalAmount * (DiscountPercentage / 100.0));
+        var totals = PosCalculator.CalculateTotals(Cart, DiscountPercentage);
+        SubTotalAmount = totals.SubTotalTTC;
+        TotalAmount = totals.TotalTTC;
         UpdateChangeAmount();
     }
 
@@ -272,10 +282,16 @@ public class POSViewModel : INotifyPropertyChanged
                 return;
             }
 
-            string transNo = DateTime.Now.ToString("yyyyMMddHHmmss");
+            string transNo = TransactionNumberGenerator.NextTransactionNo();
             using (var context = new PosDbContext())
             using (var tx = context.Database.BeginTransaction())
             {
+                if (!ValidateDatabaseStock(context, out string stockErr))
+                {
+                    await DialogService.ShowErrorAsync(stockErr, "Stock insuffisant");
+                    return;
+                }
+
                 var wallet = context.CustomerWallets.FirstOrDefault(w => w.Phone == CustomerPhone);
                 if (wallet == null)
                 {
@@ -304,8 +320,8 @@ public class POSViewModel : INotifyPropertyChanged
                 tx.Commit();
             }
 
-            double totalDiscountWallet = SubTotalAmount * (DiscountPercentage / 100.0);
-            await ShowReceiptDialogAsync(transNo, TotalAmount, TotalAmount, 0, "Portefeuille (Wallet)", totalDiscountWallet);
+            decimal totalDiscountWallet = SubTotalAmount - TotalAmount;
+            await ShowReceiptDialogAsync(transNo, TotalAmount, TotalAmount, 0m, "Portefeuille (Wallet)", totalDiscountWallet);
 
             Cart.Clear();
             DiscountPercentageString = string.Empty;
@@ -321,9 +337,25 @@ public class POSViewModel : INotifyPropertyChanged
         }
     }
 
+    private bool ValidateDatabaseStock(PosDbContext context, out string error)
+    {
+        error = string.Empty;
+        foreach (var g in Cart.GroupBy(c => c.ProductCode))
+        {
+            var prod = context.Products.FirstOrDefault(p => p.ProductCode == g.Key);
+            int needed = g.Sum(x => x.Qty);
+            if (prod == null || needed > prod.Qty)
+            {
+                error = $"Stock insuffisant pour {g.Key} (Disponible : {prod?.Qty ?? 0}).";
+                return false;
+            }
+        }
+        return true;
+    }
+
     private string SaveTransaction(string paymentMode)
     {
-        string transNo = DateTime.Now.ToString("yyyyMMddHHmmss");
+        string transNo = TransactionNumberGenerator.NextTransactionNo();
         using var context = new PosDbContext();
         SaveTransactionItems(context, transNo, paymentMode);
         context.SaveChanges();
@@ -334,8 +366,7 @@ public class POSViewModel : INotifyPropertyChanged
     {
         foreach (var item in Cart)
         {
-            double itemDiscount = item.Total * (DiscountPercentage / 100.0);
-            double netItemTotal = item.Total - itemDiscount;
+            var (itemDiscount, netItemTotal, lineHt, lineTax) = PosCalculator.CalculateLineBreakdown(item, DiscountPercentage);
             string cashierName = SessionService.CurrentUserName ?? "Admin";
 
             context.SoldItems.Add(new SoldItem
@@ -347,10 +378,14 @@ public class POSViewModel : INotifyPropertyChanged
                 Price = item.Price,
                 Qty = item.Qty,
                 Discount = itemDiscount,
+                SubTotalHT = lineHt,
+                TaxAmount = lineTax,
                 Total = netItemTotal,
                 SoldDate = DateTime.Now,
                 Cashier = cashierName,
-                PaymentMode = paymentMode
+                PaymentMode = paymentMode,
+                CustomerPhone = CustomerPhone ?? string.Empty,
+                Status = "Completed"
             });
 
             var product = context.Products.FirstOrDefault(p => p.ProductCode == item.ProductCode);
@@ -366,7 +401,7 @@ public class POSViewModel : INotifyPropertyChanged
             if (wallet != null)
             {
                 wallet.TotalSpent += TotalAmount;
-                wallet.LoyaltyPoints += (int)(TotalAmount / 1000);
+                wallet.LoyaltyPoints += PosCalculator.CalculateLoyaltyPoints(TotalAmount);
             }
         }
     }
@@ -381,14 +416,14 @@ public class POSViewModel : INotifyPropertyChanged
 
     private void UpdateChangeAmount()
     {
-        if (double.TryParse(ReceivedAmountString, out double parsed))
+        if (PosCalculator.TryParseDecimalInput(ReceivedAmountString, out decimal parsed))
         {
             ReceivedAmount = parsed;
             ChangeAmount = ReceivedAmount - TotalAmount;
         }
         else
         {
-            ReceivedAmount = 0;
+            ReceivedAmount = 0m;
             ChangeAmount = -TotalAmount;
         }
         ConfirmCashPaymentCommand.RaiseCanExecuteChanged();
@@ -396,8 +431,17 @@ public class POSViewModel : INotifyPropertyChanged
 
     private async void ConfirmCashPaymentAsync()
     {
+        using (var checkCtx = new PosDbContext())
+        {
+            if (!ValidateDatabaseStock(checkCtx, out string stockErr))
+            {
+                await DialogService.ShowErrorAsync(stockErr, "Stock insuffisant");
+                return;
+            }
+        }
+
         string transNo = SaveTransaction("Espèces");
-        double totalDiscountCash = SubTotalAmount * (DiscountPercentage / 100.0);
+        decimal totalDiscountCash = SubTotalAmount - TotalAmount;
         await ShowReceiptDialogAsync(transNo, TotalAmount, ReceivedAmount, ChangeAmount, "Espèces", totalDiscountCash);
 
         IsCheckoutDialogOpen = false;
@@ -410,9 +454,9 @@ public class POSViewModel : INotifyPropertyChanged
         RaiseCommandsChanged();
     }
 
-    private async System.Threading.Tasks.Task ShowReceiptDialogAsync(string transNo, double total, double received, double change, string paymentMode, double discount)
+    private async System.Threading.Tasks.Task ShowReceiptDialogAsync(string transNo, decimal total, decimal received, decimal change, string paymentMode, decimal discount)
     {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+        if (global::Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
         {
             var receiptWin = new ReceiptWindow(transNo, new ObservableCollection<CartItem>(Cart), total, received, change, paymentMode, discount, CustomerPhone);
             await receiptWin.ShowDialog(desktop.MainWindow);

@@ -10,23 +10,32 @@
 <RoleGuard>
     @if (!string.IsNullOrEmpty(_msg))
     {
-        <div class="alert @(_err ? "alert-error" : "alert-success")">
+        <div class="alert @(_err ? "alert-error" : "alert-success")" role="alert">
             <span>@_msg</span>
-            <button class="btn btn-sm" @onclick="() => _msg = string.Empty">×</button>
+            <button type="button" class="btn btn-icon btn-sm" aria-label="@Loc.T("Btn_Close")" @onclick="() => _msg = string.Empty">
+                <Icon Name="x" Size="16" />
+            </button>
         </div>
     }
 
     <div class="@(_isEditing || _isAdjusting ? "grid-split" : "")">
         <div class="card stack">
             <div class="row-between">
-                <input class="input" style="flex:1;min-width:220px;" @bind="_search" @bind:event="oninput" placeholder="@Loc.T("Inv_Search")" />
-                @if (Session.IsAdmin)
-                {
-                    <div class="row">
-                        <button class="btn btn-outlined btn-sm" @onclick="() => _showBrandCat = true">🏷 @Loc.T("Inv_BrandsCategories")</button>
-                        <button class="btn btn-primary btn-sm" @onclick="OpenAdd">+ @Loc.T("Inv_AddProduct")</button>
-                    </div>
-                }
+                <input class="input" style="flex:1;min-width:200px;" aria-label="@Loc.T("Inv_Search")" @bind="_search" @bind:event="oninput" placeholder="@Loc.T("Inv_Search")" />
+                <div class="row">
+                    <button type="button" class="btn btn-outlined btn-sm" @onclick="ExportCsvAsync">
+                        <Icon Name="download" Size="15" /><span>CSV</span>
+                    </button>
+                    @if (Session.IsAdmin)
+                    {
+                        <button type="button" class="btn btn-outlined btn-sm" @onclick="() => _showBrandCat = true">
+                            <Icon Name="tag" Size="15" /><span>@Loc.T("Inv_BrandsCategories")</span>
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm" @onclick="OpenAdd">
+                            <Icon Name="plus" Size="15" /><span>@Loc.T("Inv_AddProduct")</span>
+                        </button>
+                    }
+                </div>
             </div>
 
             <div class="table-wrap">
@@ -63,11 +72,17 @@
                                 </td>
                                 @if (Session.IsAdmin)
                                 {
-                                    <td>
-                                        <div class="row" style="gap:4px;">
-                                            <button class="btn btn-outlined btn-sm" title="Ajuster stock" @onclick="() => OpenAdjust(p)">↕</button>
-                                            <button class="btn btn-outlined btn-sm" title="Modifier" @onclick="() => OpenEdit(p)">✏️</button>
-                                            <button class="btn btn-danger btn-sm" title="Supprimer" @onclick="() => DeleteProductAsync(p)">🗑</button>
+                                    <td class="actions-cell">
+                                        <div class="row-nowrap">
+                                            <button type="button" class="btn btn-outlined btn-icon" aria-label="@($"Ajuster stock {p.Description}")" title="@Loc.T("Inv_AdjustStock")" @onclick="() => OpenAdjust(p)">
+                                                <Icon Name="adjust" Size="15" />
+                                            </button>
+                                            <button type="button" class="btn btn-outlined btn-icon" aria-label="@($"Modifier {p.Description}")" title="Modifier" @onclick="() => OpenEdit(p)">
+                                                <Icon Name="edit" Size="15" />
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-icon" aria-label="@($"Supprimer {p.Description}")" title="@Loc.T("Btn_Delete")" @onclick="() => _deleteTarget = p">
+                                                <Icon Name="trash" Size="15" />
+                                            </button>
                                         </div>
                                     </td>
                                 }
@@ -80,24 +95,24 @@
 
         @if (_isEditing && _editModel != null && Session.IsAdmin)
         {
-            <div class="card stack">
-                <div class="card-title" style="margin:0;">@Loc.T("Inv_ProductSheet")</div>
+            <form class="card stack" @onsubmit="SaveProductAsync" @onsubmit:preventDefault="true">
+                <h2 class="card-title" style="margin:0;">@Loc.T("Inv_ProductSheet")</h2>
 
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Code")</label>
-                    <input class="input" @bind="_editModel.ProductCode" disabled="@(!_isNew)" />
+                    <label class="label-muted" for="inv-code">@Loc.T("Col_Code")</label>
+                    <input id="inv-code" class="input" @bind="_editModel.ProductCode" disabled="@(!_isNew)" required />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Barcode")</label>
-                    <input class="input" @bind="_editModel.Barcode" />
+                    <label class="label-muted" for="inv-bc">@Loc.T("Col_Barcode")</label>
+                    <input id="inv-bc" class="input" @bind="_editModel.Barcode" />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Description")</label>
-                    <input class="input" @bind="_editModel.Description" />
+                    <label class="label-muted" for="inv-desc">@Loc.T("Col_Description")</label>
+                    <input id="inv-desc" class="input" @bind="_editModel.Description" required />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Brand")</label>
-                    <select class="input" @bind="_editModel.BrandName">
+                    <label class="label-muted" for="inv-brand">@Loc.T("Col_Brand")</label>
+                    <select id="inv-brand" class="input" @bind="_editModel.BrandName">
                         <option value="">—</option>
                         @foreach (var b in Store.Brands)
                         {
@@ -106,8 +121,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Category")</label>
-                    <select class="input" @bind="_editModel.CategoryName">
+                    <label class="label-muted" for="inv-cat">@Loc.T("Col_Category")</label>
+                    <select id="inv-cat" class="input" @bind="_editModel.CategoryName">
                         <option value="">—</option>
                         @foreach (var c in Store.Categories)
                         {
@@ -116,8 +131,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Vendor")</label>
-                    <select class="input" @bind="_editModel.VendorId">
+                    <label class="label-muted" for="inv-vendor">@Loc.T("Col_Vendor")</label>
+                    <select id="inv-vendor" class="input" @bind="_editModel.VendorId">
                         <option value="0">—</option>
                         @foreach (var v in Store.Vendors)
                         {
@@ -127,63 +142,75 @@
                 </div>
                 <div class="grid-2">
                     <div>
-                        <label class="label-muted">@Loc.T("Inv_SalePrice")</label>
-                        <input class="input" type="number" @bind="_editModel.Price" />
+                        <label class="label-muted" for="inv-price">@Loc.T("Inv_SalePrice")</label>
+                        <input id="inv-price" class="input tabular" type="number" min="0" @bind="_editModel.Price" />
                     </div>
                     <div>
-                        <label class="label-muted">@Loc.T("Inv_CostPrice")</label>
-                        <input class="input" type="number" @bind="_editModel.CostPrice" />
+                        <label class="label-muted" for="inv-cost">@Loc.T("Inv_CostPrice")</label>
+                        <input id="inv-cost" class="input tabular" type="number" min="0" @bind="_editModel.CostPrice" />
                     </div>
                 </div>
                 <div class="grid-2">
                     <div>
-                        <label class="label-muted">@Loc.T("Inv_CurrentStock")</label>
-                        <input class="input" type="number" min="0" @bind="_editModel.Qty" />
+                        <label class="label-muted" for="inv-qty">@Loc.T("Inv_CurrentStock")</label>
+                        <input id="inv-qty" class="input tabular" type="number" min="0" @bind="_editModel.Qty" />
                     </div>
                     <div>
-                        <label class="label-muted">@Loc.T("Inv_Reorder")</label>
-                        <input class="input" type="number" min="0" @bind="_editModel.Reorder" />
+                        <label class="label-muted" for="inv-reorder">@Loc.T("Inv_Reorder")</label>
+                        <input id="inv-reorder" class="input tabular" type="number" min="0" @bind="_editModel.Reorder" />
                     </div>
                 </div>
+                <label class="row" style="cursor:pointer;">
+                    <input type="checkbox" @bind="_editModel.IsTaxable" />
+                    <span>@Loc.T("Inv_Taxable") (@Store.Store.TaxRate.ToString("0.##")%)</span>
+                </label>
                 <div class="grid-2">
-                    <button class="btn btn-outlined" @onclick="() => _isEditing = false">@Loc.T("Btn_Cancel")</button>
-                    <button class="btn btn-primary" @onclick="SaveProductAsync">@Loc.T("Btn_Save")</button>
+                    <button type="button" class="btn btn-outlined" @onclick="() => _isEditing = false">@Loc.T("Btn_Cancel")</button>
+                    <button type="submit" class="btn btn-primary">@Loc.T("Btn_Save")</button>
                 </div>
-            </div>
+            </form>
         }
 
         @if (_isAdjusting && _adjustTarget != null && Session.IsAdmin)
         {
-            <div class="card stack">
-                <div class="card-title" style="margin:0;">@Loc.T("Inv_AdjustStock")</div>
+            <form class="card stack" @onsubmit="SaveAdjustmentAsync" @onsubmit:preventDefault="true">
+                <h2 class="card-title" style="margin:0;">@Loc.T("Inv_AdjustStock")</h2>
                 <div style="font-weight:700;color:var(--primary);">@_adjustTarget.Description</div>
                 <div class="label-muted">@Loc.T("Inv_CurrentStock") : @_adjustTarget.Qty</div>
 
                 <div>
-                    <label class="label-muted">@Loc.T("Inv_OpType")</label>
-                    <select class="input" @bind="_adjType">
+                    <label class="label-muted" for="adj-type">@Loc.T("Inv_OpType")</label>
+                    <select id="adj-type" class="input" @bind="_adjType">
                         <option value="Entrée">Entrée</option>
                         <option value="Sortie">Sortie</option>
                         <option value="Ajustement (Inventaire)">Ajustement (Inventaire)</option>
                     </select>
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Qty")</label>
-                    <input class="input" type="number" min="0" @bind="_adjQty" />
+                    <label class="label-muted" for="adj-qty">@Loc.T("Col_Qty")</label>
+                    <input id="adj-qty" class="input tabular" type="number" min="0" @bind="_adjQty" />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Inv_Justification")</label>
-                    <textarea class="input" rows="3" @bind="_adjReason"></textarea>
+                    <label class="label-muted" for="adj-reason">@Loc.T("Inv_Justification")</label>
+                    <textarea id="adj-reason" class="input" rows="3" @bind="_adjReason" required></textarea>
                 </div>
                 <div class="grid-2">
-                    <button class="btn btn-outlined" @onclick="() => _isAdjusting = false">@Loc.T("Btn_Cancel")</button>
-                    <button class="btn btn-success" @onclick="SaveAdjustmentAsync">@Loc.T("Btn_Confirm")</button>
+                    <button type="button" class="btn btn-outlined" @onclick="() => _isAdjusting = false">@Loc.T("Btn_Cancel")</button>
+                    <button type="submit" class="btn btn-success">@Loc.T("Btn_Confirm")</button>
                 </div>
-            </div>
+            </form>
         }
     </div>
 
     <BrandCategoryModal IsOpen="_showBrandCat" OnClose="() => _showBrandCat = false" />
+
+    <ConfirmModal IsOpen="@(_deleteTarget != null)"
+                  Title="@Loc.T("Confirm_DeleteTitle")"
+                  Message="@(_deleteTarget == null ? "" : $"Supprimer définitivement le produit « {_deleteTarget.Description} » ({_deleteTarget.ProductCode}) ?")"
+                  ConfirmText="@Loc.T("Btn_Delete")"
+                  IsDanger="true"
+                  OnConfirm="ConfirmDeleteProductAsync"
+                  OnCancel="() => _deleteTarget = null" />
 </RoleGuard>
 
 @code {
@@ -191,6 +218,7 @@
     private bool _isEditing;
     private bool _isNew;
     private Product? _editModel;
+    private Product? _deleteTarget;
 
     private bool _isAdjusting;
     private Product? _adjustTarget;
@@ -206,6 +234,7 @@
         ? Store.Products
         : Store.Products.Where(p =>
             (p.ProductCode?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (p.Barcode?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false) ||
             (p.Description?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false) ||
             (p.BrandName?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false) ||
             (p.CategoryName?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false));
@@ -219,7 +248,7 @@
     private void OpenAdd()
     {
         if (!Session.IsAdmin) return;
-        _editModel = new Product { ProductCode = "", Barcode = "", Description = "", BrandName = "", CategoryName = "", VendorName = "", Reorder = 5 };
+        _editModel = new Product { ProductCode = "", Barcode = "", Description = "", BrandName = "", CategoryName = "", VendorName = "", Reorder = 5, IsTaxable = true };
         _isNew = true; _isEditing = true; _isAdjusting = false;
     }
 
@@ -230,7 +259,7 @@
         {
             ProductCode = p.ProductCode, Barcode = p.Barcode, Description = p.Description,
             BrandName = p.BrandName, CategoryName = p.CategoryName, VendorId = p.VendorId, VendorName = p.VendorName,
-            CostPrice = p.CostPrice, Price = p.Price, Qty = p.Qty, Reorder = p.Reorder
+            CostPrice = p.CostPrice, Price = p.Price, Qty = p.Qty, Reorder = p.Reorder, IsTaxable = p.IsTaxable
         };
         _isNew = false; _isEditing = true; _isAdjusting = false;
     }
@@ -238,14 +267,16 @@
     private async Task SaveProductAsync()
     {
         if (_editModel == null) return;
-        var res = Store.SaveProduct(_editModel, _isNew, Session.IsAdmin);
+        var res = Store.SaveProduct(_editModel, _isNew, Session.IsAdmin, Session.DisplayName);
         _msg = res.Message; _err = !res.Success;
         if (res.Success) { _isEditing = false; await Storage.PersistAsync(Store); }
     }
 
-    private async Task DeleteProductAsync(Product p)
+    private async Task ConfirmDeleteProductAsync(string _)
     {
-        var res = Store.DeleteProduct(p.ProductCode, Session.IsAdmin);
+        if (_deleteTarget == null) return;
+        var res = Store.DeleteProduct(_deleteTarget.ProductCode, Session.IsAdmin, Session.DisplayName);
+        _deleteTarget = null;
         _msg = res.Message; _err = !res.Success;
         if (res.Success) await Storage.PersistAsync(Store);
     }
@@ -264,6 +295,9 @@
         _msg = res.Message; _err = !res.Success;
         if (res.Success) { _isAdjusting = false; await Storage.PersistAsync(Store); }
     }
+
+    private Task ExportCsvAsync()
+        => Storage.DownloadFileAsync($"camaroes_stock_{DateTime.Now:yyyyMMdd}.csv", PosStoreState.ExportInventoryCsv(FilteredProducts), "text/csv;charset=utf-8");
 
     public void Dispose()
     {

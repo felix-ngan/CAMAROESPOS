@@ -35,8 +35,8 @@ namespace CamaroesPOS.UI.ViewModels
             set { _isNewWallet = value; OnPropertyChanged(); }
         }
 
-        private double _rechargeAmount;
-        public double RechargeAmount
+        private decimal _rechargeAmount;
+        public decimal RechargeAmount
         {
             get => _rechargeAmount;
             set { _rechargeAmount = value; OnPropertyChanged(); }

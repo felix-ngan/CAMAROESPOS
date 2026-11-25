@@ -11,18 +11,26 @@
 
 <div class="login-wrapper">
     <div class="card login-card">
-        <div class="row-between" style="margin-bottom:14px;">
-            <span class="badge badge-info">.NET 8 · Blazor WASM</span>
-            <button class="btn btn-outlined btn-sm" @onclick="Loc.Toggle">
-                @(Loc.CurrentLang == "fr" ? "EN" : "FR")
-            </button>
+        <div class="row-between" style="margin-bottom:16px;">
+            <span class="badge badge-info">
+                <Icon Name="shield" Size="13" />
+                <span>.NET 8 · Blazor WASM PWA</span>
+            </span>
+            <div class="row-nowrap">
+                <button type="button" class="btn btn-outlined btn-icon" aria-label="@Loc.T("Theme_Toggle")" @onclick="ToggleThemeAsync">
+                    <Icon Name="@(_theme == "dark" ? "sun" : "moon")" Size="16" />
+                </button>
+                <button type="button" class="btn btn-outlined btn-sm" aria-label="@Loc.T("Lang_Toggle")" @onclick="ToggleLangAsync">
+                    @(Loc.CurrentLang == "fr" ? "EN" : "FR")
+                </button>
+            </div>
         </div>
 
-        <div class="boot-logo" style="margin-bottom:12px;">
-            <span class="boot-badge">C</span>
+        <div class="boot-logo" style="margin-bottom:10px;">
+            <span class="boot-badge" aria-hidden="true">C</span>
             <div>
-                <div class="boot-title">CAMAROES</div>
-                <div class="boot-sub">POS SYSTEM · WEB EDITION</div>
+                <h1 class="boot-title" style="margin:0;">CAMAROES</h1>
+                <div class="boot-sub">POS SYSTEM · PORTFOLIO EDITION v2</div>
             </div>
         </div>
 
@@ -32,38 +40,51 @@
 
         @if (!string.IsNullOrEmpty(_error))
         {
-            <div class="alert alert-error">@_error</div>
+            <div class="alert alert-error" role="alert">@_error</div>
         }
 
-        <div class="stack" style="gap:12px;">
+        <form class="stack" style="gap:12px;" @onsubmit="HandleLogin" @onsubmit:preventDefault="true">
             <div>
-                <label class="label-muted">@Loc.T("Login_Username")</label>
-                <input class="input" @bind="_username" @bind:event="oninput" @onkeydown="OnKeyDown" placeholder="admin" />
+                <label class="label-muted" for="login-username">@Loc.T("Login_Username")</label>
+                <input id="login-username"
+                       class="input"
+                       autocomplete="username"
+                       @bind="_username"
+                       placeholder="admin"
+                       required />
             </div>
 
             <div>
-                <label class="label-muted">@Loc.T("Login_Password")</label>
-                <input class="input" type="password" @bind="_password" @bind:event="oninput" @onkeydown="OnKeyDown" placeholder="••••••" />
+                <label class="label-muted" for="login-password">@Loc.T("Login_Password")</label>
+                <input id="login-password"
+                       class="input"
+                       type="password"
+                       autocomplete="current-password"
+                       @bind="_password"
+                       placeholder="••••••"
+                       required />
             </div>
 
-            <button class="btn btn-primary btn-lg btn-block" @onclick="HandleLogin">
+            <button type="submit" class="btn btn-primary btn-lg btn-block">
                 @Loc.T("Login_Submit")
             </button>
-        </div>
+        </form>
 
         <div class="demo-box">
-            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;text-align:center;">
-                ✨ @Loc.T("Login_QuickDemo")
+            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;text-align:center;">
+                @Loc.T("Login_QuickDemo")
             </div>
             <div class="grid-2" style="gap:8px;">
-                <button class="btn btn-outlined btn-sm" @onclick="() => QuickLogin(true)">
-                    🔑 @Loc.T("Login_DemoAdmin")
+                <button type="button" class="btn btn-outlined btn-sm" @onclick="() => QuickLogin(true)">
+                    <Icon Name="shield" Size="15" />
+                    <span>@Loc.T("Login_DemoAdmin")</span>
                 </button>
-                <button class="btn btn-outlined btn-sm" @onclick="() => QuickLogin(false)">
-                    🧾 @Loc.T("Login_DemoCashier")
+                <button type="button" class="btn btn-outlined btn-sm" @onclick="() => QuickLogin(false)">
+                    <Icon Name="pos" Size="15" />
+                    <span>@Loc.T("Login_DemoCashier")</span>
                 </button>
             </div>
-            <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px;">
+            <p style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;">
                 @Loc.T("Login_LocalHint")
             </p>
         </div>
@@ -71,14 +92,19 @@
 </div>
 
 @code {
-    private string _username = "admin";
-    private string _password = "123";
+    private string _username = string.Empty;
+    private string _password = string.Empty;
     private string _error = string.Empty;
+    private string _theme = "light";
 
     protected override async Task OnInitializedAsync()
     {
         await Storage.LoadIntoAsync(Store);
         await Storage.RestoreSessionAsync(Session, Store);
+        _theme = await Storage.LoadThemeAsync();
+        var savedLang = await Storage.LoadLangAsync();
+        if (!string.IsNullOrEmpty(savedLang)) Loc.SetLang(savedLang);
+
         Loc.OnChange += StateHasChanged;
         if (Session.IsAuthenticated)
         {
@@ -86,9 +112,16 @@
         }
     }
 
-    private async Task OnKeyDown(KeyboardEventArgs e)
+    private async Task ToggleThemeAsync()
     {
-        if (e.Key == "Enter") await HandleLogin();
+        _theme = _theme == "dark" ? "light" : "dark";
+        await Storage.SaveThemeAsync(_theme);
+    }
+
+    private async Task ToggleLangAsync()
+    {
+        Loc.Toggle();
+        await Storage.SaveLangAsync(Loc.CurrentLang);
     }
 
     private async Task QuickLogin(bool asAdmin)
@@ -107,8 +140,9 @@
             _error = Loc.T("Login_Error");
             return;
         }
-        Session.Login(user);
-        await Storage.SaveSessionAsync(user.Username);
+        var token = Session.Login(user);
+        await Storage.PersistAsync(Store);
+        await Storage.SaveSessionTokenAsync(token);
         Nav.NavigateTo(Session.IsAdmin ? "/" : "/pos", replace: true);
     }
 

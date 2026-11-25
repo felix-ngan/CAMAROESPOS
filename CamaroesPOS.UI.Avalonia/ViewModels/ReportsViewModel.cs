@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using CamaroesPOS.Application.Services;
 using CamaroesPOS.Data;
 using CamaroesPOS.Domain.Entities;
 using CamaroesPOS.UI.Avalonia.Services;
@@ -26,8 +27,8 @@ public class ReportsViewModel : INotifyPropertyChanged
     private string _searchText = string.Empty;
     public string SearchText { get => _searchText; set { _searchText = value; OnPropertyChanged(); } }
 
-    private double _totalSalesAmount;
-    public double TotalSalesAmount { get => _totalSalesAmount; set { _totalSalesAmount = value; OnPropertyChanged(); } }
+    private decimal _totalSalesAmount;
+    public decimal TotalSalesAmount { get => _totalSalesAmount; set { _totalSalesAmount = value; OnPropertyChanged(); } }
 
     private int _totalItemsSold;
     public int TotalItemsSold { get => _totalItemsSold; set { _totalItemsSold = value; OnPropertyChanged(); } }
@@ -61,7 +62,7 @@ public class ReportsViewModel : INotifyPropertyChanged
             var path = await FilePickerService.PickSavePdfPathAsync($"RapportVentes_{DateTime.Now:yyyyMMdd}.pdf", "Exporter le rapport des ventes");
             if (string.IsNullOrWhiteSpace(path)) return;
 
-            double totalDiscounts = Transactions.Sum(t => (double?)t.Discount) ?? 0;
+            decimal totalDiscounts = Transactions.Sum(t => t.Discount);
             new PdfService().GenerateSalesReportPdf(
                 StartDate ?? DateTime.Now,
                 EndDate ?? DateTime.Now,
@@ -104,7 +105,7 @@ public class ReportsViewModel : INotifyPropertyChanged
         var salesResults = querySales.OrderByDescending(t => t.SoldDate).ToList();
         Transactions.Clear();
         foreach (var item in salesResults) Transactions.Add(item);
-        TotalSalesAmount = salesResults.Sum(t => (double?)t.Total) ?? 0;
+        TotalSalesAmount = salesResults.Sum(t => t.Total);
         TotalItemsSold = salesResults.Sum(t => (int?)t.Qty) ?? 0;
 
         // 2. Produits
@@ -197,6 +198,30 @@ public class ReportsViewModel : INotifyPropertyChanged
                 var product = context.Products.FirstOrDefault(p => p.ProductCode == itemToCancel.ProductCode);
                 if (product != null) product.Qty += itemToCancel.Qty;
 
+                bool walletRefunded = false;
+                if (!string.IsNullOrWhiteSpace(itemToCancel.CustomerPhone))
+                {
+                    var wallet = context.CustomerWallets.FirstOrDefault(w => w.Phone == itemToCancel.CustomerPhone);
+                    if (wallet != null)
+                    {
+                        if (itemToCancel.PaymentMode.Contains("Portefeuille", StringComparison.OrdinalIgnoreCase))
+                        {
+                            wallet.Balance += itemToCancel.Total;
+                            context.WalletTransactions.Add(new WalletTransaction
+                            {
+                                Phone = wallet.Phone,
+                                TransNo = itemToCancel.TransNo,
+                                Type = "Refund",
+                                Amount = itemToCancel.Total,
+                                CreatedAt = DateTime.Now
+                            });
+                            walletRefunded = true;
+                        }
+                        wallet.TotalSpent = Math.Max(0m, wallet.TotalSpent - itemToCancel.Total);
+                        wallet.LoyaltyPoints = Math.Max(0, wallet.LoyaltyPoints - PosCalculator.CalculateLoyaltyPoints(itemToCancel.Total));
+                    }
+                }
+
                 context.CancelledOrders.Add(new CancelledOrder
                 {
                     TransNo = itemToCancel.TransNo,
@@ -206,10 +231,12 @@ public class ReportsViewModel : INotifyPropertyChanged
                     Qty = itemToCancel.Qty,
                     Total = itemToCancel.Total,
                     SoldDate = itemToCancel.SoldDate,
+                    CancelledAt = DateTime.Now,
                     VoidBy = currentUser,
                     CancelledBy = currentUser,
                     Reason = reason,
-                    Action = "Annuler"
+                    Action = walletRefunded ? "Remboursement Portefeuille" : "Remboursement",
+                    WalletRefunded = walletRefunded
                 });
 
                 context.SoldItems.Remove(itemToCancel);

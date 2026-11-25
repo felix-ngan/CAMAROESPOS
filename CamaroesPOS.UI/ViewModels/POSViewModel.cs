@@ -33,29 +33,29 @@ namespace CamaroesPOS.UI.ViewModels
         public ICommand IncreaseQtyCommand { get; }
         public ICommand DecreaseQtyCommand { get; }
 
-        private double _subTotalAmount;
-        public double SubTotalAmount
+        private decimal _subTotalAmount;
+        public decimal SubTotalAmount
         {
             get => _subTotalAmount;
             set { _subTotalAmount = value; OnPropertyChanged(); }
         }
 
-        private double _discountPercentage;
-        public double DiscountPercentage
+        private decimal _discountPercentage;
+        public decimal DiscountPercentage
         {
             get => _discountPercentage;
             set 
             { 
-                if (value < 0) value = 0;
-                if (value > 100) value = 100;
+                if (value < 0m) value = 0m;
+                if (value > 100m) value = 100m;
                 _discountPercentage = value; 
                 OnPropertyChanged(); 
                 UpdateTotalAmount(); 
             }
         }
 
-        private double _totalAmount;
-        public double TotalAmount
+        private decimal _totalAmount;
+        public decimal TotalAmount
         {
             get => _totalAmount;
             set { _totalAmount = value; OnPropertyChanged(); }
@@ -164,15 +164,15 @@ namespace CamaroesPOS.UI.ViewModels
             }
         }
 
-        private double _receivedAmount;
-        public double ReceivedAmount
+        private decimal _receivedAmount;
+        public decimal ReceivedAmount
         {
             get => _receivedAmount;
             set { _receivedAmount = value; OnPropertyChanged(); }
         }
 
-        private double _changeAmount;
-        public double ChangeAmount
+        private decimal _changeAmount;
+        public decimal ChangeAmount
         {
             get => _changeAmount;
             set { _changeAmount = value; OnPropertyChanged(); }
@@ -276,8 +276,8 @@ namespace CamaroesPOS.UI.ViewModels
         private void UpdateTotalAmount()
         {
             SubTotalAmount = Cart.Sum(c => c.Total);
-            TotalAmount = SubTotalAmount - (SubTotalAmount * (DiscountPercentage / 100.0));
-            UpdateChangeAmount(); // To update the popup if it's open (though you can't add to cart while it's open)
+            TotalAmount = SubTotalAmount - decimal.Round(SubTotalAmount * (DiscountPercentage / 100m), 0, MidpointRounding.AwayFromZero);
+            UpdateChangeAmount();
         }
 
         private bool CanClearCart(object obj)
@@ -351,8 +351,8 @@ namespace CamaroesPOS.UI.ViewModels
                 string transNo = SaveTransaction("Portefeuille");
                 
                 // Show receipt for Wallet
-                double totalDiscountWallet = SubTotalAmount * (DiscountPercentage / 100.0);
-                var receiptWin = new CamaroesPOS.UI.Views.ReceiptWindow(transNo, new ObservableCollection<CartItem>(Cart), TotalAmount, TotalAmount, 0, "Portefeuille (Wallet)", totalDiscountWallet);
+                decimal totalDiscountWallet = SubTotalAmount - TotalAmount;
+                var receiptWin = new CamaroesPOS.UI.Views.ReceiptWindow(transNo, new ObservableCollection<CartItem>(Cart), TotalAmount, TotalAmount, 0m, "Portefeuille (Wallet)", totalDiscountWallet);
                 receiptWin.ShowDialog();
                 
                 Cart.Clear();
@@ -377,8 +377,8 @@ namespace CamaroesPOS.UI.ViewModels
             {
                 foreach (var item in Cart)
                 {
-                    double itemDiscount = item.Total * (DiscountPercentage / 100.0);
-                    double netItemTotal = item.Total - itemDiscount;
+                    decimal itemDiscount = decimal.Round(item.Total * (DiscountPercentage / 100m), 0, MidpointRounding.AwayFromZero);
+                    decimal netItemTotal = item.Total - itemDiscount;
 
                     string cashierName = Application.Current.Properties.Contains("CurrentUserName") 
                         ? Application.Current.Properties["CurrentUserName"].ToString() 
@@ -451,14 +451,14 @@ namespace CamaroesPOS.UI.ViewModels
 
         private void UpdateChangeAmount()
         {
-            if (double.TryParse(ReceivedAmountString, out double parsed))
+            if (decimal.TryParse(ReceivedAmountString, out decimal parsed))
             {
                 ReceivedAmount = parsed;
                 ChangeAmount = ReceivedAmount - TotalAmount;
             }
             else
             {
-                ReceivedAmount = 0;
+                ReceivedAmount = 0m;
                 ChangeAmount = -TotalAmount;
             }
             CommandManager.InvalidateRequerySuggested();
@@ -471,7 +471,7 @@ namespace CamaroesPOS.UI.ViewModels
 
         private bool CanConfirmCashPayment(object obj)
         {
-            return ReceivedAmount >= TotalAmount && TotalAmount > 0;
+            return ReceivedAmount >= TotalAmount && TotalAmount > 0m;
         }
 
         private void ConfirmCashPayment(object obj)
@@ -479,7 +479,7 @@ namespace CamaroesPOS.UI.ViewModels
             string transNo = SaveTransaction("Espèces");
             
             // Show receipt for Cash Payment
-            double totalDiscountCash = SubTotalAmount * (DiscountPercentage / 100.0);
+            decimal totalDiscountCash = SubTotalAmount - TotalAmount;
             var receiptWin = new CamaroesPOS.UI.Views.ReceiptWindow(transNo, new ObservableCollection<CartItem>(Cart), TotalAmount, ReceivedAmount, ChangeAmount, "Espèces", totalDiscountCash);
             receiptWin.ShowDialog();
             

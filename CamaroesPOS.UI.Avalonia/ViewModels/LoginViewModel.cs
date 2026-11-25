@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using CamaroesPOS.Application.Security;
 using CamaroesPOS.Data;
 using CamaroesPOS.UI.Avalonia.Services;
 
@@ -46,9 +47,14 @@ public class LoginViewModel : INotifyPropertyChanged
         }
 
         using var context = new PosDbContext();
-        var user = context.Users.FirstOrDefault(u => u.Username == Username && u.Password == Password && u.IsActive);
-        if (user != null)
+        var user = context.Users.FirstOrDefault(u => u.Username == Username && u.IsActive);
+        if (user != null && PasswordHasher.Verify(Password, user.Password))
         {
+            if (!PasswordHasher.IsHashed(user.Password))
+            {
+                user.Password = PasswordHasher.Hash(Password);
+                context.SaveChanges();
+            }
             SessionService.SetSession(user);
             OnLoginSucceeded?.Invoke();
         }
@@ -60,7 +66,7 @@ public class LoginViewModel : INotifyPropertyChanged
 
     private static void CloseApp()
     {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (global::Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.Shutdown();
         }

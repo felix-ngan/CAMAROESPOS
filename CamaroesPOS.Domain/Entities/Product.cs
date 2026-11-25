@@ -2,18 +2,19 @@ namespace CamaroesPOS.Domain.Entities
 {
     public class Product
     {
-        public string ProductCode { get; set; }
-        public string Barcode { get; set; }
-        public string Description { get; set; }
+        public string ProductCode { get; set; } = string.Empty;
+        public string Barcode { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public int BrandId { get; set; }
-        public string BrandName { get; set; }
+        public string BrandName { get; set; } = string.Empty;
         public int CategoryId { get; set; }
-        public string CategoryName { get; set; }
-        public double CostPrice { get; set; }
-        public double Price { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
+        public decimal CostPrice { get; set; }
+        public decimal Price { get; set; }
         public int Qty { get; set; }
         public int Reorder { get; set; }
         public int VendorId { get; set; }
-        public string VendorName { get; set; }
+        public string VendorName { get; set; } = string.Empty;
+        public bool IsTaxable { get; set; } = true;
     }
 }

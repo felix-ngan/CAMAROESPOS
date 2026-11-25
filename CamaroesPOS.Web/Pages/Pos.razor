@@ -4,243 +4,500 @@
 @inject BrowserStorageService Storage
 @inject SessionState Session
 @inject LocalizationService Loc
+@inject IJSRuntime JS
+@using CamaroesPOS.Application.Services
 
 <PageTitle>@Loc.T("Nav_POS") — CAMAROES POS</PageTitle>
 
 <RoleGuard>
-    @if (!string.IsNullOrEmpty(_message))
-    {
-        <div class="alert @(_isError ? "alert-error" : "alert-success") no-print">
-            <span>@_message</span>
-            <button class="btn btn-sm" @onclick="() => _message = string.Empty">×</button>
-        </div>
-    }
-
-    <div class="grid-pos no-print">
-        <!-- Left: Barcode + Cart -->
-        <div class="card stack">
-            <div class="row">
-                <input class="input" style="flex:1;"
-                       @bind="_barcodeSearch" @bind:event="oninput"
-                       @onkeydown="OnBarcodeKeyDown"
-                       placeholder="@Loc.T("POS_BarcodePlaceholder")" />
-                <button class="btn btn-primary" @onclick="SearchBarcode">🔍 Scan</button>
-                <button class="btn btn-outlined" @onclick="() => _showCatalog = true">📦 @Loc.T("POS_Catalog")</button>
-            </div>
-
-            <div class="table-wrap">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>@Loc.T("Col_Code")</th>
-                            <th>@Loc.T("Col_Description")</th>
-                            <th class="text-right">@Loc.T("Col_Price")</th>
-                            <th class="text-right">@Loc.T("Col_Qty")</th>
-                            <th class="text-right">@Loc.T("Col_Total")</th>
-                            <th>@Loc.T("Col_Actions")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in _cart)
-                        {
-                            <tr>
-                                <td><strong>@item.ProductCode</strong></td>
-                                <td>@item.ProductDescription</td>
-                                <td class="text-right">@item.Price.ToString("N0")</td>
-                                <td class="text-right">@item.Qty</td>
-                                <td class="text-right"><strong>@item.Total.ToString("N0")</strong></td>
-                                <td>
-                                    <button class="btn btn-danger btn-sm" @onclick="() => RemoveItem(item)">🗑</button>
-                                </td>
-                            </tr>
-                        }
-                        @if (_cart.Count == 0)
-                        {
-                            <tr>
-                                <td colspan="6" style="text-align:center;color:var(--muted);padding:32px;">
-                                    @Loc.T("POS_EmptyCart")
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="row-between">
-                <span class="label-muted">@_cart.Sum(c => c.Qty) @Loc.T("Lbl_CartItems")</span>
-                <button class="btn btn-danger btn-sm" disabled="@(_cart.Count == 0)" @onclick="ClearCart">
-                    @Loc.T("POS_Clear")
+    <div @onkeydown="OnGlobalKeyDown" tabindex="-1" style="outline:none;">
+        @if (!string.IsNullOrEmpty(_message))
+        {
+            <div class="alert @(_isError ? "alert-error" : "alert-success") no-print" role="alert">
+                <span>@_message</span>
+                <button type="button" class="btn btn-icon btn-sm" aria-label="@Loc.T("Btn_Close")" @onclick="() => _message = string.Empty">
+                    <Icon Name="x" Size="16" />
                 </button>
             </div>
+        }
+
+        <!-- Cash Shift Status Banner -->
+        <div class="shift-bar no-print">
+            <div class="row">
+                @if (Store.ActiveShift is { } shift)
+                {
+                    <span class="badge badge-success">
+                        <Icon Name="check" Size="13" />
+                        <span>@Loc.T("POS_ShiftOpen") #@shift.Id</span>
+                    </span>
+                    <span class="kpi-sub">
+                        @Loc.T("POS_ExpectedCash") : <strong style="color:var(--navy);">@shift.ExpectedCash.ToString("N0") @Store.Store.Currency</strong>
+                        · @shift.TransactionCount @Loc.T("Lbl_SalesLines")
+                    </span>
+                }
+                else
+                {
+                    <span class="badge badge-warning">
+                        <Icon Name="alert" Size="13" />
+                        <span>@Loc.T("POS_ShiftClosed")</span>
+                    </span>
+                }
+            </div>
+            <div class="row">
+                @if (Store.HeldCarts.Count > 0)
+                {
+                    <div class="pill-group">
+                        @foreach (var hc in Store.HeldCarts)
+                        {
+                            <button type="button" class="pill-btn" @onclick="() => ResumeHeldCart(hc.Id)">
+                                <Icon Name="clock" Size="13" /> @hc.Label
+                            </button>
+                        }
+                    </div>
+                }
+                @if (Store.ActiveShift == null)
+                {
+                    <button type="button" class="btn btn-primary btn-sm" @onclick="() => { _shiftFloat = 50000m; _showOpenShiftModal = true; }">
+                        <Icon Name="cash" Size="15" /><span>@Loc.T("POS_OpenShift")</span>
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-outlined btn-sm" @onclick="OpenCloseShiftModal">
+                        <Icon Name="printer" Size="15" /><span>@Loc.T("POS_CloseShift")</span>
+                    </button>
+                }
+            </div>
         </div>
 
-        <!-- Right: Checkout Panel -->
-        <div class="card stack">
-            <div class="card-title" style="margin-bottom:0;">@Loc.T("POS_Cart")</div>
-
-            <div class="row-between">
-                <span class="label-muted" style="margin:0;">@Loc.T("POS_Subtotal")</span>
-                <strong>@SubTotal.ToString("N0") FCFA</strong>
-            </div>
-
-            <div>
-                <label class="label-muted">@Loc.T("POS_DiscountPct")</label>
-                <input class="input" value="@_discountString" @oninput="OnDiscountChanged" placeholder="0" />
-            </div>
-
-            <div class="total-box">
-                <div style="font-size:11px;font-weight:700;color:var(--primary);">@Loc.T("POS_TotalDue")</div>
-                <div style="font-size:26px;font-weight:900;color:var(--navy);">@TotalAmount.ToString("N0") FCFA</div>
-            </div>
-
-            <div>
-                <label class="label-muted">@Loc.T("POS_PaymentMode")</label>
-                <select class="input" @bind="_paymentMode">
-                    <option value="cash">@Loc.T("POS_Cash")</option>
-                    <option value="wallet">@Loc.T("POS_Wallet")</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="label-muted">@Loc.T("POS_CustomerPhone")</label>
-                <input class="input" @bind="_customerPhone" placeholder="0601020304" list="wallet-phones" />
-                <datalist id="wallet-phones">
-                    @foreach (var w in Store.CustomerWallets)
-                    {
-                        <option value="@w.Phone">@w.CustomerName (@w.Balance.ToString("N0") FCFA)</option>
-                    }
-                </datalist>
-            </div>
-
-            <button class="btn btn-success btn-lg btn-block"
-                    disabled="@(_cart.Count == 0 || TotalAmount <= 0)"
-                    @onclick="StartCheckoutAsync">
-                ✓ @Loc.T("POS_CompletePurchase")
-            </button>
-        </div>
-    </div>
-
-    <!-- Modal: Product Catalog -->
-    @if (_showCatalog)
-    {
-        <div class="modal-backdrop no-print">
-            <div class="modal-box modal-lg stack">
-                <div class="row-between">
-                    <div class="card-title" style="margin:0;">@Loc.T("POS_SelectProducts")</div>
-                    <button class="btn btn-outlined btn-sm" @onclick="() => _showCatalog = false">@Loc.T("Btn_Close")</button>
+        <!-- Split-Screen POS: Left 65% Catalog | Right 35% Cart & Checkout -->
+        <div class="grid-pos no-print">
+            <!-- LEFT: Always-visible Tactile Product Catalog -->
+            <section class="card stack" aria-label="@Loc.T("POS_Catalog")">
+                <div class="row">
+                    <div style="flex:1;min-width:180px;">
+                        <label class="label-muted" for="pos-search-input">@Loc.T("POS_Catalog")</label>
+                        <input id="pos-search-input"
+                               class="input"
+                               @bind="_barcodeSearch"
+                               @bind:event="oninput"
+                               @onkeydown="OnBarcodeKeyDown"
+                               placeholder="@Loc.T("POS_BarcodePlaceholder")" />
+                    </div>
+                    <button type="button" class="btn btn-primary" style="align-self:flex-end;" @onclick="SearchBarcode">
+                        <Icon Name="search" Size="16" /><span>Scan</span>
+                    </button>
                 </div>
 
-                <div class="catalog-grid">
-                    @foreach (var p in Store.Products)
+                <!-- Category Pills -->
+                <div class="pill-group" role="tablist" aria-label="@Loc.T("Col_Category")">
+                    <button type="button"
+                            class="pill-btn @(string.IsNullOrEmpty(_selectedCategory) ? "active" : "")"
+                            @onclick='() => _selectedCategory = ""'>
+                        @Loc.T("POS_AllCategories") (@Store.Products.Count)
+                    </button>
+                    @foreach (var cat in Store.Categories)
                     {
-                        <button class="catalog-item" @onclick="() => PickProduct(p)">
-                            <div style="font-weight:700;color:var(--navy);margin-bottom:4px;">@p.Description</div>
-                            <div style="font-weight:800;color:var(--primary);font-size:15px;">@p.Price.ToString("N0") FCFA</div>
-                            <div style="margin-top:6px;" class="row-between">
-                                <span style="font-size:11px;color:var(--muted);">@p.ProductCode</span>
-                                <span class="badge @(p.Qty <= p.Reorder ? "badge-danger" : "badge-success")">Stock : @p.Qty</span>
+                        var count = Store.Products.Count(p => p.CategoryName == cat.CategoryName);
+                        <button type="button"
+                                class="pill-btn @(_selectedCategory == cat.CategoryName ? "active" : "")"
+                                @onclick="() => _selectedCategory = cat.CategoryName">
+                            @cat.CategoryName (@count)
+                        </button>
+                    }
+                </div>
+
+                <!-- 1-Tap Tactile Product Grid -->
+                <div class="catalog-grid">
+                    @foreach (var p in FilteredCatalog)
+                    {
+                        int inCartQty = _cart.Where(c => c.ProductCode == p.ProductCode).Sum(c => c.Qty);
+                        int remaining = p.Qty - inCartQty;
+                        bool exhausted = remaining <= 0;
+
+                        <button type="button"
+                                class="catalog-tile"
+                                disabled="@exhausted"
+                                aria-label="@($"{p.Description} - {p.Price:N0} {Store.Store.Currency}")"
+                                @onclick="() => QuickAddProduct(p)">
+                            <div>
+                                <div class="row-between" style="margin-bottom:4px;">
+                                    <span style="font-size:11px;font-weight:700;color:var(--muted);">@p.ProductCode</span>
+                                    @if (inCartQty > 0)
+                                    {
+                                        <span class="badge badge-info">×@inCartQty</span>
+                                    }
+                                </div>
+                                <div class="catalog-tile-title">@p.Description</div>
+                            </div>
+                            <div>
+                                <div class="catalog-tile-price">@p.Price.ToString("N0") @Store.Store.Currency</div>
+                                <div class="row-between" style="margin-top:6px;">
+                                    <span style="font-size:11px;color:var(--muted);">@p.CategoryName</span>
+                                    @if (exhausted)
+                                    {
+                                        <span class="badge badge-danger">@Loc.T("POS_OutOfStock")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge @(remaining <= p.Reorder ? "badge-warning" : "badge-success")">Stock : @remaining</span>
+                                    }
+                                </div>
                             </div>
                         </button>
                     }
                 </div>
-            </div>
-        </div>
-    }
+            </section>
 
-    <!-- Modal: Quantity Picker -->
-    @if (_pickedProduct != null)
-    {
-        <div class="modal-backdrop no-print">
-            <div class="modal-box stack" style="max-width:340px;">
-                <div class="card-title" style="text-align:center;margin:0;">@Loc.T("POS_WhatQty")</div>
-                <div style="text-align:center;font-weight:700;color:var(--primary);">@_pickedProduct.Description</div>
-
-                <div class="row" style="justify-content:center;">
-                    <button class="btn btn-outlined" style="width:52px;height:46px;font-size:20px;" @onclick="() => { if (_pickedQty > 1) _pickedQty--; }">-</button>
-                    <input class="input" type="number" min="1" @bind="_pickedQty" style="width:90px;text-align:center;font-size:20px;font-weight:800;" />
-                    <button class="btn btn-outlined" style="width:52px;height:46px;font-size:20px;" @onclick="() => _pickedQty++">+</button>
+            <!-- RIGHT: Persistent Cart & Multi-Payment Checkout -->
+            <section class="card stack" aria-label="@Loc.T("POS_Cart")">
+                <div class="row-between">
+                    <h2 class="card-title" style="margin:0;">@Loc.T("POS_Cart") (@_cart.Sum(c => c.Qty))</h2>
+                    <div class="row-nowrap">
+                        <button type="button" class="btn btn-outlined btn-sm" disabled="@(_cart.Count == 0)" @onclick="HoldCurrentCart" title="@Loc.T("POS_Hold")">
+                            <Icon Name="pause" Size="14" /><span>@Loc.T("POS_Hold")</span>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-icon" disabled="@(_cart.Count == 0)" aria-label="@Loc.T("POS_Clear")" title="@Loc.T("POS_Clear")" @onclick="ClearCart">
+                            <Icon Name="trash" Size="15" />
+                        </button>
+                    </div>
                 </div>
 
-                <div class="grid-2">
-                    <button class="btn btn-outlined" @onclick="() => _pickedProduct = null">@Loc.T("Btn_Cancel")</button>
-                    <button class="btn btn-primary" @onclick="ConfirmAddProduct">@Loc.T("Btn_Add")</button>
-                </div>
-            </div>
-        </div>
-    }
-
-    <!-- Modal: Cash Numpad -->
-    @if (_showCashModal)
-    {
-        <div class="modal-backdrop no-print">
-            <div class="modal-box stack" style="max-width:420px;">
-                <div class="card-title" style="text-align:center;margin:0;">@Loc.T("POS_CashPayment")</div>
-                <div style="text-align:center;font-size:20px;font-weight:800;color:var(--primary);">
-                    Total : @TotalAmount.ToString("N0") FCFA
-                </div>
-
-                @if (!string.IsNullOrEmpty(_cashModalError))
+                @if (_cart.Count == 0)
                 {
-                    <div class="alert alert-error" style="margin-bottom:0;">@_cashModalError</div>
+                    <div style="text-align:center;color:var(--muted);padding:28px 12px;border:1.5px dashed var(--border);border-radius:12px;">
+                        <Icon Name="pos" Size="28" />
+                        <p style="margin-top:8px;font-size:13px;">@Loc.T("POS_EmptyCart")</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="cart-list">
+                        @foreach (var item in _cart)
+                        {
+                            var maxStock = Store.Products.FirstOrDefault(p => p.ProductCode == item.ProductCode)?.Qty ?? item.Qty;
+                            <div class="cart-row">
+                                <div style="min-width:0;flex:1;">
+                                    <div style="font-weight:700;color:var(--navy);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@item.ProductDescription</div>
+                                    <div class="kpi-sub">@item.Price.ToString("N0") × @item.Qty = <strong style="color:var(--navy);">@item.Total.ToString("N0")</strong></div>
+                                </div>
+                                <div class="qty-stepper">
+                                    <button type="button" class="qty-btn" aria-label="Diminuer quantité" @onclick="() => DecrementItem(item)">
+                                        <Icon Name="minus" Size="14" />
+                                    </button>
+                                    <span class="qty-val">@item.Qty</span>
+                                    <button type="button" class="qty-btn" aria-label="Augmenter quantité" disabled="@(item.Qty >= maxStock)" @onclick="() => IncrementItem(item)">
+                                        <Icon Name="plus" Size="14" />
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-icon" aria-label="@($"Retirer {item.ProductDescription}")" @onclick="() => RemoveItem(item)">
+                                        <Icon Name="trash" Size="14" />
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
                 }
 
-                <div class="row">
-                    <input class="input" style="flex:1;font-size:20px;font-weight:800;" @bind="_receivedString" @bind:event="oninput" placeholder="@Loc.T("POS_AmountGiven")" />
-                    <button class="btn btn-danger" @onclick="() => { _receivedString = string.Empty; _cashModalError = string.Empty; }">C</button>
+                <!-- Discount & Tax Breakdown -->
+                <div>
+                    <label class="label-muted" for="pos-discount-input">@Loc.T("POS_DiscountPct")</label>
+                    <input id="pos-discount-input" class="input" value="@_discountString" @oninput="OnDiscountChanged" placeholder="0" />
                 </div>
 
-                <div style="text-align:center;font-weight:700;font-size:15px;" class="@(IsCashValid ? "text-success" : "text-danger")">
-                    @Loc.T("POS_ChangeDue") @ChangeAmount.ToString("N0") FCFA
-                </div>
-
-                <div class="quick-grid">
-                    <button class="btn btn-outlined btn-sm" @onclick="SetExactAmount">@Loc.T("POS_Exact")</button>
-                    <button class="btn btn-outlined btn-sm" @onclick='() => _receivedString = "5000"'>5 000</button>
-                    <button class="btn btn-outlined btn-sm" @onclick='() => _receivedString = "10000"'>10 000</button>
-                    <button class="btn btn-outlined btn-sm" @onclick='() => _receivedString = "20000"'>20 000</button>
-                </div>
-
-                <div class="numpad-grid">
-                    @foreach (var d in new[] { "7", "8", "9", "4", "5", "6", "1", "2", "3", "0", "00", "000" })
+                <div class="stack" style="gap:4px;font-size:13px;">
+                    <div class="row-between">
+                        <span style="color:var(--muted);">@Loc.T("POS_SubtotalHT")</span>
+                        <span class="tabular">@Totals.TotalHT.ToString("N0") @Store.Store.Currency</span>
+                    </div>
+                    <div class="row-between">
+                        <span style="color:var(--muted);">@Loc.T("POS_Vat") (@Store.Store.TaxRate.ToString("0.##")%) :</span>
+                        <span class="tabular">@Totals.TaxAmount.ToString("N0") @Store.Store.Currency</span>
+                    </div>
+                    @if (Totals.DiscountAmount > 0m)
                     {
-                        <button class="btn btn-outlined numpad-btn" @onclick="() => PressDigit(d)">@d</button>
+                        <div class="row-between text-warning">
+                            <span>@Loc.T("Lbl_Discount")</span>
+                            <strong class="tabular">-@Totals.DiscountAmount.ToString("N0") @Store.Store.Currency</strong>
+                        </div>
                     }
                 </div>
 
-                <div class="grid-2">
-                    <button class="btn btn-outlined" @onclick="() => { _showCashModal = false; _cashModalError = string.Empty; }">@Loc.T("Btn_Cancel")</button>
-                    <button class="btn btn-success" disabled="@(!IsCashValid)" @onclick="ConfirmCashPaymentAsync">
-                        @Loc.T("Btn_Confirm")
+                <div class="total-box">
+                    <div style="font-size:11px;font-weight:700;color:var(--primary);">@Loc.T("POS_TotalDue")</div>
+                    <div style="font-size:26px;font-weight:900;color:var(--navy);">@Totals.TotalTTC.ToString("N0") @Store.Store.Currency</div>
+                </div>
+
+                <!-- Tactile Payment Mode Selector -->
+                <div>
+                    <span class="label-muted">@Loc.T("POS_PaymentMode")</span>
+                    <div class="pay-modes-grid">
+                        <button type="button" class="pay-mode-btn @(_paymentMode == "cash" ? "active" : "")" @onclick='() => _paymentMode = "cash"'>
+                            <Icon Name="cash" Size="16" /><span>@Loc.T("POS_Cash")</span>
+                        </button>
+                        <button type="button" class="pay-mode-btn momo @(_paymentMode == "momo" ? "active" : "")" @onclick='() => _paymentMode = "momo"'>
+                            <Icon Name="phone" Size="16" /><span>@Loc.T("POS_MtnMomo")</span>
+                        </button>
+                        <button type="button" class="pay-mode-btn orange @(_paymentMode == "orange" ? "active" : "")" @onclick='() => _paymentMode = "orange"'>
+                            <Icon Name="phone" Size="16" /><span>@Loc.T("POS_OrangeMoney")</span>
+                        </button>
+                        <button type="button" class="pay-mode-btn @(_paymentMode == "wallet" ? "active" : "")" @onclick='() => _paymentMode = "wallet"'>
+                            <Icon Name="wallet" Size="16" /><span>@Loc.T("POS_Wallet")</span>
+                        </button>
+                    </div>
+                    <button type="button" class="pay-mode-btn btn-block @(_paymentMode == "split" ? "active" : "")" style="margin-top:8px;" @onclick='() => _paymentMode = "split"'>
+                        <Icon Name="split" Size="16" /><span>@Loc.T("POS_SplitPayment")</span>
                     </button>
                 </div>
-            </div>
-        </div>
-    }
 
-    <!-- Modal: Printable Receipt -->
-    <ReceiptModal Result="_lastReceipt"
-                  Items="_lastReceiptItems"
-                  Cashier="@Session.DisplayName"
-                  CustomerPhone="@_lastReceiptPhone"
-                  OnClose="() => _lastReceipt = null" />
+                <div>
+                    <label class="label-muted" for="pos-customer-phone">@Loc.T("POS_CustomerPhone")</label>
+                    <input id="pos-customer-phone" class="input" @bind="_customerPhone" placeholder="0601020304" list="wallet-phones" />
+                    <datalist id="wallet-phones">
+                        @foreach (var w in Store.CustomerWallets)
+                        {
+                            <option value="@w.Phone">@w.CustomerName (@w.Balance.ToString("N0") @Store.Store.Currency)</option>
+                        }
+                    </datalist>
+                </div>
+
+                <button type="button"
+                        class="btn btn-success btn-lg btn-block"
+                        disabled="@(_cart.Count == 0 || Totals.TotalTTC <= 0m)"
+                        @onclick="StartCheckoutAsync">
+                    <Icon Name="check" Size="18" />
+                    <span>@Loc.T("POS_CompletePurchase") · @Totals.TotalTTC.ToString("N0") @Store.Store.Currency (F9)</span>
+                </button>
+            </section>
+        </div>
+
+        <!-- Modal: Cash Numpad -->
+        @if (_showCashModal)
+        {
+            <div class="modal-backdrop no-print" role="presentation" @onclick="CloseModals">
+                <div class="modal-box stack" style="max-width:420px;" role="dialog" aria-modal="true" aria-labelledby="cash-modal-title" @onclick:stopPropagation="true">
+                    <h2 id="cash-modal-title" class="card-title" style="text-align:center;margin:0;">@Loc.T("POS_CashPayment")</h2>
+                    <div class="tabular" style="text-align:center;font-size:20px;font-weight:800;color:var(--primary);">
+                        Total : @Totals.TotalTTC.ToString("N0") @Store.Store.Currency
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(_modalError))
+                    {
+                        <div class="alert alert-error" style="margin-bottom:0;" role="alert">@_modalError</div>
+                    }
+
+                    <div class="row-nowrap">
+                        <input class="input tabular" style="flex:1;font-size:20px;font-weight:800;" aria-label="@Loc.T("POS_AmountGiven")" @bind="_receivedString" @bind:event="oninput" placeholder="@Loc.T("POS_AmountGiven")" />
+                        <button type="button" class="btn btn-danger" @onclick="() => { _receivedString = string.Empty; _modalError = string.Empty; }">C</button>
+                    </div>
+
+                    <div class="tabular @(IsCashValid ? "text-success" : "text-danger")" style="text-align:center;font-weight:700;font-size:15px;">
+                        @Loc.T("POS_ChangeDue") @ChangeAmount.ToString("N0") @Store.Store.Currency
+                    </div>
+
+                    <div class="quick-grid">
+                        <button type="button" class="btn btn-outlined btn-sm" @onclick="SetExactAmount">@Loc.T("POS_Exact")</button>
+                        <button type="button" class="btn btn-outlined btn-sm" @onclick='() => _receivedString = "5000"'>5 000</button>
+                        <button type="button" class="btn btn-outlined btn-sm" @onclick='() => _receivedString = "10000"'>10 000</button>
+                        <button type="button" class="btn btn-outlined btn-sm" @onclick='() => _receivedString = "20000"'>20 000</button>
+                    </div>
+
+                    <div class="numpad-grid">
+                        @foreach (var d in new[] { "7", "8", "9", "4", "5", "6", "1", "2", "3", "0", "00", "000" })
+                        {
+                            <button type="button" class="btn btn-outlined numpad-btn" @onclick="() => PressDigit(d)">@d</button>
+                        }
+                    </div>
+
+                    <div class="grid-2">
+                        <button type="button" class="btn btn-outlined" @onclick="CloseModals">@Loc.T("Btn_Cancel")</button>
+                        <button type="button" class="btn btn-success" disabled="@(!IsCashValid)" @onclick="ConfirmCashPaymentAsync">
+                            @Loc.T("Btn_Confirm")
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Modal: Mobile Money (MTN MoMo / Orange Money) USSD Simulation -->
+        @if (_showMobileMoneyModal)
+        {
+            var isOrange = _paymentMode == "orange";
+            var providerName = isOrange ? "Orange Money" : "MTN MoMo";
+            var merchantCode = isOrange ? Store.Store.OrangeCode : Store.Store.MomoCode;
+            <div class="modal-backdrop no-print" role="presentation" @onclick="CloseModals">
+                <div class="modal-box stack" style="max-width:440px;" role="dialog" aria-modal="true" aria-labelledby="momo-modal-title" @onclick:stopPropagation="true">
+                    <h2 id="momo-modal-title" class="card-title" style="margin:0;display:flex;align-items:center;gap:8px;">
+                        <Icon Name="phone" Size="20" /><span>@providerName — USSD Push</span>
+                    </h2>
+
+                    <div class="total-box" style="text-align:center;">
+                        <div style="font-size:12px;color:var(--muted);">@Loc.T("POS_MerchantCode") : <strong>@merchantCode</strong></div>
+                        <div style="font-size:24px;font-weight:900;color:var(--navy);margin-top:4px;">@Totals.TotalTTC.ToString("N0") @Store.Store.Currency</div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(_modalError))
+                    {
+                        <div class="alert alert-error" style="margin-bottom:0;" role="alert">@_modalError</div>
+                    }
+
+                    <div>
+                        <label class="label-muted" for="momo-phone-input">@Loc.T("POS_PayerPhone")</label>
+                        <input id="momo-phone-input" class="input" @bind="_momoPayerPhone" placeholder="+237 677 00 00 00" disabled="@_ussdPending" />
+                    </div>
+
+                    @if (_ussdPending)
+                    {
+                        <div class="alert alert-info" style="margin-bottom:0;justify-content:center;gap:10px;">
+                            <div class="boot-spinner" style="width:18px;height:18px;margin:0;border-width:2px;"></div>
+                            <span>@Loc.T("POS_UssdWaiting")</span>
+                        </div>
+                    }
+
+                    <div class="grid-2">
+                        <button type="button" class="btn btn-outlined" disabled="@_ussdPending" @onclick="CloseModals">@Loc.T("Btn_Cancel")</button>
+                        <button type="button" class="btn btn-success" disabled="@_ussdPending" @onclick="ConfirmMobileMoneyAsync">
+                            @Loc.T("POS_SendUssdPush")
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Modal: Split Payment -->
+        @if (_showSplitModal)
+        {
+            <div class="modal-backdrop no-print" role="presentation" @onclick="CloseModals">
+                <div class="modal-box stack" style="max-width:440px;" role="dialog" aria-modal="true" aria-labelledby="split-modal-title" @onclick:stopPropagation="true">
+                    <h2 id="split-modal-title" class="card-title" style="margin:0;">@Loc.T("POS_SplitPayment")</h2>
+                    <div class="tabular" style="font-size:18px;font-weight:800;color:var(--primary);">
+                        Total TTC : @Totals.TotalTTC.ToString("N0") @Store.Store.Currency
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(_modalError))
+                    {
+                        <div class="alert alert-error" style="margin-bottom:0;" role="alert">@_modalError</div>
+                    }
+
+                    <div>
+                        <label class="label-muted" for="split-cash">@Loc.T("POS_CashPortion")</label>
+                        <input id="split-cash" class="input tabular" type="number" min="0" @bind="_splitCashAmount" />
+                    </div>
+                    <div>
+                        <label class="label-muted" for="split-mode">@Loc.T("POS_SecondaryMode")</label>
+                        <select id="split-mode" class="input" @bind="_splitSecondaryMode">
+                            <option value="MTN MoMo">MTN MoMo</option>
+                            <option value="Orange Money">Orange Money</option>
+                            <option value="Portefeuille">@Loc.T("POS_Wallet")</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="label-muted" for="split-sec">@Loc.T("POS_SecondaryPortion")</label>
+                        <input id="split-sec" class="input tabular" type="number" min="0" @bind="_splitSecondaryAmount" />
+                    </div>
+                    <div class="kpi-sub">
+                        Reste à couvrir : <strong class="@((_splitCashAmount + _splitSecondaryAmount) >= Totals.TotalTTC ? "text-success" : "text-danger")">@Math.Max(0m, Totals.TotalTTC - _splitCashAmount - _splitSecondaryAmount).ToString("N0") @Store.Store.Currency</strong>
+                    </div>
+
+                    <div class="grid-2">
+                        <button type="button" class="btn btn-outlined" @onclick="CloseModals">@Loc.T("Btn_Cancel")</button>
+                        <button type="button" class="btn btn-success" @onclick="ConfirmSplitPaymentAsync">@Loc.T("Btn_Confirm")</button>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Modal: Open Cash Shift -->
+        @if (_showOpenShiftModal)
+        {
+            <div class="modal-backdrop no-print" role="presentation" @onclick="CloseModals">
+                <div class="modal-box stack" style="max-width:400px;" role="dialog" aria-modal="true" aria-labelledby="open-shift-title" @onclick:stopPropagation="true">
+                    <h2 id="open-shift-title" class="card-title" style="margin:0;">@Loc.T("POS_OpenShift")</h2>
+                    <div>
+                        <label class="label-muted" for="shift-float-input">@Loc.T("POS_OpeningFloat")</label>
+                        <input id="shift-float-input" class="input tabular" type="number" min="0" @bind="_shiftFloat" />
+                    </div>
+                    <div class="grid-2">
+                        <button type="button" class="btn btn-outlined" @onclick="CloseModals">@Loc.T("Btn_Cancel")</button>
+                        <button type="button" class="btn btn-primary" @onclick="ConfirmOpenShiftAsync">@Loc.T("Btn_Confirm")</button>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Modal: Close Cash Shift (Z-Report) -->
+        @if (_showCloseShiftModal && Store.ActiveShift is { } activeShift)
+        {
+            var variance = _shiftCountedCash - activeShift.ExpectedCash;
+            <div class="modal-backdrop no-print" role="presentation" @onclick="CloseModals">
+                <div class="modal-box stack" style="max-width:460px;" role="dialog" aria-modal="true" aria-labelledby="close-shift-title" @onclick:stopPropagation="true">
+                    <h2 id="close-shift-title" class="card-title" style="margin:0;">@Loc.T("POS_CloseShift") — #@activeShift.Id</h2>
+                    <div class="stack" style="gap:6px;background:var(--surface-alt);padding:12px;border-radius:10px;font-size:13px;">
+                        <div class="row-between"><span>Fond initial :</span><strong class="tabular">@activeShift.OpeningFloat.ToString("N0") @Store.Store.Currency</strong></div>
+                        <div class="row-between"><span>Ventes Espèces :</span><strong class="tabular">@activeShift.CashSales.ToString("N0") @Store.Store.Currency</strong></div>
+                        <div class="row-between"><span>Ventes Mobile Money :</span><strong class="tabular">@activeShift.MobileMoneySales.ToString("N0") @Store.Store.Currency</strong></div>
+                        <div class="row-between"><span>Ventes Portefeuille :</span><strong class="tabular">@activeShift.WalletSales.ToString("N0") @Store.Store.Currency</strong></div>
+                        <div class="row-between" style="border-top:1px solid var(--border);padding-top:6px;">
+                            <strong>@Loc.T("POS_ExpectedCash") :</strong>
+                            <strong class="text-primary tabular">@activeShift.ExpectedCash.ToString("N0") @Store.Store.Currency</strong>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="label-muted" for="shift-counted-input">@Loc.T("POS_CountedCash")</label>
+                        <input id="shift-counted-input" class="input tabular" type="number" min="0" @bind="_shiftCountedCash" />
+                    </div>
+                    <div class="row-between">
+                        <span class="label-muted" style="margin:0;">@Loc.T("POS_Discrepancy")</span>
+                        <strong class="tabular @(variance == 0m ? "text-success" : "text-danger")">@variance.ToString("+#,##0;-#,##0;0") @Store.Store.Currency</strong>
+                    </div>
+                    <div>
+                        <label class="label-muted" for="shift-notes-input">@Loc.T("POS_ShiftNotes")</label>
+                        <input id="shift-notes-input" class="input" @bind="_shiftNotes" placeholder="RAS" />
+                    </div>
+                    <div class="grid-2">
+                        <button type="button" class="btn btn-outlined" @onclick="CloseModals">@Loc.T("Btn_Cancel")</button>
+                        <button type="button" class="btn btn-primary" @onclick="ConfirmCloseShiftAsync">@Loc.T("Btn_Confirm")</button>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Modal: Printable Receipt -->
+        <ReceiptModal Result="_lastReceipt"
+                      Items="_lastReceiptItems"
+                      Cashier="@Session.DisplayName"
+                      CustomerPhone="@_lastReceiptPhone"
+                      OnClose="() => _lastReceipt = null" />
+    </div>
 </RoleGuard>
 
 @code {
     private readonly List<CartItem> _cart = new();
     private string _barcodeSearch = string.Empty;
+    private string _selectedCategory = string.Empty;
     private string _discountString = string.Empty;
-    private double _discountPercent;
+    private decimal _discountPercent;
     private string _paymentMode = "cash";
     private string _customerPhone = string.Empty;
 
-    private bool _showCatalog;
-    private Product? _pickedProduct;
-    private int _pickedQty = 1;
-
     private bool _showCashModal;
     private string _receivedString = string.Empty;
-    private string _cashModalError = string.Empty;
 
+    private bool _showMobileMoneyModal;
+    private string _momoPayerPhone = string.Empty;
+    private bool _ussdPending;
+
+    private bool _showSplitModal;
+    private decimal _splitCashAmount;
+    private decimal _splitSecondaryAmount;
+    private string _splitSecondaryMode = "MTN MoMo";
+
+    private bool _showOpenShiftModal;
+    private decimal _shiftFloat = 50000m;
+    private bool _showCloseShiftModal;
+    private decimal _shiftCountedCash;
+    private string _shiftNotes = string.Empty;
+
+    private string _modalError = string.Empty;
     private CheckoutResult? _lastReceipt;
     private List<CartItem> _lastReceiptItems = new();
     private string _lastReceiptPhone = string.Empty;
@@ -248,25 +505,49 @@
     private string _message = string.Empty;
     private bool _isError;
 
-    private double SubTotal => _cart.Sum(c => c.Total);
-    private double TotalAmount => SubTotal - (SubTotal * (_discountPercent / 100.0));
-    private double ReceivedAmount => PosStoreState.TryParseDecimalInput(_receivedString, out var v) ? v : 0;
-    private double ChangeAmount => ReceivedAmount - TotalAmount;
-    private bool IsCashValid => PosStoreState.TryParseDecimalInput(_receivedString, out var v) && double.IsFinite(v) && v >= TotalAmount && TotalAmount > 0;
+    private CartTotals Totals => PosCalculator.CalculateTotals(_cart, _discountPercent, Store.Store.TaxRate);
+    private decimal ReceivedAmount => PosStoreState.TryParseDecimalInput(_receivedString, out var v) ? v : 0m;
+    private decimal ChangeAmount => ReceivedAmount - Totals.TotalTTC;
+    private bool IsCashValid => PosStoreState.TryParseDecimalInput(_receivedString, out var v) && v >= Totals.TotalTTC && Totals.TotalTTC > 0m;
 
-    protected override void OnInitialized() => Loc.OnChange += StateHasChanged;
+    private IEnumerable<Product> FilteredCatalog => Store.Products.Where(p =>
+        (string.IsNullOrEmpty(_selectedCategory) || p.CategoryName == _selectedCategory) &&
+        (string.IsNullOrWhiteSpace(_barcodeSearch) ||
+         p.Description.Contains(_barcodeSearch, StringComparison.OrdinalIgnoreCase) ||
+         p.ProductCode.Contains(_barcodeSearch, StringComparison.OrdinalIgnoreCase) ||
+         p.Barcode.Contains(_barcodeSearch, StringComparison.OrdinalIgnoreCase) ||
+         p.BrandName.Contains(_barcodeSearch, StringComparison.OrdinalIgnoreCase)));
+
+    protected override void OnInitialized()
+    {
+        Store.OnChanged += StateHasChanged;
+        Loc.OnChange += StateHasChanged;
+    }
+
+    private async Task OnGlobalKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") CloseModals();
+        else if (e.Key == "F2") await JS.InvokeVoidAsync("posInterop.focusElementById", "pos-search-input");
+        else if (e.Key == "F9" && _cart.Count > 0 && Totals.TotalTTC > 0m && !_showCashModal && !_showMobileMoneyModal && !_showSplitModal)
+            await StartCheckoutAsync();
+    }
+
+    private void CloseModals()
+    {
+        if (_ussdPending) return;
+        _showCashModal = false;
+        _showMobileMoneyModal = false;
+        _showSplitModal = false;
+        _showOpenShiftModal = false;
+        _showCloseShiftModal = false;
+        _modalError = string.Empty;
+    }
 
     private void OnDiscountChanged(ChangeEventArgs e)
     {
         _discountString = e.Value?.ToString() ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(_discountString))
-        {
-            _discountPercent = 0;
-        }
-        else if (PosStoreState.TryParseDecimalInput(_discountString, out var parsed))
-        {
-            _discountPercent = PosStoreState.ClampDiscount(parsed);
-        }
+        if (string.IsNullOrWhiteSpace(_discountString)) _discountPercent = 0m;
+        else if (PosStoreState.TryParseDecimalInput(_discountString, out var parsed)) _discountPercent = PosStoreState.ClampDiscount(parsed);
     }
 
     private void OnBarcodeKeyDown(KeyboardEventArgs e)
@@ -285,31 +566,24 @@
         }
         else
         {
-            AddProductToCart(prod, 1);
-            _message = string.Empty;
+            QuickAddProduct(prod);
+            _barcodeSearch = string.Empty;
         }
-        _barcodeSearch = string.Empty;
     }
 
-    private void PickProduct(Product p)
-    {
-        _pickedProduct = p;
-        _pickedQty = 1;
-    }
-
-    private void ConfirmAddProduct()
-    {
-        if (_pickedProduct == null || _pickedQty <= 0) return;
-        AddProductToCart(_pickedProduct, _pickedQty);
-        _pickedProduct = null;
-    }
-
-    private void AddProductToCart(Product p, int qty)
+    private void QuickAddProduct(Product p)
     {
         var existing = _cart.FirstOrDefault(c => c.ProductCode == p.ProductCode);
+        int currentQty = existing?.Qty ?? 0;
+        if (currentQty + 1 > p.Qty)
+        {
+            ShowAlert($"Stock maximum atteint pour « {p.Description} » ({p.Qty} en stock).", true);
+            return;
+        }
+
         if (existing != null)
         {
-            existing.Qty += qty;
+            existing.Qty += 1;
             existing.Total = existing.Qty * existing.Price;
         }
         else
@@ -320,10 +594,34 @@
                 ProductDescription = p.Description,
                 CostPrice = p.CostPrice,
                 Price = p.Price,
-                Qty = qty,
-                Total = p.Price * qty,
+                Qty = 1,
+                Total = p.Price,
+                IsTaxable = p.IsTaxable,
                 Date = DateTime.Now
             });
+        }
+        _message = string.Empty;
+    }
+
+    private void IncrementItem(CartItem item)
+    {
+        var prod = Store.Products.FirstOrDefault(p => p.ProductCode == item.ProductCode);
+        if (prod != null && item.Qty + 1 > prod.Qty)
+        {
+            ShowAlert($"Stock insuffisant pour « {prod.Description} » (Disponible : {prod.Qty}).", true);
+            return;
+        }
+        item.Qty += 1;
+        item.Total = item.Qty * item.Price;
+    }
+
+    private void DecrementItem(CartItem item)
+    {
+        if (item.Qty <= 1) _cart.Remove(item);
+        else
+        {
+            item.Qty -= 1;
+            item.Total = item.Qty * item.Price;
         }
     }
 
@@ -333,27 +631,58 @@
     {
         _cart.Clear();
         _discountString = string.Empty;
-        _discountPercent = 0;
+        _discountPercent = 0m;
+    }
+
+    private void HoldCurrentCart()
+    {
+        if (_cart.Count == 0) return;
+        Store.HoldCart(_cart, _discountPercent, _customerPhone);
+        ClearCart();
+        _customerPhone = string.Empty;
+        ShowAlert("Ticket mis en attente.", false);
+    }
+
+    private void ResumeHeldCart(string id)
+    {
+        var held = Store.PopHeldCart(id);
+        if (held == null) return;
+        _cart.Clear();
+        _cart.AddRange(held.Items);
+        _discountPercent = held.DiscountPercent;
+        _discountString = held.DiscountPercent > 0m ? held.DiscountPercent.ToString("0.##") : string.Empty;
+        _customerPhone = held.CustomerPhone;
     }
 
     private async Task StartCheckoutAsync()
     {
         _message = string.Empty;
+        _modalError = string.Empty;
+
+        var stockCheck = Store.ValidateCartStock(_cart);
+        if (!stockCheck.Success)
+        {
+            ShowAlert(stockCheck.Message, true);
+            return;
+        }
+
         if (_paymentMode == "wallet")
         {
-            var itemsCopy = _cart.Select(c => new CartItem { ProductCode = c.ProductCode, ProductDescription = c.ProductDescription, Price = c.Price, CostPrice = c.CostPrice, Qty = c.Qty, Total = c.Total }).ToList();
+            var itemsCopy = CloneCart();
             var res = Store.CheckoutWallet(_cart, _discountPercent, _customerPhone.Trim(), Session.DisplayName);
-            if (!res.Success)
-            {
-                ShowAlert(res.Message, true);
-                return;
-            }
-            await Storage.PersistAsync(Store);
-            _lastReceipt = res;
-            _lastReceiptItems = itemsCopy;
-            _lastReceiptPhone = _customerPhone.Trim();
-            ClearCart();
-            _customerPhone = string.Empty;
+            await FinalizeCheckoutAsync(res, itemsCopy, _customerPhone.Trim());
+        }
+        else if (_paymentMode == "momo" || _paymentMode == "orange")
+        {
+            _momoPayerPhone = string.IsNullOrWhiteSpace(_customerPhone) ? "+237 677 11 22 33" : _customerPhone;
+            _showMobileMoneyModal = true;
+        }
+        else if (_paymentMode == "split")
+        {
+            decimal half = decimal.Round(Totals.TotalTTC / 2m, 0, MidpointRounding.AwayFromZero);
+            _splitCashAmount = half;
+            _splitSecondaryAmount = Totals.TotalTTC - half;
+            _showSplitModal = true;
         }
         else
         {
@@ -367,33 +696,105 @@
         _receivedString = (_receivedString == "0" || string.IsNullOrEmpty(_receivedString)) ? d : _receivedString + d;
     }
 
-    private void SetExactAmount() => _receivedString = Math.Ceiling(TotalAmount).ToString("0");
+    private void SetExactAmount() => _receivedString = Math.Ceiling(Totals.TotalTTC).ToString("0");
 
     private async Task ConfirmCashPaymentAsync()
     {
-        _cashModalError = string.Empty;
-        var itemsCopy = _cart.Select(c => new CartItem { ProductCode = c.ProductCode, ProductDescription = c.ProductDescription, Price = c.Price, CostPrice = c.CostPrice, Qty = c.Qty, Total = c.Total }).ToList();
+        _modalError = string.Empty;
+        var itemsCopy = CloneCart();
         var res = Store.CheckoutCash(_cart, _discountPercent, ReceivedAmount, _customerPhone.Trim(), Session.DisplayName);
-        if (!res.Success)
-        {
-            _cashModalError = res.Message;
-            return;
-        }
-        await Storage.PersistAsync(Store);
+        if (!res.Success) { _modalError = res.Message; return; }
         _showCashModal = false;
-        _lastReceipt = res;
-        _lastReceiptItems = itemsCopy;
-        _lastReceiptPhone = _customerPhone.Trim();
-        ClearCart();
-        _customerPhone = string.Empty;
+        await FinalizeCheckoutAsync(res, itemsCopy, _customerPhone.Trim());
         _receivedString = string.Empty;
     }
 
-    private void ShowAlert(string msg, bool error)
+    private async Task ConfirmMobileMoneyAsync()
     {
-        _message = msg;
-        _isError = error;
+        _modalError = string.Empty;
+        if (string.IsNullOrWhiteSpace(_momoPayerPhone) || _momoPayerPhone.Trim().Length < 8)
+        {
+            _modalError = "Numéro Mobile Money invalide (min. 8 chiffres).";
+            return;
+        }
+        _ussdPending = true;
+        StateHasChanged();
+        await Task.Delay(900); // Realistic USSD confirmation simulation
+        _ussdPending = false;
+
+        var itemsCopy = CloneCart();
+        var provider = _paymentMode == "orange" ? "Orange Money" : "MTN MoMo";
+        var res = Store.CheckoutMobileMoney(_cart, _discountPercent, provider, _momoPayerPhone.Trim(), _customerPhone.Trim(), Session.DisplayName);
+        if (!res.Success) { _modalError = res.Message; return; }
+        _showMobileMoneyModal = false;
+        await FinalizeCheckoutAsync(res, itemsCopy, string.IsNullOrWhiteSpace(_customerPhone) ? _momoPayerPhone.Trim() : _customerPhone.Trim());
     }
 
-    public void Dispose() => Loc.OnChange -= StateHasChanged;
+    private async Task ConfirmSplitPaymentAsync()
+    {
+        _modalError = string.Empty;
+        var itemsCopy = CloneCart();
+        var res = Store.CheckoutSplit(_cart, _discountPercent, _splitCashAmount, _splitSecondaryMode, _splitSecondaryAmount, _customerPhone.Trim(), Session.DisplayName);
+        if (!res.Success) { _modalError = res.Message; return; }
+        _showSplitModal = false;
+        await FinalizeCheckoutAsync(res, itemsCopy, _customerPhone.Trim());
+    }
+
+    private async Task FinalizeCheckoutAsync(CheckoutResult res, List<CartItem> itemsCopy, string phone)
+    {
+        if (!res.Success)
+        {
+            ShowAlert(res.Message, true);
+            return;
+        }
+        await Storage.PersistAsync(Store);
+        _lastReceipt = res;
+        _lastReceiptItems = itemsCopy;
+        _lastReceiptPhone = phone;
+        ClearCart();
+        _customerPhone = string.Empty;
+    }
+
+    private async Task ConfirmOpenShiftAsync()
+    {
+        var res = Store.OpenShift(Session.DisplayName, _shiftFloat);
+        _showOpenShiftModal = false;
+        ShowAlert(res.Message, !res.Success);
+        if (res.Success) await Storage.PersistAsync(Store);
+    }
+
+    private void OpenCloseShiftModal()
+    {
+        if (Store.ActiveShift == null) return;
+        _shiftCountedCash = Store.ActiveShift.ExpectedCash;
+        _shiftNotes = string.Empty;
+        _showCloseShiftModal = true;
+    }
+
+    private async Task ConfirmCloseShiftAsync()
+    {
+        var res = Store.CloseShift(Session.DisplayName, _shiftCountedCash, _shiftNotes);
+        _showCloseShiftModal = false;
+        ShowAlert(res.Message, !res.Success);
+        if (res.Success) await Storage.PersistAsync(Store);
+    }
+
+    private List<CartItem> CloneCart() => _cart.Select(c => new CartItem
+    {
+        ProductCode = c.ProductCode,
+        ProductDescription = c.ProductDescription,
+        Price = c.Price,
+        CostPrice = c.CostPrice,
+        Qty = c.Qty,
+        Total = c.Total,
+        IsTaxable = c.IsTaxable
+    }).ToList();
+
+    private void ShowAlert(string msg, bool error) { _message = msg; _isError = error; }
+
+    public void Dispose()
+    {
+        Store.OnChanged -= StateHasChanged;
+        Loc.OnChange -= StateHasChanged;
+    }
 }

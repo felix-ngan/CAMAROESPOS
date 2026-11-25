@@ -10,17 +10,21 @@
 <RoleGuard>
     @if (!string.IsNullOrEmpty(_msg))
     {
-        <div class="alert @(_err ? "alert-error" : "alert-success")">
+        <div class="alert @(_err ? "alert-error" : "alert-success")" role="alert">
             <span>@_msg</span>
-            <button class="btn btn-sm" @onclick="() => _msg = string.Empty">×</button>
+            <button type="button" class="btn btn-icon btn-sm" aria-label="@Loc.T("Btn_Close")" @onclick="() => _msg = string.Empty">
+                <Icon Name="x" Size="16" />
+            </button>
         </div>
     }
 
     <div class="@(_isEditing ? "grid-split" : "")">
         <div class="card stack">
             <div class="row-between">
-                <div class="card-title" style="margin:0;">@Loc.T("Wallet_Title")</div>
-                <button class="btn btn-primary btn-sm" @onclick="OpenCreate">+ @Loc.T("Wallet_Create")</button>
+                <h2 class="card-title" style="margin:0;">@Loc.T("Wallet_Title")</h2>
+                <button type="button" class="btn btn-primary btn-sm" @onclick="OpenCreate">
+                    <Icon Name="plus" Size="15" /><span>@Loc.T("Wallet_Create")</span>
+                </button>
             </div>
 
             <div class="table-wrap">
@@ -43,15 +47,19 @@
                                 <td><strong>@w.Phone</strong></td>
                                 <td>@w.CustomerName</td>
                                 <td>@w.Email</td>
-                                <td class="text-right"><strong class="text-success">@w.Balance.ToString("N0") FCFA</strong></td>
+                                <td class="text-right"><strong class="text-success">@w.Balance.ToString("N0") @Store.Store.Currency</strong></td>
                                 <td class="text-right"><span class="badge badge-info">@w.LoyaltyPoints pts</span></td>
                                 <td class="text-right">@w.TotalSpent.ToString("N0")</td>
-                                <td>
-                                    <div class="row" style="gap:4px;">
-                                        <button class="btn btn-outlined btn-sm" title="Recharger" @onclick="() => OpenRecharge(w)">💳</button>
+                                <td class="actions-cell">
+                                    <div class="row-nowrap">
+                                        <button type="button" class="btn btn-outlined btn-icon" aria-label="@($"Recharger {w.CustomerName}")" title="Recharger" @onclick="() => OpenRecharge(w)">
+                                            <Icon Name="wallet" Size="15" />
+                                        </button>
                                         @if (Session.IsAdmin)
                                         {
-                                            <button class="btn btn-danger btn-sm" title="Supprimer" @onclick="() => DeleteWalletAsync(w)">🗑</button>
+                                            <button type="button" class="btn btn-danger btn-icon" aria-label="@($"Supprimer {w.CustomerName}")" title="@Loc.T("Btn_Delete")" @onclick="() => _deleteTarget = w">
+                                                <Icon Name="trash" Size="15" />
+                                            </button>
                                         }
                                     </div>
                                 </td>
@@ -64,38 +72,47 @@
 
         @if (_isEditing && _model != null)
         {
-            <div class="card stack">
-                <div class="card-title" style="margin:0;">@Loc.T("Wallet_Operation")</div>
+            <form class="card stack" @onsubmit="SaveWalletAsync" @onsubmit:preventDefault="true">
+                <h2 class="card-title" style="margin:0;">@Loc.T("Wallet_Operation")</h2>
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Phone")</label>
-                    <input class="input" @bind="_model.Phone" disabled="@(!_isNew)" />
+                    <label class="label-muted" for="w-phone">@Loc.T("Col_Phone")</label>
+                    <input id="w-phone" class="input" @bind="_model.Phone" disabled="@(!_isNew)" required />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Name")</label>
-                    <input class="input" @bind="_model.CustomerName" />
+                    <label class="label-muted" for="w-name">@Loc.T("Col_Name")</label>
+                    <input id="w-name" class="input" @bind="_model.CustomerName" />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Email")</label>
-                    <input class="input" @bind="_model.Email" />
+                    <label class="label-muted" for="w-email">@Loc.T("Col_Email")</label>
+                    <input id="w-email" class="input" type="email" @bind="_model.Email" />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Wallet_Amount")</label>
-                    <input class="input" type="number" min="0" @bind="_amount" />
+                    <label class="label-muted" for="w-amt">@Loc.T("Wallet_Amount")</label>
+                    <input id="w-amt" class="input tabular" type="number" min="0" @bind="_amount" />
                 </div>
                 <div class="grid-2">
-                    <button class="btn btn-outlined" @onclick="() => _isEditing = false">@Loc.T("Btn_Cancel")</button>
-                    <button class="btn btn-success" @onclick="SaveWalletAsync">@Loc.T("Btn_Confirm")</button>
+                    <button type="button" class="btn btn-outlined" @onclick="() => _isEditing = false">@Loc.T("Btn_Cancel")</button>
+                    <button type="submit" class="btn btn-success">@Loc.T("Btn_Confirm")</button>
                 </div>
-            </div>
+            </form>
         }
     </div>
+
+    <ConfirmModal IsOpen="@(_deleteTarget != null)"
+                  Title="@Loc.T("Confirm_DeleteTitle")"
+                  Message="@(_deleteTarget == null ? "" : $"Supprimer le portefeuille de {_deleteTarget.CustomerName} ({_deleteTarget.Phone}) et son historique ?")"
+                  ConfirmText="@Loc.T("Btn_Delete")"
+                  IsDanger="true"
+                  OnConfirm="ConfirmDeleteWalletAsync"
+                  OnCancel="() => _deleteTarget = null" />
 </RoleGuard>
 
 @code {
     private bool _isEditing;
     private bool _isNew;
     private CustomerWallet? _model;
-    private double _amount;
+    private CustomerWallet? _deleteTarget;
+    private decimal _amount;
     private string _msg = string.Empty;
     private bool _err;
 
@@ -108,26 +125,28 @@
     private void OpenCreate()
     {
         _model = new CustomerWallet { Phone = "", CustomerName = "", Email = "" };
-        _amount = 0; _isNew = true; _isEditing = true;
+        _amount = 0m; _isNew = true; _isEditing = true;
     }
 
     private void OpenRecharge(CustomerWallet w)
     {
         _model = new CustomerWallet { Phone = w.Phone, CustomerName = w.CustomerName, Email = w.Email, Balance = w.Balance, LoyaltyPoints = w.LoyaltyPoints, TotalSpent = w.TotalSpent };
-        _amount = 0; _isNew = false; _isEditing = true;
+        _amount = 0m; _isNew = false; _isEditing = true;
     }
 
     private async Task SaveWalletAsync()
     {
         if (_model == null) return;
-        var res = Store.SaveWallet(_model, _amount, _isNew);
+        var res = Store.SaveWallet(_model, _amount, _isNew, Session.DisplayName);
         _msg = res.Message; _err = !res.Success;
         if (res.Success) { _isEditing = false; await Storage.PersistAsync(Store); }
     }
 
-    private async Task DeleteWalletAsync(CustomerWallet w)
+    private async Task ConfirmDeleteWalletAsync(string _)
     {
-        var res = Store.DeleteWallet(w.Phone, Session.IsAdmin);
+        if (_deleteTarget == null) return;
+        var res = Store.DeleteWallet(_deleteTarget.Phone, Session.IsAdmin, Session.DisplayName);
+        _deleteTarget = null;
         _msg = res.Message; _err = !res.Success;
         if (res.Success) await Storage.PersistAsync(Store);
     }

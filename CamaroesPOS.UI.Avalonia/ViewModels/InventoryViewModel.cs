@@ -115,7 +115,7 @@ public class InventoryViewModel : INotifyPropertyChanged
 
     private async void OpenCatalogManagerAsync()
     {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+        if (global::Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
         {
             var win = new BrandCategoryWindow();
             await win.ShowDialog(desktop.MainWindow);

@@ -5,39 +5,49 @@
 
 @if (IsOpen)
 {
-    <div class="modal-backdrop">
-        <div class="modal-box modal-lg stack">
+    <div class="modal-backdrop" role="presentation" @onclick="OnClose">
+        <div class="modal-box modal-lg stack" role="dialog" aria-modal="true" aria-labelledby="bc-modal-title" @onclick:stopPropagation="true">
             <div class="row-between">
-                <div class="card-title" style="margin:0;">@Loc.T("Inv_BrandsCategories")</div>
-                <button class="btn btn-outlined btn-sm" @onclick="OnClose">@Loc.T("Btn_Close")</button>
+                <h2 id="bc-modal-title" class="card-title" style="margin:0;">@Loc.T("Inv_BrandsCategories")</h2>
+                <button type="button" class="btn btn-icon btn-outlined" aria-label="@Loc.T("Btn_Close")" @onclick="OnClose">
+                    <Icon Name="x" Size="16" />
+                </button>
             </div>
 
             @if (!string.IsNullOrEmpty(_msg))
             {
-                <div class="alert @(_err ? "alert-error" : "alert-success")">@_msg</div>
+                <div class="alert @(_err ? "alert-error" : "alert-success")" role="alert">@_msg</div>
             }
 
             <div class="grid-2">
                 <!-- Brands -->
                 <div class="card stack" style="box-shadow:none;">
-                    <div class="card-title" style="margin:0;">@Loc.T("Col_Brand")</div>
-                    <div class="row">
-                        <input class="input" style="flex:1;" @bind="_brandName" placeholder="@Loc.T("Col_Brand")" />
-                        <button class="btn btn-primary btn-sm" @onclick="SaveBrandAsync">@Loc.T("Btn_Save")</button>
+                    <h3 class="card-title" style="margin:0;">@Loc.T("Col_Brand")</h3>
+                    <form class="row-nowrap" @onsubmit="SaveBrandAsync" @onsubmit:preventDefault="true">
+                        <input class="input" style="flex:1;" aria-label="@Loc.T("Col_Brand")" @bind="_brandName" placeholder="@Loc.T("Col_Brand")" />
+                        <button type="submit" class="btn btn-primary btn-sm">@Loc.T("Btn_Save")</button>
                         @if (_editBrandId.HasValue)
                         {
-                            <button class="btn btn-outlined btn-sm" @onclick="CancelBrand">×</button>
+                            <button type="button" class="btn btn-icon btn-outlined" aria-label="@Loc.T("Btn_Cancel")" @onclick="CancelBrand">
+                                <Icon Name="x" Size="15" />
+                            </button>
                         }
-                    </div>
+                    </form>
                     <table class="data-table">
                         <tbody>
                             @foreach (var b in Store.Brands)
                             {
                                 <tr>
                                     <td>@b.BrandName</td>
-                                    <td class="text-right">
-                                        <button class="btn btn-outlined btn-sm" @onclick="() => { _editBrandId = b.Id; _brandName = b.BrandName; }">✏️</button>
-                                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteBrandAsync(b.Id)">🗑</button>
+                                    <td class="actions-cell">
+                                        <div class="row-nowrap">
+                                            <button type="button" class="btn btn-outlined btn-icon" aria-label="@($"Modifier {b.BrandName}")" @onclick="() => { _editBrandId = b.Id; _brandName = b.BrandName; }">
+                                                <Icon Name="edit" Size="14" />
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-icon" aria-label="@($"Supprimer {b.BrandName}")" @onclick="() => DeleteBrandAsync(b.Id)">
+                                                <Icon Name="trash" Size="14" />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -47,24 +57,32 @@
 
                 <!-- Categories -->
                 <div class="card stack" style="box-shadow:none;">
-                    <div class="card-title" style="margin:0;">@Loc.T("Col_Category")</div>
-                    <div class="row">
-                        <input class="input" style="flex:1;" @bind="_catName" placeholder="@Loc.T("Col_Category")" />
-                        <button class="btn btn-primary btn-sm" @onclick="SaveCatAsync">@Loc.T("Btn_Save")</button>
+                    <h3 class="card-title" style="margin:0;">@Loc.T("Col_Category")</h3>
+                    <form class="row-nowrap" @onsubmit="SaveCatAsync" @onsubmit:preventDefault="true">
+                        <input class="input" style="flex:1;" aria-label="@Loc.T("Col_Category")" @bind="_catName" placeholder="@Loc.T("Col_Category")" />
+                        <button type="submit" class="btn btn-primary btn-sm">@Loc.T("Btn_Save")</button>
                         @if (_editCatId.HasValue)
                         {
-                            <button class="btn btn-outlined btn-sm" @onclick="CancelCat">×</button>
+                            <button type="button" class="btn btn-icon btn-outlined" aria-label="@Loc.T("Btn_Cancel")" @onclick="CancelCat">
+                                <Icon Name="x" Size="15" />
+                            </button>
                         }
-                    </div>
+                    </form>
                     <table class="data-table">
                         <tbody>
                             @foreach (var c in Store.Categories)
                             {
                                 <tr>
                                     <td>@c.CategoryName</td>
-                                    <td class="text-right">
-                                        <button class="btn btn-outlined btn-sm" @onclick="() => { _editCatId = c.Id; _catName = c.CategoryName; }">✏️</button>
-                                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteCatAsync(c.Id)">🗑</button>
+                                    <td class="actions-cell">
+                                        <div class="row-nowrap">
+                                            <button type="button" class="btn btn-outlined btn-icon" aria-label="@($"Modifier {c.CategoryName}")" @onclick="() => { _editCatId = c.Id; _catName = c.CategoryName; }">
+                                                <Icon Name="edit" Size="14" />
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-icon" aria-label="@($"Supprimer {c.CategoryName}")" @onclick="() => DeleteCatAsync(c.Id)">
+                                                <Icon Name="trash" Size="14" />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             }

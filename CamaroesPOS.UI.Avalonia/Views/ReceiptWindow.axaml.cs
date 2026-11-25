@@ -12,10 +12,10 @@ public partial class ReceiptWindow : Window
 {
     private readonly string _transNo;
     private readonly IEnumerable<CartItem> _items;
-    private readonly double _total;
-    private readonly double _received;
-    private readonly double _change;
-    private readonly double _discount;
+    private readonly decimal _total;
+    private readonly decimal _received;
+    private readonly decimal _change;
+    private readonly decimal _discount;
     private readonly string _customerPhone;
 
     public ReceiptWindow()
@@ -26,7 +26,7 @@ public partial class ReceiptWindow : Window
         _customerPhone = string.Empty;
     }
 
-    public ReceiptWindow(string transNo, IEnumerable<CartItem> items, double total, double received, double change, string paymentMode, double discount = 0, string customerPhone = "") : this()
+    public ReceiptWindow(string transNo, IEnumerable<CartItem> items, decimal total, decimal received, decimal change, string paymentMode, decimal discount = 0m, string customerPhone = "") : this()
     {
         _transNo = transNo;
         _items = items;
@@ -41,7 +41,7 @@ public partial class ReceiptWindow : Window
         TxtPaymentMode.Text = paymentMode;
         ItemsList.ItemsSource = items;
 
-        double subTotal = total + discount;
+        decimal subTotal = total + discount;
         bool hasDiscount = discount > 0;
         LblSubTotal.IsVisible = hasDiscount;
         TxtSubTotal.IsVisible = hasDiscount;

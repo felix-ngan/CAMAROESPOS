@@ -1,11 +1,17 @@
 @using System.Globalization
 
 <div class="chart-box">
-    <svg viewBox="0 0 520 200" style="width:100%;height:auto;display:block;">
+    @if (!string.IsNullOrEmpty(_hoveredText))
+    {
+        <div class="chart-tooltip" role="status">@_hoveredText</div>
+    }
+    <svg viewBox="0 0 540 210" style="width:100%;height:auto;display:block;" role="img" aria-label="@(PrimaryLabel ?? "Graphique linéaire")">
         @for (int g = 0; g <= 4; g++)
         {
-            double y = 16 + g * 36;
-            <line x1="42" y1="@F(y)" x2="504" y2="@F(y)" stroke="#E2E8F0" stroke-width="1" />
+            double y = 18 + g * 36;
+            double tickVal = MaxVal * (1.0 - g / 4.0);
+            <line x1="56" y1="@F(y)" x2="524" y2="@F(y)" stroke="var(--border)" stroke-width="1" />
+            @((MarkupString)$"<text x=\"50\" y=\"{F(y + 4)}\" text-anchor=\"end\" font-size=\"10\" fill=\"var(--muted)\">{System.Net.WebUtility.HtmlEncode(FormatAxis(tickVal))}</text>")
         }
 
         @if (Values.Length > 0)
@@ -15,9 +21,15 @@
 
             @for (int i = 0; i < Values.Length; i++)
             {
-                var (x, y) = PointAt(i, Values[i]);
-                <circle cx="@F(x)" cy="@F(y)" r="4.5" fill="@StrokeColor" stroke="#fff" stroke-width="1.5">
-                    <title>@((i < Labels.Length ? Labels[i] : "") + ": " + Values[i].ToString("N0"))</title>
+                int idx = i;
+                var (x, y) = PointAt(idx, Values[idx]);
+                string tip = $"{(idx < Labels.Length ? Labels[idx] : "")} · {PrimaryLabel ?? ""}: {Values[idx]:N0}";
+                <circle cx="@F(x)" cy="@F(y)" r="5.5" fill="@StrokeColor" stroke="var(--surface)" stroke-width="2"
+                        style="cursor:pointer;"
+                        @onmouseenter="() => _hoveredText = tip"
+                        @onclick="() => _hoveredText = tip"
+                        @onmouseleave="() => _hoveredText = null">
+                    <title>@tip</title>
                 </circle>
             }
         }
@@ -27,9 +39,15 @@
             <polyline points="@BuildLinePoints(SecondaryValues)" fill="none" stroke="@SecondaryStrokeColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
             @for (int i = 0; i < SecondaryValues.Length; i++)
             {
-                var (x, y) = PointAt(i, SecondaryValues[i]);
-                <circle cx="@F(x)" cy="@F(y)" r="4" fill="@SecondaryStrokeColor" stroke="#fff" stroke-width="1.5">
-                    <title>@((i < Labels.Length ? Labels[i] : "") + ": " + SecondaryValues[i].ToString("N0"))</title>
+                int idx = i;
+                var (x, y) = PointAt(idx, SecondaryValues[idx]);
+                string tip = $"{(idx < Labels.Length ? Labels[idx] : "")} · {SecondaryLabel ?? ""}: {SecondaryValues[idx]:N0}";
+                <circle cx="@F(x)" cy="@F(y)" r="5" fill="@SecondaryStrokeColor" stroke="var(--surface)" stroke-width="2"
+                        style="cursor:pointer;"
+                        @onmouseenter="() => _hoveredText = tip"
+                        @onclick="() => _hoveredText = tip"
+                        @onmouseleave="() => _hoveredText = null">
+                    <title>@tip</title>
                 </circle>
             }
         }
@@ -37,7 +55,7 @@
         @for (int i = 0; i < Labels.Length; i++)
         {
             double x = XAt(i, Labels.Length);
-            @((MarkupString)$"<text x=\"{F(x)}\" y=\"186\" text-anchor=\"middle\" font-size=\"11\" fill=\"#8F9BBA\">{System.Net.WebUtility.HtmlEncode(Labels[i])}</text>")
+            @((MarkupString)$"<text x=\"{F(x)}\" y=\"192\" text-anchor=\"middle\" font-size=\"11\" fill=\"var(--muted)\">{System.Net.WebUtility.HtmlEncode(Labels[i])}</text>")
         }
     </svg>
 
@@ -60,11 +78,13 @@
     [Parameter] public string[] Labels { get; set; } = Array.Empty<string>();
     [Parameter] public double[] Values { get; set; } = Array.Empty<double>();
     [Parameter] public double[]? SecondaryValues { get; set; }
-    [Parameter] public string StrokeColor { get; set; } = "#1E88E5";
-    [Parameter] public string FillColor { get; set; } = "rgba(30, 136, 229, 0.14)";
-    [Parameter] public string SecondaryStrokeColor { get; set; } = "#E53935";
+    [Parameter] public string StrokeColor { get; set; } = "#1D72E8";
+    [Parameter] public string FillColor { get; set; } = "rgba(29, 114, 232, 0.14)";
+    [Parameter] public string SecondaryStrokeColor { get; set; } = "#DC2626";
     [Parameter] public string? PrimaryLabel { get; set; }
     [Parameter] public string? SecondaryLabel { get; set; }
+
+    private string? _hoveredText;
 
     private double MaxVal
     {
@@ -72,17 +92,17 @@
         {
             double m = Values.Length > 0 ? Values.Max() : 0;
             if (SecondaryValues != null && SecondaryValues.Length > 0) m = Math.Max(m, SecondaryValues.Max());
-            return m <= 0 ? 1 : m * 1.1;
+            return m <= 0 ? 1 : m * 1.12;
         }
     }
 
-    private static double XAt(int idx, int count) => count <= 1 ? 273 : 48 + idx * (450.0 / (count - 1));
+    private static double XAt(int idx, int count) => count <= 1 ? 290 : 64 + idx * (452.0 / (count - 1));
 
     private (double X, double Y) PointAt(int idx, double val)
     {
         double x = XAt(idx, Math.Max(Values.Length, SecondaryValues?.Length ?? 0));
         double ratio = Math.Clamp(val / MaxVal, 0, 1);
-        double y = 160 - ratio * 144;
+        double y = 162 - ratio * 144;
         return (x, y);
     }
 
@@ -95,8 +115,9 @@
         var line = BuildLinePoints(vals);
         double lastX = XAt(vals.Length - 1, vals.Length);
         double firstX = XAt(0, vals.Length);
-        return $"{firstX.ToString("0.##", CultureInfo.InvariantCulture)},160 {line} {lastX.ToString("0.##", CultureInfo.InvariantCulture)},160";
+        return $"{F(firstX)},162 {line} {F(lastX)},162";
     }
 
     private static string F(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
+    private static string FormatAxis(double v) => v >= 1_000_000 ? $"{v / 1_000_000:0.#}M" : v >= 1_000 ? $"{v / 1_000:0.#}k" : v.ToString("0");
 }

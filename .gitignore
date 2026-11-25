@@ -71,6 +71,11 @@ Thumbs.db
 # Agent files
 .antigravitycli/
 .superpowers/
+.serena/
+.local/
+.playwright-mcp/
+.avalonia-build-tasks/
+Library/
 dist/
 *.db
 *.db-shm

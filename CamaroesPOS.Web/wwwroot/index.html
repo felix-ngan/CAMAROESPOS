@@ -3,34 +3,54 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CAMAROES POS — Web Edition</title>
+    <meta name="description" content="CAMAROES POS v2 — Point de Vente moderne .NET 8 Blazor WebAssembly PWA (FCFA, TVA 19,25 %, MTN MoMo & Orange Money, CRM, Rapport Z, bilingue FR/EN)." />
+    <meta name="theme-color" content="#1D72E8" />
+    <title>CAMAROES POS — Web Edition v2</title>
     <base href="/" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" href="css/app.css" />
+    <script>
+        (function () {
+            try {
+                if (window.localStorage.getItem('camaroes_pos_theme_v2') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch {}
+        })();
+    </script>
 </head>
 <body>
     <div id="app">
         <div class="boot-screen">
             <div class="boot-card">
                 <div class="boot-logo">
-                    <span class="boot-badge">C</span>
+                    <span class="boot-badge" aria-hidden="true">C</span>
                     <div>
                         <div class="boot-title">CAMAROES</div>
-                        <div class="boot-sub">POS SYSTEM · .NET 8 BLAZOR</div>
+                        <div class="boot-sub">POS SYSTEM · .NET 8 BLAZOR PWA</div>
                     </div>
                 </div>
-                <div class="boot-spinner"></div>
+                <div class="boot-spinner" role="status" aria-label="Chargement"></div>
                 <p class="boot-hint">Chargement de l'application C# WebAssembly...</p>
             </div>
         </div>
     </div>
 
-    <div id="blazor-error-ui">
+    <div id="blazor-error-ui" role="alert">
         Une erreur inattendue est survenue.
         <a href="" class="reload">Recharger</a>
-        <a class="dismiss">×</a>
+        <a class="dismiss" aria-label="Fermer">×</a>
     </div>
 
     <script src="js/posInterop.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/service-worker.js').catch(function () {});
+            });
+        }
+    </script>
 </body>
 </html>

@@ -10,13 +10,13 @@ namespace CamaroesPOS.UI.Views
     {
         private string _transNo;
         private IEnumerable<CartItem> _items;
-        private double _totalAmount;
-        private double _receivedAmount;
-        private double _changeAmount;
+        private decimal _totalAmount;
+        private decimal _receivedAmount;
+        private decimal _changeAmount;
         private string _paymentMode;
-        private double _discountAmount;
+        private decimal _discountAmount;
         
-        public ReceiptWindow(string transNo, IEnumerable<CartItem> items, double totalAmount, double receivedAmount, double changeAmount, string paymentMode, double discountAmount = 0)
+        public ReceiptWindow(string transNo, IEnumerable<CartItem> items, decimal totalAmount, decimal receivedAmount, decimal changeAmount, string paymentMode, decimal discountAmount = 0m)
         {
             InitializeComponent();
             
@@ -34,9 +34,9 @@ namespace CamaroesPOS.UI.Views
             
             ItemsList.ItemsSource = items;
             
-            if (_discountAmount > 0)
+            if (_discountAmount > 0m)
             {
-                double subTotal = totalAmount + discountAmount;
+                decimal subTotal = totalAmount + discountAmount;
                 GridSubTotal.Visibility = Visibility.Visible;
                 GridDiscount.Visibility = Visibility.Visible;
                 TxtSubTotal.Text = $"{subTotal:N0} FCFA";

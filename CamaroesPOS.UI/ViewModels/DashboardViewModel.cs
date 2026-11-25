@@ -10,8 +10,8 @@ namespace CamaroesPOS.UI.ViewModels
 {
     public class DashboardViewModel : INotifyPropertyChanged
     {
-        private double _todaySales;
-        public double TodaySales
+        private decimal _todaySales;
+        public decimal TodaySales
         {
             get => _todaySales;
             set { _todaySales = value; OnPropertyChanged(); }
@@ -97,8 +97,8 @@ namespace CamaroesPOS.UI.ViewModels
             set { _criticalStockList = value; OnPropertyChanged(); }
         }
 
-        private double _totalWalletsBalance;
-        public double TotalWalletsBalance
+        private decimal _totalWalletsBalance;
+        public decimal TotalWalletsBalance
         {
             get => _totalWalletsBalance;
             set { _totalWalletsBalance = value; OnPropertyChanged(); }
@@ -118,8 +118,8 @@ namespace CamaroesPOS.UI.ViewModels
             set { _totalLoyaltyPoints = value; OnPropertyChanged(); }
         }
 
-        private double _totalSalesAllTime;
-        public double TotalSalesAllTime
+        private decimal _totalSalesAllTime;
+        public decimal TotalSalesAllTime
         {
             get => _totalSalesAllTime;
             set { _totalSalesAllTime = value; OnPropertyChanged(); }
@@ -139,8 +139,8 @@ namespace CamaroesPOS.UI.ViewModels
             set { _totalItemsSoldAllTime = value; OnPropertyChanged(); }
         }
 
-        private double _totalCancelledAmount;
-        public double TotalCancelledAmount
+        private decimal _totalCancelledAmount;
+        public decimal TotalCancelledAmount
         {
             get => _totalCancelledAmount;
             set { _totalCancelledAmount = value; OnPropertyChanged(); }
@@ -184,8 +184,8 @@ namespace CamaroesPOS.UI.ViewModels
         public SeriesCollection DiscountChart { get; set; }
         public SeriesCollection PaymentModesChart { get; set; }
 
-        private double _totalDiscountAmount;
-        public double TotalDiscountAmount
+        private decimal _totalDiscountAmount;
+        public decimal TotalDiscountAmount
         {
             get => _totalDiscountAmount;
             set { _totalDiscountAmount = value; OnPropertyChanged(); }
@@ -196,14 +196,14 @@ namespace CamaroesPOS.UI.ViewModels
         public string[] WalletsLabels { get; set; }
         public string[] ProductsLabels { get; set; }
 
-        private double _totalCogs;
-        public double TotalCOGS { get => _totalCogs; set { _totalCogs = value; OnPropertyChanged(); } }
+        private decimal _totalCogs;
+        public decimal TotalCOGS { get => _totalCogs; set { _totalCogs = value; OnPropertyChanged(); } }
 
-        private double _totalExpenses;
-        public double TotalExpensesDashboard { get => _totalExpenses; set { _totalExpenses = value; OnPropertyChanged(); } }
+        private decimal _totalExpenses;
+        public decimal TotalExpensesDashboard { get => _totalExpenses; set { _totalExpenses = value; OnPropertyChanged(); } }
 
-        private double _netProfit;
-        public double NetProfit { get => _netProfit; set { _netProfit = value; OnPropertyChanged(); } }
+        private decimal _netProfit;
+        public decimal NetProfit { get => _netProfit; set { _netProfit = value; OnPropertyChanged(); } }
 
         public SeriesCollection ProfitChart { get; set; }
         public string[] ProfitLabels { get; set; }
@@ -225,14 +225,19 @@ namespace CamaroesPOS.UI.ViewModels
                 var yesterday = today.AddDays(-1);
                 
                 // 1 & 2. Ventes du jour et Chiffre d'affaires
-                TodaySales = context.SoldItems.Where(s => s.SoldDate >= today && s.SoldDate < tomorrow).Sum(s => (double?)s.Total) ?? 0;
-                TotalSalesAllTime = context.SoldItems.Sum(s => (double?)s.Total) ?? 0;
+                var allSold = context.SoldItems.ToList();
+                var allCancelled = context.CancelledOrders.ToList();
+                var allExpenses = context.Expenses.ToList();
+                var allWallets = context.CustomerWallets.ToList();
+
+                TodaySales = allSold.Where(s => s.SoldDate >= today && s.SoldDate < tomorrow).Sum(s => s.Total);
+                TotalSalesAllTime = allSold.Sum(s => s.Total);
                 
-                var yesterdaySales = context.SoldItems.Where(s => s.SoldDate >= yesterday && s.SoldDate < today).Sum(s => (double?)s.Total) ?? 0;
+                var yesterdaySales = allSold.Where(s => s.SoldDate >= yesterday && s.SoldDate < today).Sum(s => s.Total);
                 TodaySalesChart = new SeriesCollection
                 {
-                    new PieSeries { Title = "Aujourd'hui", Values = new ChartValues<double> { TodaySales }, Fill = System.Windows.Media.Brushes.DodgerBlue },
-                    new PieSeries { Title = "Hier", Values = new ChartValues<double> { yesterdaySales }, Fill = System.Windows.Media.Brushes.LightGray }
+                    new PieSeries { Title = "Aujourd'hui", Values = new ChartValues<double> { (double)TodaySales }, Fill = System.Windows.Media.Brushes.DodgerBlue },
+                    new PieSeries { Title = "Hier", Values = new ChartValues<double> { (double)yesterdaySales }, Fill = System.Windows.Media.Brushes.LightGray }
                 };
 
                 // Graphique des ventes des 7 derniers jours (Chiffre d'affaires)
@@ -242,7 +247,7 @@ namespace CamaroesPOS.UI.ViewModels
                 {
                     var d = today.AddDays(-i);
                     var nextD = d.AddDays(1);
-                    var dailyTotal = context.SoldItems.Where(s => s.SoldDate >= d && s.SoldDate < nextD).Sum(s => (double?)s.Total) ?? 0;
+                    var dailyTotal = (double)allSold.Where(s => s.SoldDate >= d && s.SoldDate < nextD).Sum(s => s.Total);
                     salesValues.Add(dailyTotal);
                     labels[6 - i] = d.ToString("dd MMM");
                 }
@@ -299,22 +304,22 @@ namespace CamaroesPOS.UI.ViewModels
 
 
                 // 5. Portefeuilles et CRM
-                TotalCustomers = context.CustomerWallets.Count();
-                TotalLoyaltyPoints = context.CustomerWallets.Sum(w => (int?)w.LoyaltyPoints) ?? 0;
-                TotalWalletsBalance = context.CustomerWallets.Sum(w => (double?)w.Balance) ?? 0;
+                TotalCustomers = allWallets.Count;
+                TotalLoyaltyPoints = allWallets.Sum(w => w.LoyaltyPoints);
+                TotalWalletsBalance = allWallets.Sum(w => w.Balance);
                 
-                var topCustomers = context.CustomerWallets.OrderByDescending(w => w.TotalSpent).Take(5).ToList();
+                var topCustomers = allWallets.OrderByDescending(w => w.TotalSpent).Take(5).ToList();
                 WalletsLabels = topCustomers.Select(w => string.IsNullOrEmpty(w.CustomerName) ? w.Phone : w.CustomerName).ToArray();
                 WalletsChart = new SeriesCollection
                 {
-                    new RowSeries { Title = "Total Achats", Values = new ChartValues<double>(topCustomers.Select(w => w.TotalSpent)), Fill = System.Windows.Media.Brushes.Teal }
+                    new RowSeries { Title = "Total Achats", Values = new ChartValues<double>(topCustomers.Select(w => (double)w.TotalSpent)), Fill = System.Windows.Media.Brushes.Teal }
                 };
 
                 // 6. Articles vendus
-                TotalItemsSoldToday = context.SoldItems.Where(s => s.SoldDate >= today && s.SoldDate < tomorrow).Sum(s => (int?)s.Qty) ?? 0;
-                TotalItemsSoldAllTime = context.SoldItems.Sum(s => (int?)s.Qty) ?? 0;
+                TotalItemsSoldToday = allSold.Where(s => s.SoldDate >= today && s.SoldDate < tomorrow).Sum(s => s.Qty);
+                TotalItemsSoldAllTime = allSold.Sum(s => s.Qty);
                 
-                var topSoldToday = context.SoldItems.Where(s => s.SoldDate >= today && s.SoldDate < tomorrow)
+                var topSoldToday = allSold.Where(s => s.SoldDate >= today && s.SoldDate < tomorrow)
                                     .GroupBy(s => s.Description)
                                     .Select(g => new { Desc = g.Key, Qty = g.Sum(s => s.Qty) })
                                     .OrderByDescending(x => x.Qty).Take(5).ToList();
@@ -325,13 +330,13 @@ namespace CamaroesPOS.UI.ViewModels
                 };
 
                 // 7. Annulations
-                TotalCancelledAmount = context.CancelledOrders.Sum(c => (double?)c.Total) ?? 0;
+                TotalCancelledAmount = allCancelled.Sum(c => c.Total);
                 var cancelValues = new ChartValues<double>();
                 for (int i = 6; i >= 0; i--)
                 {
                     var d = today.AddDays(-i);
                     var nextD = d.AddDays(1);
-                    var dailyCancel = context.CancelledOrders.Where(c => c.SoldDate >= d && c.SoldDate < nextD).Sum(c => (double?)c.Total) ?? 0;
+                    var dailyCancel = (double)allCancelled.Where(c => c.SoldDate >= d && c.SoldDate < nextD).Sum(c => c.Total);
                     cancelValues.Add(dailyCancel);
                 }
                 CancelledChart = new SeriesCollection
@@ -356,13 +361,13 @@ namespace CamaroesPOS.UI.ViewModels
                 }
 
                 // 9. Réductions
-                TotalDiscountAmount = context.SoldItems.Sum(s => (double?)s.Discount) ?? 0;
+                TotalDiscountAmount = allSold.Sum(s => s.Discount);
                 var discountValues = new ChartValues<double>();
                 for (int i = 6; i >= 0; i--)
                 {
                     var d = today.AddDays(-i);
                     var nextD = d.AddDays(1);
-                    var dailyDiscount = context.SoldItems.Where(s => s.SoldDate >= d && s.SoldDate < nextD).Sum(s => (double?)s.Discount) ?? 0;
+                    var dailyDiscount = (double)allSold.Where(s => s.SoldDate >= d && s.SoldDate < nextD).Sum(s => s.Discount);
                     discountValues.Add(dailyDiscount);
                 }
                 DiscountChart = new SeriesCollection
@@ -386,8 +391,8 @@ namespace CamaroesPOS.UI.ViewModels
                 }
 
                 // 11. Calcul du Bénéfice Net (Revenus - Coûts d'achat - Dépenses)
-                TotalCOGS = context.SoldItems.Sum(s => (double?)(s.CostPrice * s.Qty)) ?? 0;
-                TotalExpensesDashboard = context.Expenses.Sum(e => (double?)e.Amount) ?? 0;
+                TotalCOGS = allSold.Sum(s => s.CostPrice * s.Qty);
+                TotalExpensesDashboard = allExpenses.Sum(e => e.Amount);
                 NetProfit = TotalSalesAllTime - TotalCOGS - TotalExpensesDashboard;
 
                 ProfitLabels = new[] { "Revenus", "Coûts", "Dépenses", "Bénéfice Net" };
@@ -396,15 +401,15 @@ namespace CamaroesPOS.UI.ViewModels
                     new ColumnSeries 
                     { 
                         Title = "Montants", 
-                        Values = new ChartValues<double> { TotalSalesAllTime, TotalCOGS, TotalExpensesDashboard, NetProfit },
+                        Values = new ChartValues<double> { (double)TotalSalesAllTime, (double)TotalCOGS, (double)TotalExpensesDashboard, (double)NetProfit },
                         Fill = System.Windows.Media.Brushes.DodgerBlue
                     }
                 };
 
                 // 12. Statistiques des modes de paiement
-                var payments = context.SoldItems
+                var payments = allSold
                     .GroupBy(s => s.PaymentMode ?? "Espèces")
-                    .Select(g => new { Mode = g.Key, Total = g.Sum(s => s.Total) })
+                    .Select(g => new { Mode = g.Key, Total = (double)g.Sum(s => s.Total) })
                     .ToList();
 
                 PaymentModesChart = new SeriesCollection();

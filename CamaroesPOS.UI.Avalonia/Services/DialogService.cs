@@ -24,7 +24,7 @@ public static class DialogService
 
     private static async Task<bool> ShowInternalAsync(string title, string message, MaterialIconKind icon, string accentHex, bool isConfirm)
     {
-        if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
+        if (global::Avalonia.Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
             return false;
 
         Window? owner = null;
