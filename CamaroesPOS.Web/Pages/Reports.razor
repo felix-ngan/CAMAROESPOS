@@ -11,9 +11,11 @@
     <div class="stack">
         @if (!string.IsNullOrEmpty(_msg))
         {
-            <div class="alert @(_err ? "alert-error" : "alert-success") no-print">
+            <div class="alert @(_err ? "alert-error" : "alert-success") no-print" role="alert">
                 <span>@_msg</span>
-                <button class="btn btn-sm" @onclick="() => _msg = string.Empty">×</button>
+                <button type="button" class="btn btn-icon btn-sm" aria-label="@Loc.T("Btn_Close")" @onclick="() => _msg = string.Empty">
+                    <Icon Name="x" Size="16" />
+                </button>
             </div>
         }
 
@@ -21,46 +23,64 @@
         <div class="card no-print">
             <div class="row">
                 <div>
-                    <label class="label-muted">@Loc.T("Rep_StartDate")</label>
-                    <input class="input input-inline" type="date" @bind="_startDate" />
+                    <label class="label-muted" for="rep-start">@Loc.T("Rep_StartDate")</label>
+                    <input id="rep-start" class="input input-inline" type="date" @bind="_startDate" />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Rep_EndDate")</label>
-                    <input class="input input-inline" type="date" @bind="_endDate" />
+                    <label class="label-muted" for="rep-end">@Loc.T("Rep_EndDate")</label>
+                    <input id="rep-end" class="input input-inline" type="date" @bind="_endDate" />
                 </div>
                 <div style="flex:1;min-width:190px;">
-                    <label class="label-muted">@Loc.T("Rep_Search")</label>
-                    <input class="input" @bind="_search" @bind:event="oninput" placeholder="@Loc.T("Rep_Search")" />
+                    <label class="label-muted" for="rep-search">@Loc.T("Rep_Search")</label>
+                    <input id="rep-search" class="input" @bind="_search" @bind:event="oninput" placeholder="@Loc.T("Rep_Search")" />
                 </div>
                 <div class="row" style="align-self:flex-end;">
-                    <button class="btn btn-outlined btn-sm" @onclick="ResetFilters">@Loc.T("Rep_Reset")</button>
-                    <button class="btn btn-success btn-sm" @onclick="PrintReportAsync">🖨️ @Loc.T("Rep_ExportPdf")</button>
+                    <button type="button" class="btn btn-outlined btn-sm" @onclick="ResetFilters">@Loc.T("Rep_Reset")</button>
+                    <button type="button" class="btn btn-outlined btn-sm" @onclick="ExportCsvAsync">
+                        <Icon Name="download" Size="15" /><span>@Loc.T("Rep_ExportCsv")</span>
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" @onclick="PrintReportAsync">
+                        <Icon Name="printer" Size="15" /><span>@Loc.T("Rep_ExportPdf")</span>
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- Summary KPIs -->
-        <div class="grid-2">
+        @{
+            var activeTickets = FilteredTickets.Where(t => t.Status != "Refunded").ToList();
+        }
+        <div class="grid-3">
             <div class="card">
-                <span class="label-muted">@Loc.T("Lbl_Revenue")</span>
-                <div class="kpi-value text-primary">@FilteredSales.Sum(s => s.Total).ToString("N0") FCFA</div>
-                <div class="kpi-sub">@FilteredSales.Count() @Loc.T("Lbl_SalesLines")</div>
+                <span class="label-muted">@Loc.T("Lbl_Revenue") (TTC)</span>
+                <div class="kpi-value text-primary">@activeTickets.Sum(t => t.TotalTTC).ToString("N0") @Store.Store.Currency</div>
+                <div class="kpi-sub">@activeTickets.Count @Loc.T("Lbl_SalesLines") · HT : @activeTickets.Sum(t => t.SubTotalHT).ToString("N0")</div>
             </div>
             <div class="card">
                 <span class="label-muted">@Loc.T("Dash_ItemsSold")</span>
-                <div class="kpi-value">@FilteredSales.Sum(s => s.Qty)</div>
-                <div class="kpi-sub">@Loc.T("Lbl_Discounts") : @FilteredSales.Sum(s => s.Discount).ToString("N0") FCFA</div>
+                <div class="kpi-value">@activeTickets.Sum(t => t.TotalQty)</div>
+                <div class="kpi-sub">@Loc.T("Lbl_Discounts") : @activeTickets.Sum(t => t.Discount).ToString("N0") @Store.Store.Currency</div>
+            </div>
+            <div class="card">
+                <span class="label-muted">@Loc.T("POS_Vat") (@Store.Store.TaxRate.ToString("0.##")%)</span>
+                <div class="kpi-value text-success">@activeTickets.Sum(t => t.TaxAmount).ToString("N0") @Store.Store.Currency</div>
+                <div class="kpi-sub">@Loc.T("Lbl_Cancellations") : @FilteredCancelled.Sum(c => c.Total).ToString("N0") @Store.Store.Currency</div>
             </div>
         </div>
 
-        <!-- 5 Tabs -->
+        <!-- 7 Tabs: Grouped Tickets, Stock, Stock History, Refunds, Wallets, Z-Reports, Audit Log -->
         <div class="card">
-            <div class="tabs no-print">
-                <button class="tab-btn @(_tab == 0 ? "active" : "")" @onclick="() => _tab = 0">@Loc.T("Rep_TabSales")</button>
-                <button class="tab-btn @(_tab == 1 ? "active" : "")" @onclick="() => _tab = 1">@Loc.T("Rep_TabStock")</button>
-                <button class="tab-btn @(_tab == 2 ? "active" : "")" @onclick="() => _tab = 2">@Loc.T("Rep_TabHistory")</button>
-                <button class="tab-btn @(_tab == 3 ? "active" : "")" @onclick="() => _tab = 3">@Loc.T("Rep_TabCancelled")</button>
-                <button class="tab-btn @(_tab == 4 ? "active" : "")" @onclick="() => _tab = 4">@Loc.T("Rep_TabWallets")</button>
+            <div class="tabs no-print" role="tablist">
+                <button type="button" class="tab-btn @(_tab == 0 ? "active" : "")" @onclick="() => _tab = 0">@Loc.T("Rep_TabSales")</button>
+                <button type="button" class="tab-btn @(_tab == 1 ? "active" : "")" @onclick="() => _tab = 1">@Loc.T("Rep_TabStock")</button>
+                <button type="button" class="tab-btn @(_tab == 2 ? "active" : "")" @onclick="() => _tab = 2">@Loc.T("Rep_TabHistory")</button>
+                <button type="button" class="tab-btn @(_tab == 3 ? "active" : "")" @onclick="() => _tab = 3">@Loc.T("Rep_TabCancelled")</button>
+                <button type="button" class="tab-btn @(_tab == 4 ? "active" : "")" @onclick="() => _tab = 4">@Loc.T("Rep_TabWallets")</button>
+                <button type="button" class="tab-btn @(_tab == 5 ? "active" : "")" @onclick="() => _tab = 5">@Loc.T("Rep_TabShifts")</button>
+                @if (Session.IsAdmin)
+                {
+                    <button type="button" class="tab-btn @(_tab == 6 ? "active" : "")" @onclick="() => _tab = 6">@Loc.T("Rep_TabAudit")</button>
+                }
             </div>
 
             @if (_tab == 0)
@@ -76,29 +96,46 @@
                                 <th class="text-right">@Loc.T("Col_Total")</th>
                                 <th>@Loc.T("Col_Cashier")</th>
                                 <th>Mode</th>
-                                @if (Session.IsAdmin)
-                                {
-                                    <th class="no-print">@Loc.T("Col_Actions")</th>
-                                }
+                                <th>@Loc.T("Col_Status")</th>
+                                <th class="no-print">@Loc.T("Col_Actions")</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var s in FilteredSales)
+                            @foreach (var t in FilteredTickets)
                             {
+                                bool refunded = t.Status == "Refunded";
                                 <tr>
-                                    <td>@s.SoldDate.ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td><strong>@s.TransNo</strong></td>
-                                    <td>@s.Description</td>
-                                    <td class="text-right">@s.Qty</td>
-                                    <td class="text-right"><strong>@s.Total.ToString("N0")</strong></td>
-                                    <td>@s.Cashier</td>
-                                    <td><span class="badge badge-info">@s.PaymentMode</span></td>
-                                    @if (Session.IsAdmin)
-                                    {
-                                        <td class="no-print">
-                                            <button class="btn btn-danger btn-sm" title="Annuler la vente" @onclick="() => CancelSaleAsync(s)">⊘</button>
-                                        </td>
-                                    }
+                                    <td>@t.SoldDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td><strong>@t.TransNo</strong></td>
+                                    <td>
+                                        @string.Join(", ", t.Lines.Select(l => $"{l.Description} (×{l.Qty})"))
+                                        @if (!string.IsNullOrWhiteSpace(t.PaymentReference))
+                                        {
+                                            <div class="kpi-sub">@t.PaymentReference</div>
+                                        }
+                                    </td>
+                                    <td class="text-right">@t.TotalQty</td>
+                                    <td class="text-right"><strong>@t.TotalTTC.ToString("N0")</strong></td>
+                                    <td>@t.Cashier</td>
+                                    <td><span class="badge badge-info">@t.PaymentMode</span></td>
+                                    <td>
+                                        <span class="badge @(refunded ? "badge-danger" : "badge-success")">
+                                            @(refunded ? Loc.T("Status_Refunded") : Loc.T("Status_Completed"))
+                                        </span>
+                                    </td>
+                                    <td class="actions-cell no-print">
+                                        <div class="row-nowrap">
+                                            <button type="button" class="btn btn-outlined btn-icon" aria-label="@Loc.T("Rep_ViewReceipt")" title="@Loc.T("Rep_ViewReceipt")" @onclick="() => OpenTicketReceipt(t)">
+                                                <Icon Name="printer" Size="15" />
+                                            </button>
+                                            @if (Session.IsAdmin && !refunded)
+                                            {
+                                                <button type="button" class="btn btn-danger btn-icon" aria-label="@Loc.T("Rep_Refund")" title="@Loc.T("Rep_Refund")" @onclick="() => _refundTarget = t">
+                                                    <Icon Name="undo" Size="15" />
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -189,7 +226,13 @@
                                 <tr>
                                     <td>@c.SoldDate.ToString("dd/MM/yyyy HH:mm")</td>
                                     <td>@c.TransNo</td>
-                                    <td>@c.Description</td>
+                                    <td>
+                                        @c.Description
+                                        @if (c.WalletRefunded)
+                                        {
+                                            <span class="badge badge-success" style="margin-left:6px;">Wallet recrédité</span>
+                                        }
+                                    </td>
                                     <td class="text-right text-danger">@c.Total.ToString("N0")</td>
                                     <td>@c.CancelledBy</td>
                                     <td>@c.Reason</td>
@@ -199,7 +242,7 @@
                     </table>
                 </div>
             }
-            else
+            else if (_tab == 4)
             {
                 <div class="table-wrap">
                     <table class="data-table">
@@ -215,12 +258,80 @@
                         <tbody>
                             @foreach (var wt in FilteredWallets)
                             {
+                                string badge = wt.Type == "Credit" ? "badge-success" : wt.Type == "Refund" ? "badge-info" : "badge-warning";
                                 <tr>
                                     <td>@wt.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
                                     <td>@wt.TransNo</td>
                                     <td>@wt.Phone</td>
-                                    <td><span class="badge @(wt.Type == "Credit" ? "badge-success" : "badge-warning")">@wt.Type</span></td>
-                                    <td class="text-right"><strong>@wt.Amount.ToString("N0") FCFA</strong></td>
+                                    <td><span class="badge @badge">@wt.Type</span></td>
+                                    <td class="text-right"><strong>@wt.Amount.ToString("N0") @Store.Store.Currency</strong></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else if (_tab == 5)
+            {
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Ouverture</th>
+                                <th>Clôture</th>
+                                <th class="text-right">Fond initial</th>
+                                <th class="text-right">Ventes Total</th>
+                                <th class="text-right">Attendu Esp.</th>
+                                <th class="text-right">Compté</th>
+                                <th class="text-right">Écart</th>
+                                <th>@Loc.T("Col_Status")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var sh in Store.CashShifts.OrderByDescending(x => x.OpenedAt))
+                            {
+                                <tr>
+                                    <td><strong>#@sh.Id</strong></td>
+                                    <td>@sh.OpenedAt.ToString("dd/MM HH:mm")<div class="kpi-sub">@sh.OpenedBy</div></td>
+                                    <td>@(sh.ClosedAt?.ToString("dd/MM HH:mm") ?? "—")<div class="kpi-sub">@(sh.ClosedBy ?? "")</div></td>
+                                    <td class="text-right">@sh.OpeningFloat.ToString("N0")</td>
+                                    <td class="text-right"><strong>@sh.TotalSales.ToString("N0")</strong></td>
+                                    <td class="text-right">@sh.ExpectedCash.ToString("N0")</td>
+                                    <td class="text-right">@(sh.CountedCash?.ToString("N0") ?? "—")</td>
+                                    <td class="text-right @(sh.Discrepancy is < 0m ? "text-danger" : "text-success")">@(sh.Discrepancy?.ToString("+#,##0;-#,##0;0") ?? "—")</td>
+                                    <td><span class="badge @(sh.IsOpen ? "badge-success" : "badge-info")">@(sh.IsOpen ? "Ouverte" : "Clôturée")</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else if (_tab == 6 && Session.IsAdmin)
+            {
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>@Loc.T("Col_Date")</th>
+                                <th>Acteur</th>
+                                <th>Action</th>
+                                <th>Cible</th>
+                                <th>Détails</th>
+                                <th>Niveau</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var a in Store.AuditLogs.OrderByDescending(x => x.Timestamp).Take(100))
+                            {
+                                string sevBadge = a.Severity == "Critical" ? "badge-danger" : a.Severity == "Warning" ? "badge-warning" : "badge-info";
+                                <tr>
+                                    <td>@a.Timestamp.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                    <td><strong>@a.Actor</strong> <span class="kpi-sub">(@a.Role)</span></td>
+                                    <td><code>@a.Action</code></td>
+                                    <td>@a.Target</td>
+                                    <td>@a.Details</td>
+                                    <td><span class="badge @sevBadge">@a.Severity</span></td>
                                 </tr>
                             }
                         </tbody>
@@ -229,6 +340,23 @@
             }
         </div>
     </div>
+
+    <ConfirmModal IsOpen="@(_refundTarget != null)"
+                  Title="@Loc.T("Rep_RefundTitle")"
+                  Message="@(_refundTarget == null ? "" : $"Rembourser le ticket {_refundTarget.TransNo} ({_refundTarget.TotalTTC:N0} {Store.Store.Currency}) ? Le stock sera restauré et le portefeuille client sera recrédité le cas échéant.")"
+                  ConfirmText="@Loc.T("Rep_Refund")"
+                  IsDanger="true"
+                  ShowReasonInput="true"
+                  RequireReason="true"
+                  ReasonLabel="@Loc.T("Rep_RefundReason")"
+                  OnConfirm="ConfirmRefundAsync"
+                  OnCancel="() => _refundTarget = null" />
+
+    <ReceiptModal Result="_previewReceipt"
+                  Items="_previewItems"
+                  Cashier="@_previewCashier"
+                  CustomerPhone="@_previewPhone"
+                  OnClose="() => _previewReceipt = null" />
 </RoleGuard>
 
 @code {
@@ -239,6 +367,12 @@
     private string _msg = string.Empty;
     private bool _err;
 
+    private SalesTicketSummary? _refundTarget;
+    private CheckoutResult? _previewReceipt;
+    private List<CartItem> _previewItems = new();
+    private string _previewCashier = string.Empty;
+    private string _previewPhone = string.Empty;
+
     private bool InRange(DateTime d)
         => (!_startDate.HasValue || d >= _startDate.Value.Date) &&
            (!_endDate.HasValue || d < _endDate.Value.Date.AddDays(1));
@@ -247,9 +381,7 @@
         => string.IsNullOrWhiteSpace(_search) ||
            fields.Any(f => f != null && f.Contains(_search, StringComparison.OrdinalIgnoreCase));
 
-    private IEnumerable<SoldItem> FilteredSales => Store.SoldItems
-        .Where(s => InRange(s.SoldDate) && Match(s.TransNo, s.ProductCode, s.Description, s.Cashier, s.PaymentMode))
-        .OrderByDescending(s => s.SoldDate);
+    private List<SalesTicketSummary> FilteredTickets => Store.GetGroupedSalesTickets(_startDate, _endDate, _search);
 
     private IEnumerable<Product> FilteredProducts => Store.Products
         .Where(p => Match(p.ProductCode, p.Description, p.BrandName, p.CategoryName, p.VendorName))
@@ -280,11 +412,57 @@
         _search = string.Empty;
     }
 
-    private async Task CancelSaleAsync(SoldItem s)
+    private void OpenTicketReceipt(SalesTicketSummary t)
     {
-        var res = Store.CancelSale(s.Id, Session.DisplayName, Session.IsAdmin);
+        _previewItems = t.Lines.Select(l => new CartItem
+        {
+            ProductCode = l.ProductCode,
+            ProductDescription = l.Description,
+            Price = l.Price,
+            Qty = l.Qty,
+            Total = l.Price * l.Qty
+        }).ToList();
+        _previewCashier = t.Cashier;
+        _previewPhone = t.CustomerPhone;
+        _previewReceipt = new CheckoutResult(
+            true,
+            "",
+            t.TransNo,
+            t.SoldDate,
+            t.SubTotalHT,
+            t.TaxAmount,
+            Store.Store.TaxRate,
+            t.TotalTTC + t.Discount,
+            t.Discount,
+            t.TotalTTC,
+            t.TotalTTC,
+            0m,
+            t.PaymentMode,
+            t.PaymentReference);
+    }
+
+    private async Task ConfirmRefundAsync(string reason)
+    {
+        if (_refundTarget == null) return;
+        var res = Store.RefundTransaction(_refundTarget.TransNo, Session.DisplayName, Session.IsAdmin, reason);
+        _refundTarget = null;
         _msg = res.Message; _err = !res.Success;
         if (res.Success) await Storage.PersistAsync(Store);
+    }
+
+    private async Task ExportCsvAsync()
+    {
+        if (_tab == 1)
+        {
+            var csv = PosStoreState.ExportInventoryCsv(FilteredProducts);
+            await Storage.DownloadFileAsync($"camaroes_stock_{DateTime.Now:yyyyMMdd}.csv", csv, "text/csv;charset=utf-8");
+        }
+        else
+        {
+            var lines = FilteredTickets.SelectMany(t => t.Lines);
+            var csv = PosStoreState.ExportSalesCsv(lines);
+            await Storage.DownloadFileAsync($"camaroes_ventes_{DateTime.Now:yyyyMMdd}.csv", csv, "text/csv;charset=utf-8");
+        }
     }
 
     private Task PrintReportAsync() => Storage.PrintAsync();

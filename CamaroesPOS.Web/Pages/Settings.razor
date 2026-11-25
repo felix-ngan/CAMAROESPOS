@@ -10,17 +10,19 @@
 <RoleGuard RequireAdmin="true">
     @if (!string.IsNullOrEmpty(_msg))
     {
-        <div class="alert @(_err ? "alert-error" : "alert-success")">
+        <div class="alert @(_err ? "alert-error" : "alert-success")" role="alert">
             <span>@_msg</span>
-            <button class="btn btn-sm" @onclick="() => _msg = string.Empty">×</button>
+            <button type="button" class="btn btn-icon btn-sm" aria-label="@Loc.T("Btn_Close")" @onclick="() => _msg = string.Empty">
+                <Icon Name="x" Size="16" />
+            </button>
         </div>
     }
 
     <div class="card">
-        <div class="tabs">
-            <button class="tab-btn @(_tab == 0 ? "active" : "")" @onclick="() => _tab = 0">@Loc.T("Set_TabUsers")</button>
-            <button class="tab-btn @(_tab == 1 ? "active" : "")" @onclick="() => _tab = 1">@Loc.T("Set_TabStore")</button>
-            <button class="tab-btn @(_tab == 2 ? "active" : "")" @onclick="() => _tab = 2">@Loc.T("Set_TabSecurity")</button>
+        <div class="tabs" role="tablist">
+            <button type="button" class="tab-btn @(_tab == 0 ? "active" : "")" @onclick="() => _tab = 0">@Loc.T("Set_TabUsers")</button>
+            <button type="button" class="tab-btn @(_tab == 1 ? "active" : "")" @onclick="() => _tab = 1">@Loc.T("Set_TabStore")</button>
+            <button type="button" class="tab-btn @(_tab == 2 ? "active" : "")" @onclick="() => _tab = 2">@Loc.T("Set_TabSecurity")</button>
         </div>
 
         @if (_tab == 0)
@@ -43,29 +45,29 @@
                                     <td><strong>@u.Username</strong></td>
                                     <td>@u.Name</td>
                                     <td><span class="badge @(u.Role == "Admin" ? "badge-info" : "badge-success")">@u.Role</span></td>
-                                    <td>@(u.IsActive ? "✓" : "✕")</td>
+                                    <td><Icon Name="@(u.IsActive ? "check" : "x")" Size="15" Class="@(u.IsActive ? "text-success" : "text-danger")" /></td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
 
-                <div class="card stack" style="box-shadow:none;">
+                <form class="card stack" style="box-shadow:none;" @onsubmit="SaveUserAsync" @onsubmit:preventDefault="true">
                     <div>
-                        <label class="label-muted">@Loc.T("Login_Username")</label>
-                        <input class="input" @bind="_uUsername" />
+                        <label class="label-muted" for="set-username">@Loc.T("Login_Username")</label>
+                        <input id="set-username" class="input" @bind="_uUsername" autocomplete="off" required />
                     </div>
                     <div>
-                        <label class="label-muted">@Loc.T("Col_Name")</label>
-                        <input class="input" @bind="_uName" />
+                        <label class="label-muted" for="set-name">@Loc.T("Col_Name")</label>
+                        <input id="set-name" class="input" @bind="_uName" />
                     </div>
                     <div>
-                        <label class="label-muted">@Loc.T("Login_Password")</label>
-                        <input class="input" type="password" @bind="_uPassword" />
+                        <label class="label-muted" for="set-pass">@Loc.T("Login_Password")</label>
+                        <input id="set-pass" class="input" type="password" @bind="_uPassword" autocomplete="new-password" placeholder="@(_editingExistingUser ? Loc.T("Set_PasswordHint") : "••••••")" />
                     </div>
                     <div>
-                        <label class="label-muted">@Loc.T("Col_Role")</label>
-                        <select class="input" @bind="_uRole">
+                        <label class="label-muted" for="set-role">@Loc.T("Col_Role")</label>
+                        <select id="set-role" class="input" @bind="_uRole">
                             <option value="Admin">Admin</option>
                             <option value="Cashier">Cashier</option>
                         </select>
@@ -75,65 +77,117 @@
                         <span>@Loc.T("Col_Active")</span>
                     </label>
                     <div class="grid-2">
-                        <button class="btn btn-outlined" @onclick="ClearUserForm">@Loc.T("Btn_New")</button>
-                        <button class="btn btn-primary" @onclick="SaveUserAsync">@Loc.T("Btn_Save")</button>
+                        <button type="button" class="btn btn-outlined" @onclick="ClearUserForm">@Loc.T("Btn_New")</button>
+                        <button type="submit" class="btn btn-primary">@Loc.T("Btn_Save")</button>
                     </div>
-                </div>
+                </form>
             </div>
         }
         else if (_tab == 1)
         {
-            <div class="stack" style="max-width:520px;">
+            <form class="stack" style="max-width:560px;" @onsubmit="SaveStoreAsync" @onsubmit:preventDefault="true">
                 <div>
-                    <label class="label-muted">@Loc.T("Set_StoreName")</label>
-                    <input class="input" @bind="_storeName" />
+                    <label class="label-muted" for="st-name">@Loc.T("Set_StoreName")</label>
+                    <input id="st-name" class="input" @bind="_storeName" required />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Vendor_Address")</label>
-                    <input class="input" @bind="_storeAddress" />
+                    <label class="label-muted" for="st-addr">@Loc.T("Vendor_Address")</label>
+                    <input id="st-addr" class="input" @bind="_storeAddress" />
                 </div>
-                <div>
-                    <label class="label-muted">@Loc.T("Set_Momo")</label>
-                    <input class="input" @bind="_momoCode" />
+                <div class="grid-2">
+                    <div>
+                        <label class="label-muted" for="st-phone">@Loc.T("Set_Phone")</label>
+                        <input id="st-phone" class="input" @bind="_storePhone" />
+                    </div>
+                    <div>
+                        <label class="label-muted" for="st-tax">@Loc.T("Set_TaxRate")</label>
+                        <input id="st-tax" class="input tabular" type="number" step="0.05" min="0" max="50" @bind="_taxRate" />
+                    </div>
                 </div>
-                <div>
-                    <label class="label-muted">@Loc.T("Set_Orange")</label>
-                    <input class="input" @bind="_orangeCode" />
+                <div class="grid-2">
+                    <div>
+                        <label class="label-muted" for="st-niu">@Loc.T("Set_Niu")</label>
+                        <input id="st-niu" class="input" @bind="_storeNiu" />
+                    </div>
+                    <div>
+                        <label class="label-muted" for="st-rccm">@Loc.T("Set_Rccm")</label>
+                        <input id="st-rccm" class="input" @bind="_storeRccm" />
+                    </div>
                 </div>
-                <button class="btn btn-primary" @onclick="SaveStoreAsync">@Loc.T("Set_SaveSettings")</button>
-            </div>
+                <div class="grid-2">
+                    <div>
+                        <label class="label-muted" for="st-momo">@Loc.T("Set_Momo")</label>
+                        <input id="st-momo" class="input" @bind="_momoCode" />
+                    </div>
+                    <div>
+                        <label class="label-muted" for="st-om">@Loc.T("Set_Orange")</label>
+                        <input id="st-om" class="input" @bind="_orangeCode" />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">@Loc.T("Set_SaveSettings")</button>
+            </form>
         }
         else
         {
-            <div class="stack" style="max-width:440px;">
-                <div class="card-title" style="margin:0;">@Loc.T("Set_ChangePassword")</div>
-                <div>
-                    <label class="label-muted">@Loc.T("Set_OldPass")</label>
-                    <input class="input" type="password" @bind="_oldPass" />
-                </div>
-                <div>
-                    <label class="label-muted">@Loc.T("Set_NewPass")</label>
-                    <input class="input" type="password" @bind="_newPass" />
-                </div>
-                <div>
-                    <label class="label-muted">@Loc.T("Set_ConfirmPass")</label>
-                    <input class="input" type="password" @bind="_confirmPass" />
-                </div>
-                <button class="btn btn-primary" @onclick="ChangePasswordAsync">@Loc.T("Set_UpdatePass")</button>
+            <div class="grid-2" style="gap:24px;">
+                <form class="stack" @onsubmit="ChangePasswordAsync" @onsubmit:preventDefault="true">
+                    <h2 class="card-title" style="margin:0;">@Loc.T("Set_ChangePassword")</h2>
+                    <div>
+                        <label class="label-muted" for="pw-old">@Loc.T("Set_OldPass")</label>
+                        <input id="pw-old" class="input" type="password" autocomplete="current-password" @bind="_oldPass" required />
+                    </div>
+                    <div>
+                        <label class="label-muted" for="pw-new">@Loc.T("Set_NewPass")</label>
+                        <input id="pw-new" class="input" type="password" autocomplete="new-password" @bind="_newPass" required />
+                    </div>
+                    <div>
+                        <label class="label-muted" for="pw-conf">@Loc.T("Set_ConfirmPass")</label>
+                        <input id="pw-conf" class="input" type="password" autocomplete="new-password" @bind="_confirmPass" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">@Loc.T("Set_UpdatePass")</button>
+                </form>
 
-                <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px;">
-                    <button class="btn btn-danger" @onclick="ResetDemoAsync">↺ @Loc.T("Nav_ResetDemo")</button>
+                <div class="stack">
+                    <h2 class="card-title" style="margin:0;">@Loc.T("Set_BackupTitle")</h2>
+                    <p style="font-size:13px;color:var(--muted);">
+                        Exportez toutes les données locales (produits, ventes, shifts Z, journal d'audit, mots de passe hachés PBKDF2) ou restaurez une sauvegarde JSON.
+                    </p>
+                    <div class="row">
+                        <button type="button" class="btn btn-outlined" @onclick="ExportBackupAsync">
+                            <Icon Name="download" Size="16" /><span>@Loc.T("Set_ExportBackup")</span>
+                        </button>
+                        <label class="btn btn-primary" style="cursor:pointer;">
+                            <Icon Name="upload" Size="16" /><span>@Loc.T("Set_ImportBackup")</span>
+                            <InputFile OnChange="ImportBackupAsync" accept=".json,application/json" style="display:none;" />
+                        </label>
+                    </div>
+
+                    <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px;">
+                        <button type="button" class="btn btn-danger" @onclick="() => _confirmReset = true">
+                            <Icon Name="refresh" Size="16" /><span>@Loc.T("Nav_ResetDemo")</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         }
     </div>
+
+    <ConfirmModal IsOpen="_confirmReset"
+                  Title="@Loc.T("Nav_ResetDemo")"
+                  Message="Réinitialiser toutes les données locales aux valeurs de démonstration ?"
+                  ConfirmText="@Loc.T("Btn_Confirm")"
+                  IsDanger="true"
+                  OnConfirm="ConfirmResetDemoAsync"
+                  OnCancel="() => _confirmReset = false" />
 </RoleGuard>
 
 @code {
     private int _tab;
     private string _msg = string.Empty;
     private bool _err;
+    private bool _confirmReset;
 
+    private bool _editingExistingUser;
     private string _uUsername = string.Empty;
     private string _uName = string.Empty;
     private string _uPassword = string.Empty;
@@ -142,6 +196,10 @@
 
     private string _storeName = string.Empty;
     private string _storeAddress = string.Empty;
+    private string _storePhone = string.Empty;
+    private string _storeNiu = string.Empty;
+    private string _storeRccm = string.Empty;
+    private decimal _taxRate = 19.25m;
     private string _momoCode = string.Empty;
     private string _orangeCode = string.Empty;
 
@@ -166,21 +224,27 @@
     {
         _storeName = Store.Store.StoreName;
         _storeAddress = Store.Store.Address;
+        _storePhone = Store.Store.Phone;
+        _storeNiu = Store.Store.Niu;
+        _storeRccm = Store.Store.Rccm;
+        _taxRate = Store.Store.TaxRate;
         _momoCode = Store.Store.MomoCode;
         _orangeCode = Store.Store.OrangeCode;
     }
 
     private void SelectUser(User u)
     {
+        _editingExistingUser = true;
         _uUsername = u.Username;
         _uName = u.Name;
-        _uPassword = u.Password;
+        _uPassword = string.Empty; // NEVER pre-fill password hashes into UI inputs
         _uRole = u.Role;
         _uActive = u.IsActive;
     }
 
     private void ClearUserForm()
     {
+        _editingExistingUser = false;
         _uUsername = string.Empty;
         _uName = string.Empty;
         _uPassword = string.Empty;
@@ -190,14 +254,14 @@
 
     private async Task SaveUserAsync()
     {
-        var res = Store.SaveUser(new User { Username = _uUsername.Trim(), Name = _uName.Trim(), Password = _uPassword, Role = _uRole, IsActive = _uActive }, Session.IsAdmin);
+        var res = Store.SaveUser(new User { Username = _uUsername.Trim(), Name = _uName.Trim(), Password = _uPassword, Role = _uRole, IsActive = _uActive }, Session.IsAdmin, Session.DisplayName);
         _msg = res.Message; _err = !res.Success;
         if (res.Success) { ClearUserForm(); await Storage.PersistAsync(Store); }
     }
 
     private async Task SaveStoreAsync()
     {
-        var res = Store.SaveStore(_storeName.Trim(), _storeAddress.Trim(), _momoCode.Trim(), _orangeCode.Trim(), Session.IsAdmin);
+        var res = Store.SaveStore(_storeName.Trim(), _storeAddress.Trim(), _momoCode.Trim(), _orangeCode.Trim(), Session.IsAdmin, _storePhone.Trim(), _storeNiu.Trim(), _storeRccm.Trim(), _taxRate, Session.DisplayName);
         _msg = res.Message; _err = !res.Success;
         if (res.Success) await Storage.PersistAsync(Store);
     }
@@ -213,8 +277,35 @@
         }
     }
 
-    private async Task ResetDemoAsync()
+    private async Task ExportBackupAsync()
     {
+        var json = Store.ExportSnapshotJson(pretty: true);
+        await Storage.DownloadFileAsync($"camaroes_pos_backup_{DateTime.Now:yyyyMMdd_HHmm}.json", json, "application/json;charset=utf-8");
+        _msg = "Sauvegarde JSON exportée.";
+        _err = false;
+    }
+
+    private async Task ImportBackupAsync(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            using var stream = e.File.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024);
+            using var reader = new StreamReader(stream);
+            var json = await reader.ReadToEndAsync();
+            var res = Store.ImportBackupJson(json, Session.DisplayName, Session.IsAdmin);
+            _msg = res.Message; _err = !res.Success;
+            if (res.Success) await Storage.PersistAsync(Store);
+        }
+        catch (Exception ex)
+        {
+            _msg = $"Impossible d'importer le fichier : {ex.Message}";
+            _err = true;
+        }
+    }
+
+    private async Task ConfirmResetDemoAsync(string _)
+    {
+        _confirmReset = false;
         await Storage.ResetAsync(Store);
         _msg = "Données de démonstration réinitialisées.";
         _err = false;

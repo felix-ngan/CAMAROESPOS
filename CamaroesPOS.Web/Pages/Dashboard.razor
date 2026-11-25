@@ -7,28 +7,39 @@
 
 <RoleGuard RequireAdmin="true">
     <div class="stack">
-        <!-- Top Actions -->
+        <!-- Top Actions & Coherent Global Period Filter -->
         <div class="row-between">
             <div class="row">
+                <div class="pill-group" role="group" aria-label="Période d'analyse">
+                    <button type="button" class="pill-btn @(_period == DashboardPeriod.Today ? "active" : "")" @onclick="() => SetPeriod(DashboardPeriod.Today)">@Loc.T("Dash_Period_Today")</button>
+                    <button type="button" class="pill-btn @(_period == DashboardPeriod.Last7Days ? "active" : "")" @onclick="() => SetPeriod(DashboardPeriod.Last7Days)">@Loc.T("Dash_Period_7d")</button>
+                    <button type="button" class="pill-btn @(_period == DashboardPeriod.Last30Days ? "active" : "")" @onclick="() => SetPeriod(DashboardPeriod.Last30Days)">@Loc.T("Dash_Period_30d")</button>
+                    <button type="button" class="pill-btn @(_period == DashboardPeriod.AllTime ? "active" : "")" @onclick="() => SetPeriod(DashboardPeriod.AllTime)">@Loc.T("Dash_Period_All")</button>
+                </div>
                 @if (_m.LowStockItems > 0)
                 {
-                    <span class="badge badge-danger">⚠ @_m.LowStockItems @Loc.T("Lbl_CriticalAlertCount")</span>
+                    <span class="badge badge-danger">
+                        <Icon Name="alert" Size="13" />
+                        <span>@_m.LowStockItems @Loc.T("Lbl_CriticalAlertCount")</span>
+                    </span>
                 }
             </div>
-            <button class="btn btn-outlined btn-sm" @onclick="Refresh">↻ @Loc.T("Refresh")</button>
+            <button type="button" class="btn btn-outlined btn-sm" @onclick="Refresh">
+                <Icon Name="refresh" Size="15" /><span>@Loc.T("Refresh")</span>
+            </button>
         </div>
 
-        <!-- KPI Row 1 -->
+        <!-- KPI Row 1 (All aligned to selected period!) -->
         <div class="grid-4">
             <div class="card">
                 <span class="label-muted">@Loc.T("Dash_TodaySales")</span>
-                <div class="kpi-value text-primary">@_m.TodaySales.ToString("N0") FCFA</div>
-                <div class="kpi-sub">Total : @_m.TotalSalesAllTime.ToString("N0") FCFA</div>
+                <div class="kpi-value text-primary">@_m.PeriodSales.ToString("N0") @Store.Store.Currency</div>
+                <div class="kpi-sub">@Loc.T("Today") : @_m.TodaySales.ToString("N0") · @Loc.T("Lbl_Cumulative") : @_m.TotalSalesAllTime.ToString("N0")</div>
             </div>
             <div class="card">
                 <span class="label-muted">@Loc.T("Dash_NetProfit")</span>
-                <div class="kpi-value text-success">@_m.NetProfit.ToString("N0") FCFA</div>
-                <div class="kpi-sub">@Loc.T("Lbl_Expenses") : @_m.TotalExpenses.ToString("N0") FCFA</div>
+                <div class="kpi-value @(_m.NetProfit >= 0m ? "text-success" : "text-danger")">@_m.NetProfit.ToString("N0") @Store.Store.Currency</div>
+                <div class="kpi-sub">@Loc.T("Lbl_Expenses") : @_m.TotalExpenses.ToString("N0") @Store.Store.Currency</div>
             </div>
             <div class="card">
                 <span class="label-muted">@Loc.T("Dash_StockVolume")</span>
@@ -46,18 +57,18 @@
         <div class="grid-4">
             <div class="card">
                 <span class="label-muted">@Loc.T("Dash_ItemsSold")</span>
-                <div class="kpi-value">@_m.TotalItemsSoldToday @Loc.T("Lbl_TodayShort")</div>
-                <div class="kpi-sub">@Loc.T("Lbl_Cumulative") : @_m.TotalItemsSoldAllTime</div>
+                <div class="kpi-value">@_m.PeriodItemsSold</div>
+                <div class="kpi-sub">@Loc.T("Today") : @_m.TotalItemsSoldToday · @Loc.T("Lbl_Cumulative") : @_m.TotalItemsSoldAllTime</div>
             </div>
             <div class="card">
                 <span class="label-muted">@Loc.T("Dash_Wallets")</span>
-                <div class="kpi-value" style="color:#00897B;">@_m.TotalWalletsBalance.ToString("N0") FCFA</div>
+                <div class="kpi-value" style="color:#0D9488;">@_m.TotalWalletsBalance.ToString("N0") @Store.Store.Currency</div>
                 <div class="kpi-sub">@Loc.T("Wallet_Points") : @_m.TotalLoyaltyPoints.ToString("N0")</div>
             </div>
             <div class="card">
                 <span class="label-muted">@Loc.T("Dash_Discounts")</span>
-                <div class="kpi-value text-warning">@_m.TotalDiscountAmount.ToString("N0") FCFA</div>
-                <div class="kpi-sub">@Loc.T("Lbl_Cancellations") : @_m.TotalCancelledAmount.ToString("N0") FCFA</div>
+                <div class="kpi-value text-warning">@_m.TotalDiscountAmount.ToString("N0") @Store.Store.Currency</div>
+                <div class="kpi-sub">@Loc.T("POS_Vat") : @_m.TotalTaxCollected.ToString("N0") · @Loc.T("Lbl_Cancellations") : @_m.TotalCancelledAmount.ToString("N0")</div>
             </div>
             <div class="card">
                 <span class="label-muted">@Loc.T("Dash_Users")</span>
@@ -69,11 +80,11 @@
         <!-- Charts Row 1 -->
         <div class="grid-2-1">
             <div class="card">
-                <div class="card-title">@Loc.T("Dash_ChartRevenue7d")</div>
-                <LineChartSvg Labels="@_m.Last7DaysLabels" Values="@_m.Last7DaysSales" PrimaryLabel="@($"{Loc.T("Lbl_Revenue")} (FCFA)")" />
+                <h2 class="card-title">@Loc.T("Dash_ChartRevenue7d")</h2>
+                <LineChartSvg Labels="@_m.Last7DaysLabels" Values="@_m.Last7DaysSales" PrimaryLabel="@($"{Loc.T("Lbl_Revenue")} ({Store.Store.Currency})")" />
             </div>
             <div class="card">
-                <div class="card-title">@Loc.T("Dash_ChartPayments")</div>
+                <h2 class="card-title">@Loc.T("Dash_ChartPayments")</h2>
                 <PieChartSvg Items="@_m.PaymentModes" />
             </div>
         </div>
@@ -81,41 +92,41 @@
         <!-- Charts Row 2 -->
         <div class="grid-2">
             <div class="card">
-                <div class="card-title">@Loc.T("Dash_ChartStock7d")</div>
+                <h2 class="card-title">@Loc.T("Dash_ChartStock7d")</h2>
                 <LineChartSvg Labels="@_m.Last7DaysLabels"
                               Values="@_m.Last7DaysStockIn"
                               SecondaryValues="@_m.Last7DaysStockOut"
-                              StrokeColor="#2E7D32"
-                              FillColor="rgba(46, 125, 50, 0.1)"
-                              SecondaryStrokeColor="#E53935"
+                              StrokeColor="#15803D"
+                              FillColor="rgba(21, 128, 61, 0.12)"
+                              SecondaryStrokeColor="#DC2626"
                               PrimaryLabel="@Loc.T("Lbl_StockIn")"
                               SecondaryLabel="@Loc.T("Lbl_StockOut")" />
             </div>
             <div class="card">
-                <div class="card-title">@Loc.T("Dash_ChartProfit")</div>
-                <BarChartSvg Items="@ProfitItems" Colors="@(new[] { "#1E88E5", "#FB8C00", "#E53935", "#2E7D32" })" />
+                <h2 class="card-title">@Loc.T("Dash_ChartProfit")</h2>
+                <BarChartSvg Items="@ProfitItems" Colors="@(new[] { "#1D72E8", "#D97706", "#DC2626", "#15803D" })" />
             </div>
         </div>
 
-        <!-- Charts Row 3 (Top Stock, Top Customers, Top Sold, Roles) -->
+        <!-- Charts Row 3 -->
         <div class="grid-2">
             <div class="card">
-                <div class="card-title">@Loc.T("Dash_ChartTopStock")</div>
+                <h2 class="card-title">@Loc.T("Dash_ChartTopStock")</h2>
                 <BarChartSvg Items="@_m.TopProductsStock" />
             </div>
             <div class="card">
-                <div class="card-title">@Loc.T("Dash_ChartTopCustomers")</div>
-                <BarChartSvg Items="@_m.TopCustomers" Colors="@(new[] { "#00897B", "#1E88E5", "#7E57C2", "#FB8C00", "#2E7D32" })" />
+                <h2 class="card-title">@Loc.T("Dash_ChartTopCustomers")</h2>
+                <BarChartSvg Items="@_m.TopCustomers" Colors="@(new[] { "#0D9488", "#1D72E8", "#7E57C2", "#D97706", "#15803D" })" />
             </div>
         </div>
 
         <div class="grid-2-1">
             <div class="card">
-                <div class="card-title">@Loc.T("Dash_ChartTopSold")</div>
+                <h2 class="card-title">@Loc.T("Dash_ChartTopSold")</h2>
                 <BarChartSvg Items="@_m.TopSoldItems" />
             </div>
             <div class="card">
-                <div class="card-title">@Loc.T("Dash_ChartRoles")</div>
+                <h2 class="card-title">@Loc.T("Dash_ChartRoles")</h2>
                 <PieChartSvg Items="@_m.UsersByRole" />
             </div>
         </div>
@@ -123,7 +134,7 @@
         <!-- Tables Row -->
         <div class="grid-2">
             <div class="card">
-                <div class="card-title">@Loc.T("Dash_CriticalAlerts")</div>
+                <h2 class="card-title">@Loc.T("Dash_CriticalAlerts")</h2>
                 <div class="table-wrap">
                     <table class="data-table">
                         <thead>
@@ -155,8 +166,13 @@
 
             <div class="card">
                 <div class="row-between" style="margin-bottom:10px;">
-                    <div class="card-title" style="margin-bottom:0;">@Loc.T("Dash_UsersList")</div>
-                    <input class="input input-inline" @bind="_userSearch" @bind:event="oninput" placeholder="@Loc.T("Dash_SearchUser")" />
+                    <h2 class="card-title" style="margin-bottom:0;">@Loc.T("Dash_UsersList")</h2>
+                    <input class="input input-inline"
+                           style="min-width:220px;"
+                           aria-label="@Loc.T("Dash_SearchUser")"
+                           @bind="_userSearch"
+                           @bind:event="oninput"
+                           placeholder="@Loc.T("Dash_SearchUser")" />
                 </div>
                 <div class="table-wrap">
                     <table class="data-table">
@@ -185,6 +201,7 @@
 </RoleGuard>
 
 @code {
+    private DashboardPeriod _period = DashboardPeriod.Last7Days;
     private DashboardMetrics _m = new();
     private string _userSearch = string.Empty;
 
@@ -210,9 +227,15 @@
         Loc.OnChange += StateHasChanged;
     }
 
+    private void SetPeriod(DashboardPeriod p)
+    {
+        _period = p;
+        Refresh();
+    }
+
     private void Refresh()
     {
-        _m = Store.GetDashboardMetrics();
+        _m = Store.GetDashboardMetrics(_period);
         StateHasChanged();
     }
 

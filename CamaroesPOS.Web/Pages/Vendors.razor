@@ -10,19 +10,23 @@
 <RoleGuard>
     @if (!string.IsNullOrEmpty(_msg))
     {
-        <div class="alert @(_err ? "alert-error" : "alert-success")">
+        <div class="alert @(_err ? "alert-error" : "alert-success")" role="alert">
             <span>@_msg</span>
-            <button class="btn btn-sm" @onclick="() => _msg = string.Empty">×</button>
+            <button type="button" class="btn btn-icon btn-sm" aria-label="@Loc.T("Btn_Close")" @onclick="() => _msg = string.Empty">
+                <Icon Name="x" Size="16" />
+            </button>
         </div>
     }
 
     <div class="@(_isEditing ? "grid-split" : "")">
         <div class="card stack">
             <div class="row-between">
-                <input class="input" style="flex:1;min-width:220px;" @bind="_search" @bind:event="oninput" placeholder="@Loc.T("Vendor_Search")" />
+                <input class="input" style="flex:1;min-width:200px;" aria-label="@Loc.T("Vendor_Search")" @bind="_search" @bind:event="oninput" placeholder="@Loc.T("Vendor_Search")" />
                 @if (Session.IsAdmin)
                 {
-                    <button class="btn btn-primary btn-sm" @onclick="OpenAdd">+ @Loc.T("Vendor_Add")</button>
+                    <button type="button" class="btn btn-primary btn-sm" @onclick="OpenAdd">
+                        <Icon Name="plus" Size="15" /><span>@Loc.T("Vendor_Add")</span>
+                    </button>
                 }
             </div>
 
@@ -52,10 +56,14 @@
                                 <td>@v.Address</td>
                                 @if (Session.IsAdmin)
                                 {
-                                    <td>
-                                        <div class="row" style="gap:4px;">
-                                            <button class="btn btn-outlined btn-sm" @onclick="() => OpenEdit(v)">✏️</button>
-                                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteVendorAsync(v)">🗑</button>
+                                    <td class="actions-cell">
+                                        <div class="row-nowrap">
+                                            <button type="button" class="btn btn-outlined btn-icon" aria-label="@($"Modifier {v.VendorName}")" @onclick="() => OpenEdit(v)">
+                                                <Icon Name="edit" Size="15" />
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-icon" aria-label="@($"Supprimer {v.VendorName}")" @onclick="() => _deleteTarget = v">
+                                                <Icon Name="trash" Size="15" />
+                                            </button>
                                         </div>
                                     </td>
                                 }
@@ -68,35 +76,43 @@
 
         @if (_isEditing && _model != null && Session.IsAdmin)
         {
-            <div class="card stack">
-                <div class="card-title" style="margin:0;">@Loc.T("Vendor_Details")</div>
+            <form class="card stack" @onsubmit="SaveVendorAsync" @onsubmit:preventDefault="true">
+                <h2 class="card-title" style="margin:0;">@Loc.T("Vendor_Details")</h2>
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Vendor")</label>
-                    <input class="input" @bind="_model.VendorName" />
+                    <label class="label-muted" for="v-name">@Loc.T("Col_Vendor")</label>
+                    <input id="v-name" class="input" @bind="_model.VendorName" required />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Vendor_Contact")</label>
-                    <input class="input" @bind="_model.ContactPerson" />
+                    <label class="label-muted" for="v-contact">@Loc.T("Vendor_Contact")</label>
+                    <input id="v-contact" class="input" @bind="_model.ContactPerson" />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Phone")</label>
-                    <input class="input" @bind="_model.Phone" />
+                    <label class="label-muted" for="v-phone">@Loc.T("Col_Phone")</label>
+                    <input id="v-phone" class="input" @bind="_model.Phone" />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Col_Email")</label>
-                    <input class="input" @bind="_model.Email" />
+                    <label class="label-muted" for="v-email">@Loc.T("Col_Email")</label>
+                    <input id="v-email" class="input" type="email" @bind="_model.Email" />
                 </div>
                 <div>
-                    <label class="label-muted">@Loc.T("Vendor_Address")</label>
-                    <textarea class="input" rows="2" @bind="_model.Address"></textarea>
+                    <label class="label-muted" for="v-addr">@Loc.T("Vendor_Address")</label>
+                    <textarea id="v-addr" class="input" rows="2" @bind="_model.Address"></textarea>
                 </div>
                 <div class="grid-2">
-                    <button class="btn btn-outlined" @onclick="() => _isEditing = false">@Loc.T("Btn_Cancel")</button>
-                    <button class="btn btn-primary" @onclick="SaveVendorAsync">@Loc.T("Btn_Save")</button>
+                    <button type="button" class="btn btn-outlined" @onclick="() => _isEditing = false">@Loc.T("Btn_Cancel")</button>
+                    <button type="submit" class="btn btn-primary">@Loc.T("Btn_Save")</button>
                 </div>
-            </div>
+            </form>
         }
     </div>
+
+    <ConfirmModal IsOpen="@(_deleteTarget != null)"
+                  Title="@Loc.T("Confirm_DeleteTitle")"
+                  Message="@(_deleteTarget == null ? "" : $"Supprimer le fournisseur « {_deleteTarget.VendorName} » ?")"
+                  ConfirmText="@Loc.T("Btn_Delete")"
+                  IsDanger="true"
+                  OnConfirm="ConfirmDeleteVendorAsync"
+                  OnCancel="() => _deleteTarget = null" />
 </RoleGuard>
 
 @code {
@@ -104,6 +120,7 @@
     private bool _isEditing;
     private bool _isNew;
     private Vendor? _model;
+    private Vendor? _deleteTarget;
     private string _msg = string.Empty;
     private bool _err;
 
@@ -142,9 +159,11 @@
         if (res.Success) { _isEditing = false; await Storage.PersistAsync(Store); }
     }
 
-    private async Task DeleteVendorAsync(Vendor v)
+    private async Task ConfirmDeleteVendorAsync(string _)
     {
-        var res = Store.DeleteVendor(v.Id, Session.IsAdmin);
+        if (_deleteTarget == null) return;
+        var res = Store.DeleteVendor(_deleteTarget.Id, Session.IsAdmin);
+        _deleteTarget = null;
         _msg = res.Message; _err = !res.Success;
         if (res.Success) await Storage.PersistAsync(Store);
     }
