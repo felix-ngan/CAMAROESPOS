@@ -74,6 +74,7 @@ Thumbs.db
 .serena/
 .local/
 .playwright-mcp/
+.avalonia-build-tasks/
 Library/
 dist/
 *.db

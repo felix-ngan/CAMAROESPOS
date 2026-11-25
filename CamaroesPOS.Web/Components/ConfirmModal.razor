@@ -1,0 +1,77 @@
+@inject LocalizationService Loc
+
+@if (IsOpen)
+{
+    <div class="modal-backdrop no-print" role="presentation" @onclick="HandleCancel" @onkeydown="HandleKeyDown">
+        <div class="modal-box stack" style="max-width:440px;" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title" @onclick:stopPropagation="true">
+            <div class="row-between">
+                <h2 id="confirm-modal-title" class="card-title" style="margin:0;display:flex;align-items:center;gap:8px;">
+                    <Icon Name="alert" Size="20" Class="text-danger" />
+                    <span>@Title</span>
+                </h2>
+                <button type="button" class="btn btn-icon btn-outlined" aria-label="@Loc.T("Btn_Close")" @onclick="HandleCancel">
+                    <Icon Name="x" Size="16" />
+                </button>
+            </div>
+
+            <p style="color:var(--text);font-size:14px;">@Message</p>
+
+            @if (ShowReasonInput)
+            {
+                <div>
+                    <label class="label-muted" for="confirm-reason-input">@ReasonLabel</label>
+                    <input id="confirm-reason-input" class="input" @bind="_reason" @bind:event="oninput" placeholder="@ReasonPlaceholder" />
+                </div>
+            }
+
+            <div class="grid-2" style="margin-top:4px;">
+                <button type="button" class="btn btn-outlined" @onclick="HandleCancel">@Loc.T("Btn_Cancel")</button>
+                <button type="button"
+                        class="btn @(IsDanger ? "btn-danger-solid" : "btn-primary")"
+                        disabled="@(RequireReason && string.IsNullOrWhiteSpace(_reason))"
+                        @onclick="HandleConfirm">
+                    @ConfirmText
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public string Title { get; set; } = "Confirmation";
+    [Parameter] public string Message { get; set; } = "";
+    [Parameter] public string ConfirmText { get; set; } = "Confirmer";
+    [Parameter] public bool IsDanger { get; set; } = true;
+    [Parameter] public bool ShowReasonInput { get; set; }
+    [Parameter] public bool RequireReason { get; set; }
+    [Parameter] public string ReasonLabel { get; set; } = "Motif";
+    [Parameter] public string ReasonPlaceholder { get; set; } = "Ex : Erreur de caisse, retour client...";
+    [Parameter] public EventCallback<string> OnConfirm { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private string _reason = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        if (!IsOpen) _reason = string.Empty;
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") await HandleCancel();
+    }
+
+    private async Task HandleConfirm()
+    {
+        var r = _reason.Trim();
+        _reason = string.Empty;
+        await OnConfirm.InvokeAsync(r);
+    }
+
+    private async Task HandleCancel()
+    {
+        _reason = string.Empty;
+        await OnCancel.InvokeAsync();
+    }
+}

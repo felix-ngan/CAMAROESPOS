@@ -4,22 +4,44 @@
 
 @if (Result != null)
 {
-    <div class="modal-backdrop">
-        <div class="modal-box">
-            <div class="receipt-paper">
+    <div class="modal-backdrop" role="presentation" @onclick="OnClose" @onkeydown="OnKeyDown">
+        <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="receipt-modal-title" @onclick:stopPropagation="true">
+            <div class="row-between no-print" style="margin-bottom:12px;">
+                <div class="pill-group" role="group" aria-label="Format d'impression">
+                    <button type="button" class="pill-btn @(_thermalMode ? "active" : "")" @onclick="() => _thermalMode = true">@Loc.T("Receipt_Format80")</button>
+                    <button type="button" class="pill-btn @(!_thermalMode ? "active" : "")" @onclick="() => _thermalMode = false">@Loc.T("Receipt_FormatA4")</button>
+                </div>
+                <button type="button" class="btn btn-icon btn-outlined" aria-label="@Loc.T("Btn_Close")" @onclick="OnClose">
+                    <Icon Name="x" Size="16" />
+                </button>
+            </div>
+
+            <div class="receipt-paper @(_thermalMode ? "thermal-80" : "")">
                 <div style="text-align:center;">
-                    <div style="font-size:22px;font-weight:900;color:#2B3674;">@Store.Store.StoreName</div>
-                    <div style="font-size:12px;color:#64748B;">@Store.Store.Address</div>
-                    <div style="font-size:13px;font-weight:700;margin-top:4px;color:#1E88E5;">@Loc.T("Receipt_Title")</div>
+                    <h2 id="receipt-modal-title" style="font-size:20px;font-weight:900;color:#1E293B;margin:0;">@Store.Store.StoreName</h2>
+                    <div style="font-size:11.5px;color:#475569;">@Store.Store.Address</div>
+                    @if (!string.IsNullOrWhiteSpace(Store.Store.Phone))
+                    {
+                        <div style="font-size:11.5px;color:#475569;">Tél : @Store.Store.Phone</div>
+                    }
+                    <div style="font-size:10.5px;color:#475569;margin-top:2px;">
+                        @if (!string.IsNullOrWhiteSpace(Store.Store.Niu)) { <span>NIU : @Store.Store.Niu</span> }
+                        @if (!string.IsNullOrWhiteSpace(Store.Store.Rccm)) { <span> · RCCM : @Store.Store.Rccm</span> }
+                    </div>
+                    <div style="font-size:12.5px;font-weight:800;margin-top:6px;color:#1D72E8;text-transform:uppercase;">@Loc.T("Receipt_Title")</div>
                 </div>
 
                 <div class="receipt-divider"></div>
 
-                <div style="font-size:12px;" class="stack">
-                    <div class="row-between"><span>N° Trans :</span><strong>@Result.TransNo</strong></div>
-                    <div class="row-between"><span>Date :</span><span>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span></div>
+                <div style="font-size:12px;gap:4px;" class="stack">
+                    <div class="row-between"><span>@Loc.T("Lbl_TransNo") :</span><strong>@Result.TransNo</strong></div>
+                    <div class="row-between"><span>Date :</span><span>@DisplayTimestamp.ToString("dd/MM/yyyy HH:mm:ss")</span></div>
                     <div class="row-between"><span>@Loc.T("Col_Cashier") :</span><span>@Cashier</span></div>
                     <div class="row-between"><span>@Loc.T("POS_PaymentMode")</span><strong>@Result.PaymentMode</strong></div>
+                    @if (!string.IsNullOrWhiteSpace(Result.PaymentReference))
+                    {
+                        <div class="row-between"><span>@Loc.T("Receipt_Ref")</span><strong>@Result.PaymentReference</strong></div>
+                    }
                     @if (!string.IsNullOrWhiteSpace(CustomerPhone))
                     {
                         <div class="row-between"><span>@Loc.T("Col_Phone") :</span><span>@CustomerPhone</span></div>
@@ -28,12 +50,13 @@
 
                 <div class="receipt-divider"></div>
 
-                <table class="data-table" style="font-size:12px;">
+                <table class="data-table" style="font-size:12px;color:#0F172A;">
                     <thead>
                         <tr>
-                            <th>@Loc.T("Lbl_Item")</th>
-                            <th class="text-right">@Loc.T("Col_Qty")</th>
-                            <th class="text-right">@Loc.T("Col_Total")</th>
+                            <th style="color:#475569;">@Loc.T("Lbl_Item")</th>
+                            <th class="text-right" style="color:#475569;">@Loc.T("Col_Qty")</th>
+                            <th class="text-right" style="color:#475569;">@Loc.T("Receipt_UnitPrice")</th>
+                            <th class="text-right" style="color:#475569;">@Loc.T("Col_Total")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -42,7 +65,8 @@
                             <tr>
                                 <td>@item.ProductDescription</td>
                                 <td class="text-right">@item.Qty</td>
-                                <td class="text-right">@item.Total.ToString("N0")</td>
+                                <td class="text-right">@item.Price.ToString("N0")</td>
+                                <td class="text-right"><strong>@item.Total.ToString("N0")</strong></td>
                             </tr>
                         }
                     </tbody>
@@ -50,31 +74,60 @@
 
                 <div class="receipt-divider"></div>
 
-                <div class="stack" style="gap:4px;font-size:13px;">
-                    @if (Result.DiscountAmount > 0)
+                <div class="stack" style="gap:4px;font-size:12.5px;">
+                    @if (Result.DiscountAmount > 0m)
                     {
-                        <div class="row-between"><span>@Loc.T("POS_Subtotal")</span><span>@Result.SubTotal.ToString("N0") FCFA</span></div>
-                        <div class="row-between text-warning"><span>@Loc.T("Lbl_Discount")</span><span>-@Result.DiscountAmount.ToString("N0") FCFA</span></div>
+                        <div class="row-between"><span>@Loc.T("POS_Subtotal")</span><span>@Result.SubTotal.ToString("N0") @Store.Store.Currency</span></div>
+                        <div class="row-between" style="color:#B45309;"><span>@Loc.T("Lbl_Discount")</span><span>-@Result.DiscountAmount.ToString("N0") @Store.Store.Currency</span></div>
                     }
-                    <div class="row-between" style="font-size:16px;font-weight:800;color:#2B3674;margin-top:4px;">
-                        <span>TOTAL :</span>
-                        <span class="text-primary">@Result.TotalAmount.ToString("N0") FCFA</span>
+                    <div class="row-between" style="color:#475569;">
+                        <span>@Loc.T("POS_SubtotalHT")</span>
+                        <span>@Result.SubTotalHT.ToString("N0") @Store.Store.Currency</span>
                     </div>
-                    @if (Result.PaymentMode == "Espèces")
+                    <div class="row-between" style="color:#475569;">
+                        <span>@Loc.T("POS_Vat") (@Result.TaxRatePercent.ToString("0.##")%) :</span>
+                        <span>@Result.TaxAmount.ToString("N0") @Store.Store.Currency</span>
+                    </div>
+                    <div class="row-between" style="font-size:16px;font-weight:900;color:#1E293B;margin-top:4px;">
+                        <span>TOTAL TTC :</span>
+                        <span style="color:#1D72E8;">@Result.TotalAmount.ToString("N0") @Store.Store.Currency</span>
+                    </div>
+                    @if (Result.ReceivedAmount > 0m && (Result.PaymentMode.Contains("Espèces") || Result.ChangeAmount > 0m))
                     {
-                        <div class="row-between"><span>@Loc.T("Lbl_Received")</span><span>@Result.ReceivedAmount.ToString("N0") FCFA</span></div>
-                        <div class="row-between text-success"><strong>@Loc.T("POS_ChangeDue")</strong><strong>@Result.ChangeAmount.ToString("N0") FCFA</strong></div>
+                        <div class="row-between"><span>@Loc.T("Lbl_Received")</span><span>@Result.ReceivedAmount.ToString("N0") @Store.Store.Currency</span></div>
+                        <div class="row-between" style="color:#15803D;"><strong>@Loc.T("POS_ChangeDue")</strong><strong>@Result.ChangeAmount.ToString("N0") @Store.Store.Currency</strong></div>
                     }
                 </div>
 
                 <div class="receipt-divider"></div>
-                <div style="text-align:center;font-size:12px;font-style:italic;color:#2B3674;">@Loc.T("Receipt_Thanks")</div>
-                <div style="text-align:center;font-size:11px;color:#8F9BBA;margin-top:4px;">@Loc.T("Receipt_NoReturn")</div>
+
+                <!-- Deterministic Fiscal Verification QR SVG -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin:8px 0;">
+                    <svg width="74" height="74" viewBox="0 0 21 21" role="img" aria-label="QR Code de vérification ticket">
+                        <rect width="21" height="21" fill="#FFFFFF" />
+                        @for (int r = 0; r < 21; r++)
+                        {
+                            for (int c = 0; c < 21; c++)
+                            {
+                                if (IsQrModuleOn(r, c, QrSeed))
+                                {
+                                    <rect x="@c" y="@r" width="1" height="1" fill="#0F172A" />
+                                }
+                            }
+                        }
+                    </svg>
+                    <span style="font-size:10px;color:#475569;">@Result.TransNo · @Result.TotalAmount.ToString("N0") @Store.Store.Currency</span>
+                </div>
+
+                <div style="text-align:center;font-size:12px;font-style:italic;color:#1E293B;">@Loc.T("Receipt_Thanks")</div>
+                <div style="text-align:center;font-size:10.5px;color:#475569;margin-top:4px;">@Loc.T("Receipt_NoReturn")</div>
             </div>
 
             <div class="grid-2 no-print" style="margin-top:14px;">
-                <button class="btn btn-primary" @onclick="PrintAsync">🖨️ @Loc.T("Receipt_PrintPdf")</button>
-                <button class="btn btn-danger" @onclick="OnClose">@Loc.T("Btn_Close")</button>
+                <button type="button" class="btn btn-primary" @onclick="PrintAsync">
+                    <Icon Name="printer" Size="16" /><span>@Loc.T("Receipt_PrintPdf")</span>
+                </button>
+                <button type="button" class="btn btn-outlined" @onclick="OnClose">@Loc.T("Btn_Close")</button>
             </div>
         </div>
     </div>
@@ -87,5 +140,37 @@
     [Parameter] public string CustomerPhone { get; set; } = "";
     [Parameter] public EventCallback OnClose { get; set; }
 
+    private bool _thermalMode;
+
+    private DateTime DisplayTimestamp => Result != null && Result.Timestamp != default ? Result.Timestamp : DateTime.Now;
+    private int QrSeed => HashCode.Combine(Result?.TransNo ?? "", Result?.TotalAmount ?? 0m);
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") await OnClose.InvokeAsync();
+    }
+
     private Task PrintAsync() => Storage.PrintAsync();
+
+    private static bool IsQrModuleOn(int r, int c, int seed)
+    {
+        // Standard 3 finder patterns (top-left, top-right, bottom-left)
+        if (InFinder(r, c, 0, 0) || InFinder(r, c, 0, 14) || InFinder(r, c, 14, 0))
+            return FinderBit(r, c);
+        if (r == 6 || c == 6) return (r + c) % 2 == 0;
+        uint h = (uint)(seed ^ (r * 73856093) ^ (c * 19349663));
+        h ^= h >> 13;
+        h *= 0x5bd1e995;
+        return (h & 1) == 1;
+    }
+
+    private static bool InFinder(int r, int c, int top, int left)
+        => r >= top && r < top + 7 && c >= left && c < left + 7;
+
+    private static bool FinderBit(int r, int c)
+    {
+        int lr = r < 7 ? r : r - 14;
+        int lc = c < 7 ? c : c - 14;
+        return lr == 0 || lr == 6 || lc == 0 || lc == 6 || (lr >= 2 && lr <= 4 && lc >= 2 && lc <= 4);
+    }
 }

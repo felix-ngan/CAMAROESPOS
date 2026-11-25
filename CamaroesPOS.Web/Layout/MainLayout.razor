@@ -12,12 +12,12 @@
         <div class="sidebar-backdrop" @onclick="() => _mobileOpen = false"></div>
     }
 
-    <aside class="sidebar @(_mobileOpen ? "open" : "") no-print">
+    <aside class="sidebar @(_mobileOpen ? "open" : "") no-print" aria-label="Navigation principale">
         <div class="brand-header">
-            <div class="brand-icon">C</div>
+            <div class="brand-icon" aria-hidden="true">C</div>
             <div>
                 <div class="brand-name">CAMAROES</div>
-                <div class="brand-sub">POS SYSTEM · WEB</div>
+                <div class="brand-sub">POS SYSTEM · v2.0</div>
             </div>
         </div>
 
@@ -25,38 +25,38 @@
             @if (Session.IsAdmin)
             {
                 <NavLink class="nav-item" href="" Match="NavLinkMatch.All">
-                    <span>📊</span><span>@Loc.T("Nav_Dashboard")</span>
+                    <Icon Name="dashboard" /><span>@Loc.T("Nav_Dashboard")</span>
                 </NavLink>
             }
 
             <NavLink class="nav-item" href="pos">
-                <span>🛒</span><span>@Loc.T("Nav_POS")</span>
+                <Icon Name="pos" /><span>@Loc.T("Nav_POS")</span>
             </NavLink>
 
             <NavLink class="nav-item" href="inventory">
-                <span>📦</span><span>@Loc.T("Nav_Inventory")</span>
+                <Icon Name="inventory" /><span>@Loc.T("Nav_Inventory")</span>
             </NavLink>
 
             <NavLink class="nav-item" href="wallets">
-                <span>👥</span><span>@Loc.T("Nav_Wallets")</span>
+                <Icon Name="users" /><span>@Loc.T("Nav_Wallets")</span>
             </NavLink>
 
             <NavLink class="nav-item" href="vendors">
-                <span>🚚</span><span>@Loc.T("Nav_Vendors")</span>
+                <Icon Name="truck" /><span>@Loc.T("Nav_Vendors")</span>
             </NavLink>
 
             <NavLink class="nav-item" href="reports">
-                <span>📈</span><span>@Loc.T("Nav_Reports")</span>
+                <Icon Name="reports" /><span>@Loc.T("Nav_Reports")</span>
             </NavLink>
 
             @if (Session.IsAdmin)
             {
                 <NavLink class="nav-item" href="expenses">
-                    <span>💸</span><span>@Loc.T("Nav_Expenses")</span>
+                    <Icon Name="expenses" /><span>@Loc.T("Nav_Expenses")</span>
                 </NavLink>
 
                 <NavLink class="nav-item" href="settings">
-                    <span>⚙️</span><span>@Loc.T("Nav_Settings")</span>
+                    <Icon Name="settings" /><span>@Loc.T("Nav_Settings")</span>
                 </NavLink>
             }
         </nav>
@@ -70,16 +70,16 @@
                 </div>
             }
 
-            <button class="btn btn-outlined btn-sm btn-block" @onclick="ResetDemoAsync">
-                ↺ @Loc.T("Nav_ResetDemo")
+            <button type="button" class="btn btn-outlined btn-sm btn-block" @onclick="() => _confirmReset = true">
+                <Icon Name="refresh" Size="15" /><span>@Loc.T("Nav_ResetDemo")</span>
             </button>
 
-            <a class="btn btn-outlined btn-sm btn-block" href="https://github.com/felix-ngan/CAMAROESPOS" target="_blank" rel="noopener">
-                ↗ @Loc.T("Nav_Github")
+            <a class="btn btn-outlined btn-sm btn-block" href="https://github.com/felix-ngan/CAMAROESPOS" target="_blank" rel="noopener noreferrer">
+                <Icon Name="external" Size="15" /><span>@Loc.T("Nav_Github")</span>
             </a>
 
-            <button class="btn btn-danger btn-sm btn-block" @onclick="Logout">
-                ⎋ @Loc.T("Nav_Logout")
+            <button type="button" class="btn btn-danger btn-sm btn-block" @onclick="Logout">
+                <Icon Name="logout" Size="15" /><span>@Loc.T("Nav_Logout")</span>
             </button>
         </div>
     </aside>
@@ -87,17 +87,44 @@
     <div class="main-area">
         <header class="topbar no-print">
             <div class="topbar-left">
-                <button class="btn btn-outlined btn-sm mobile-menu-btn" @onclick="() => _mobileOpen = !_mobileOpen">☰</button>
-                <div class="topbar-title">@GetPageTitle()</div>
+                <button type="button"
+                        class="btn btn-outlined btn-icon mobile-menu-btn"
+                        aria-label="@Loc.T("Menu_Toggle")"
+                        aria-expanded="@_mobileOpen"
+                        @onclick="() => _mobileOpen = !_mobileOpen">
+                    <Icon Name="menu" Size="20" />
+                </button>
+                <h1 class="topbar-title">@GetPageTitle()</h1>
             </div>
 
             <div class="topbar-actions">
-                <button class="btn btn-outlined btn-sm" @onclick="Loc.Toggle" title="Changer la langue (FR/EN)">
+                <button type="button"
+                        class="btn btn-outlined btn-icon"
+                        aria-label="@Loc.T("Theme_Toggle")"
+                        title="@Loc.T("Theme_Toggle")"
+                        @onclick="ToggleThemeAsync">
+                    <Icon Name="@(_theme == "dark" ? "sun" : "moon")" Size="18" />
+                </button>
+                <button type="button"
+                        class="btn btn-outlined btn-sm"
+                        aria-label="@Loc.T("Lang_Toggle")"
+                        title="@Loc.T("Lang_Toggle")"
+                        @onclick="ToggleLangAsync">
                     @(Loc.CurrentLang == "fr" ? "EN" : "FR")
                 </button>
-                <span class="date-chip">📅 @Loc.T("Today") · @DateTime.Today.ToString("dd/MM/yyyy")</span>
+                <span class="date-chip">
+                    <Icon Name="clock" Size="15" />
+                    <span>@Loc.T("Today") · @DateTime.Today.ToString("dd/MM/yyyy")</span>
+                </span>
             </div>
         </header>
+
+        @if (Storage.StorageQuotaExceeded)
+        {
+            <div class="alert alert-warning no-print" role="alert">
+                <span>@Loc.T("Storage_QuotaWarning")</span>
+            </div>
+        }
 
         <main>
             @Body
@@ -105,15 +132,30 @@
     </div>
 </div>
 
+<ConfirmModal IsOpen="_confirmReset"
+              Title="@Loc.T("Nav_ResetDemo")"
+              Message="Toutes vos modifications locales seront réinitialisées aux données de démonstration. Continuer ?"
+              ConfirmText="@Loc.T("Btn_Confirm")"
+              IsDanger="true"
+              OnConfirm="ConfirmResetDemoAsync"
+              OnCancel="() => _confirmReset = false" />
+
 @code {
     private bool _mobileOpen;
+    private bool _confirmReset;
+    private string _theme = "light";
 
     protected override async Task OnInitializedAsync()
     {
         await Storage.LoadIntoAsync(Store);
         await Storage.RestoreSessionAsync(Session, Store);
+        _theme = await Storage.LoadThemeAsync();
+        var savedLang = await Storage.LoadLangAsync();
+        if (!string.IsNullOrEmpty(savedLang)) Loc.SetLang(savedLang);
+
         Session.OnChange += StateHasChanged;
         Loc.OnChange += StateHasChanged;
+        Storage.OnStorageWarning += StateHasChanged;
     }
 
     private string GetPageTitle()
@@ -133,8 +175,21 @@
         };
     }
 
-    private async Task ResetDemoAsync()
+    private async Task ToggleThemeAsync()
     {
+        _theme = _theme == "dark" ? "light" : "dark";
+        await Storage.SaveThemeAsync(_theme);
+    }
+
+    private async Task ToggleLangAsync()
+    {
+        Loc.Toggle();
+        await Storage.SaveLangAsync(Loc.CurrentLang);
+    }
+
+    private async Task ConfirmResetDemoAsync(string _)
+    {
+        _confirmReset = false;
         await Storage.ResetAsync(Store);
         StateHasChanged();
     }
@@ -150,5 +205,6 @@
     {
         Session.OnChange -= StateHasChanged;
         Loc.OnChange -= StateHasChanged;
+        Storage.OnStorageWarning -= StateHasChanged;
     }
 }
