@@ -21,17 +21,19 @@ namespace CamaroesPOS.Data
         public DbSet<Vendor> Vendors { get; set; }
         public DbSet<WalletTransaction> WalletTransactions { get; set; }
         public DbSet<Expense> Expenses { get; set; }
+        public DbSet<CashShift> CashShifts { get; set; }
+        public DbSet<AuditEntry> AuditEntries { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                // La base de données SQLite sera créée dans le dossier des données de l'application (AppData) ou le dossier local
                 string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CamaroesPOS", "camaroes_pos.db");
-                
-                // S'assurer que le dossier existe
-                Directory.CreateDirectory(Path.GetDirectoryName(dbPath));
-                
+                var dir = Path.GetDirectoryName(dbPath);
+                if (!string.IsNullOrEmpty(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
                 optionsBuilder.UseSqlite($"Data Source={dbPath}");
             }
         }
@@ -39,15 +41,34 @@ namespace CamaroesPOS.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
-            // Configuration de Fluent API pour les entités sans "Id" par défaut
-            modelBuilder.Entity<Product>().HasKey(p => p.ProductCode);
+
+            modelBuilder.Entity<Product>(e =>
+            {
+                e.HasKey(p => p.ProductCode);
+                e.HasIndex(p => p.Barcode);
+            });
+
             modelBuilder.Entity<CustomerWallet>().HasKey(w => w.Phone);
             modelBuilder.Entity<User>().HasKey(u => u.Username);
-            
-            // Entités sans clé primaire
-            modelBuilder.Entity<Store>().HasNoKey();
+            modelBuilder.Entity<Store>().HasKey(s => s.Id);
             modelBuilder.Entity<StoreRevenue>().HasNoKey();
+
+            modelBuilder.Entity<SoldItem>(e =>
+            {
+                e.HasIndex(s => s.TransNo);
+                e.HasIndex(s => s.SoldDate);
+            });
+
+            modelBuilder.Entity<WalletTransaction>(e =>
+            {
+                e.HasIndex(w => w.Phone);
+                e.HasIndex(w => w.TransNo);
+            });
+
+            modelBuilder.Entity<AuditEntry>(e =>
+            {
+                e.HasIndex(a => a.Timestamp);
+            });
         }
     }
 }

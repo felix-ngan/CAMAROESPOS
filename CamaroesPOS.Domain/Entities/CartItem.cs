@@ -5,17 +5,18 @@ namespace CamaroesPOS.Domain.Entities
     public class CartItem
     {
         public int Id { get; set; }
-        public string TransactionNo { get; set; }
-        public string ProductCode { get; set; }
-        public string ProductDescription { get; set; }
-        public double CostPrice { get; set; }
-        public double Price { get; set; }
+        public string TransactionNo { get; set; } = string.Empty;
+        public string ProductCode { get; set; } = string.Empty;
+        public string ProductDescription { get; set; } = string.Empty;
+        public decimal CostPrice { get; set; }
+        public decimal Price { get; set; }
         public int Qty { get; set; }
-        public double DiscountAmount { get; set; }
-        public double DiscountPercent { get; set; }
-        public double Total { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public decimal DiscountPercent { get; set; }
+        public decimal Total { get; set; }
         public DateTime Date { get; set; }
-        public string Cashier { get; set; }
-        public string Status { get; set; }
+        public string Cashier { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public bool IsTaxable { get; set; } = true;
     }
 }

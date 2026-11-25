@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CamaroesPOS.Domain\CamaroesPOS.Domain.csproj" />
+    <ProjectReference Include="..\CamaroesPOS.Application\CamaroesPOS.Application.csproj" />
     <ProjectReference Include="..\CamaroesPOS.Data\CamaroesPOS.Data.csproj" />
   </ItemGroup>
 

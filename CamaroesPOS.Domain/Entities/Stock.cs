@@ -5,14 +5,14 @@ namespace CamaroesPOS.Domain.Entities
     public class Stock
     {
         public int Id { get; set; }
-        public string RefNo { get; set; }
-        public string ProductCode { get; set; }
-        public string Description { get; set; }
+        public string RefNo { get; set; } = string.Empty;
+        public string ProductCode { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public int Qty { get; set; }
         public DateTime StockInDate { get; set; }
-        public string StockInBy { get; set; }
-        public string Status { get; set; }
+        public string StockInBy { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
         public int VendorId { get; set; }
-        public string VendorName { get; set; }
+        public string VendorName { get; set; } = string.Empty;
     }
 }
