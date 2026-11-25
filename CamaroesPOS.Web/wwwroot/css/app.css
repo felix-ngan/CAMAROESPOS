@@ -57,10 +57,13 @@ html, body {
     overflow-x: hidden;
 }
 
-/* Accessible focus rings — never remove focus visibility */
+/* Accessible focus rings — never remove focus visibility on interactive controls */
 :focus-visible {
     outline: 2.5px solid var(--primary);
     outline-offset: 2px;
+}
+h1[tabindex="-1"]:focus, h1[tabindex="-1"]:focus-visible {
+    outline: none;
 }
 
 .icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }

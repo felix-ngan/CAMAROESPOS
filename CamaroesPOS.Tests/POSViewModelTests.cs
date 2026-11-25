@@ -13,17 +13,14 @@ public class POSViewModelTests
         DatabaseInitializer.Initialize();
         var vm = new POSViewModel();
 
-        vm.DiscountPercentage = -15;
-        Assert.Equal(0, vm.DiscountPercentage);
+        vm.DiscountPercentage = -15m;
+        Assert.Equal(0m, vm.DiscountPercentage);
 
-        vm.DiscountPercentage = 150;
-        Assert.Equal(100, vm.DiscountPercentage);
+        vm.DiscountPercentage = 150m;
+        Assert.Equal(100m, vm.DiscountPercentage);
 
-        vm.DiscountPercentage = double.NaN;
-        Assert.Equal(0, vm.DiscountPercentage);
-
-        vm.DiscountPercentage = 20;
-        Assert.Equal(20, vm.DiscountPercentage);
+        vm.DiscountPercentage = 20m;
+        Assert.Equal(20m, vm.DiscountPercentage);
     }
 
     [Fact]
@@ -31,15 +28,15 @@ public class POSViewModelTests
     {
         DatabaseInitializer.Initialize();
         var vm = new POSViewModel();
-        vm.AddProductToCart(new Product { ProductCode = "T001", Description = "Test", Price = 10000, CostPrice = 5000, Qty = 10 }, 1);
+        vm.AddProductToCart(new Product { ProductCode = "T001", Description = "Test", Price = 10000m, CostPrice = 5000m, Qty = 10 }, 1);
 
         vm.DiscountPercentageString = "10";
-        Assert.Equal(10, vm.DiscountPercentage);
-        Assert.Equal(9000, vm.TotalAmount);
+        Assert.Equal(10m, vm.DiscountPercentage);
+        Assert.Equal(9000m, vm.TotalAmount);
 
         vm.DiscountPercentageString = "";
-        Assert.Equal(0, vm.DiscountPercentage);
-        Assert.Equal(10000, vm.TotalAmount);
+        Assert.Equal(0m, vm.DiscountPercentage);
+        Assert.Equal(10000m, vm.TotalAmount);
     }
 
     [Fact]
@@ -47,13 +44,26 @@ public class POSViewModelTests
     {
         DatabaseInitializer.Initialize();
         var vm = new POSViewModel();
-        vm.AddProductToCart(new Product { ProductCode = "T002", Description = "Item", Price = 105, CostPrice = 50, Qty = 10 }, 1);
-        vm.DiscountPercentageString = "15"; // 105 * 0.85 = 89.25
+        vm.AddProductToCart(new Product { ProductCode = "T002", Description = "Item", Price = 105m, CostPrice = 50m, Qty = 10 }, 1);
+        vm.DiscountPercentageString = "15";
 
         vm.ExactAmountCommand.Execute(null);
 
-        Assert.True(vm.ChangeAmount >= 0);
+        Assert.True(vm.ChangeAmount >= 0m);
         Assert.True(vm.ConfirmCashPaymentCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void AddProductToCart_CapsAtAvailableStock_PreventingOversell()
+    {
+        DatabaseInitializer.Initialize();
+        var vm = new POSViewModel();
+        var scarce = new Product { ProductCode = "T_LOW", Description = "Scarce Item", Price = 5000m, CostPrice = 2000m, Qty = 3 };
+
+        vm.AddProductToCart(scarce, 10);
+
+        Assert.Single(vm.Cart);
+        Assert.Equal(3, vm.Cart[0].Qty);
     }
 
     [Fact]
@@ -62,16 +72,16 @@ public class POSViewModelTests
         DatabaseInitializer.Initialize();
         var vm = new POSViewModel();
 
-        vm.AddProductToCart(new Product { ProductCode = "T001", Description = "Test Item", Price = 10000, CostPrice = 5000, Qty = 10 }, 1);
-        Assert.Equal(10000, vm.SubTotalAmount);
-        Assert.Equal(10000, vm.TotalAmount);
+        vm.AddProductToCart(new Product { ProductCode = "T001", Description = "Test Item", Price = 10000m, CostPrice = 5000m, Qty = 10 }, 1);
+        Assert.Equal(10000m, vm.SubTotalAmount);
+        Assert.Equal(10000m, vm.TotalAmount);
 
         vm.ReceivedAmountString = "5000";
-        Assert.Equal(-5000, vm.ChangeAmount);
+        Assert.Equal(-5000m, vm.ChangeAmount);
         Assert.False(vm.ConfirmCashPaymentCommand.CanExecute(null));
 
         vm.ReceivedAmountString = "15000";
-        Assert.Equal(5000, vm.ChangeAmount);
+        Assert.Equal(5000m, vm.ChangeAmount);
         Assert.True(vm.ConfirmCashPaymentCommand.CanExecute(null));
     }
 
@@ -80,10 +90,10 @@ public class POSViewModelTests
     {
         DatabaseInitializer.Initialize();
         var vm = new POSViewModel();
-        vm.AddProductToCart(new Product { ProductCode = "T003", Description = "Free", Price = 1000, CostPrice = 500, Qty = 10 }, 1);
+        vm.AddProductToCart(new Product { ProductCode = "T003", Description = "Free", Price = 1000m, CostPrice = 500m, Qty = 10 }, 1);
         vm.DiscountPercentageString = "100";
 
-        Assert.Equal(0, vm.TotalAmount);
+        Assert.Equal(0m, vm.TotalAmount);
         Assert.False(vm.CheckoutCommand.CanExecute(null));
     }
 }
